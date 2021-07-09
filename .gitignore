@@ -1,0 +1,11 @@
+# directories
+venv/
+__pycache__/
+.pytest_cache/
+build/
+dist/
+itrading.egg-info/
+tmp/
+
+# files
+.env
