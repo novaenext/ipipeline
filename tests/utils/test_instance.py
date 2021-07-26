@@ -5,13 +5,13 @@ from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
 
 
 class TestInstanceIdentifier(TestCase):
-    def test_valid_instance(self) -> None:
+    def test_init_valid_args(self) -> None:
         identifier = InstanceIdentifier('i1', tags=['t1', 't2'])
 
         self.assertEqual(identifier.id, 'i1')
         self.assertListEqual(identifier.tags, ['t1', 't2'])
 
-    def test_invalid_instance(self) -> None:
+    def test_init_invalid_args(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
             r'id_ does not match the pattern \(only letters, digits, '
@@ -67,6 +67,12 @@ class MockClass2:
 
 class MockClass3:
     def __init__(self) -> None:
+        self._param1 = 1
+        self._param2 = '2'
+
+
+class MockClass4:
+    def __init__(self) -> None:
         pass
 
 
@@ -84,7 +90,12 @@ class TestCreateInstanceRepr(TestCase):
 
         self.assertEqual(instance_repr, 'MockClass2(param1=None, param2=None)')
 
-    def test_instance_without_params_without_attrs(self) -> None:
+    def test_instance_without_params_with_attrs(self) -> None:
         instance_repr = create_instance_repr(MockClass3())
 
         self.assertEqual(instance_repr, 'MockClass3()')
+
+    def test_instance_without_params_without_attrs(self) -> None:
+        instance_repr = create_instance_repr(MockClass4())
+
+        self.assertEqual(instance_repr, 'MockClass4()')
