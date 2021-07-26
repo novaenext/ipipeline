@@ -7,10 +7,6 @@ class BaseError(Exception):
         return f'{self._descr}: {self._detail}'
 
 
-class NodeError(BaseError):
-    pass
-
-
 class PipelineError(BaseError):
     pass
 
