@@ -135,6 +135,28 @@ class TestPipeline(TestCase):
         ):
             pipeline.add_conn('c1', 'n1', 'n3')
 
+    def test_add_conn_missing_src_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline._nodes = {'n1': None, 'n2': None, 'n3': None, 'n4': None}
+        pipeline._graph = {'n1': [], 'n2': [], 'n3': [], 'n4': []}
+
+        with self.assertRaisesRegex(
+            PipelineError, 
+            'inexistent node_id found: conn_id == c1 and node_id == n7'
+        ):
+            pipeline.add_conn('c1', 'n7', 'n1')
+
+    def test_add_conn_missing_dst_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline._nodes = {'n1': None, 'n2': None, 'n3': None, 'n4': None}
+        pipeline._graph = {'n1': [], 'n2': [], 'n3': [], 'n4': []}
+
+        with self.assertRaisesRegex(
+            PipelineError, 
+            'inexistent node_id found: conn_id == c1 and node_id == n7'
+        ):
+            pipeline.add_conn('c1', 'n1', 'n7')
+
     def test_check_existent_conn_id_existent(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._conns = {'c1': None}
