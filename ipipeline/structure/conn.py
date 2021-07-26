@@ -6,11 +6,11 @@ from ..utils.instance import InstanceIdentifier, create_instance_repr
 
 class BaseConn(ABC, InstanceIdentifier):
     def __init__(
-        self,
+        self, 
         id_: str, 
-        src_id: str,
-        dst_id: str,
-        weight: int = 0,
+        src_id: str, 
+        dst_id: str, 
+        weight: int = 0, 
         tags: List[str] = []
     ) -> None:
         self._src_id = src_id

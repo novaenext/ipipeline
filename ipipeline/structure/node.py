@@ -6,12 +6,12 @@ from ..utils.instance import InstanceIdentifier, create_instance_repr
 
 class BaseNode(ABC, InstanceIdentifier):
     def __init__(
-        self,
-        id_: str,
-        func: Callable,
-        inputs: Dict[str, Any] = {},
-        outputs: List[str] = [],
-        props: List[str] = [],
+        self, 
+        id_: str, 
+        func: Callable, 
+        inputs: Dict[str, Any] = {}, 
+        outputs: List[str] = [], 
+        props: List[str] = [], 
         tags: List[str] = []
     ) -> None:
         self._func = func
