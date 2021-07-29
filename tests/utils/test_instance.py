@@ -17,7 +17,7 @@ class TestInstanceIdentifier(TestCase):
             r'id_ does not match the pattern \(only letters, digits, '
             r'underscore and/or dash\): id_ == i1,'
         ):
-            _ = InstanceIdentifier('i1,', tags=['t1', 't2'])
+            _ = InstanceIdentifier('i1,')
 
     def test_check_id_valid_pattern(self) -> None:
         identifier = InstanceIdentifier('i1')
