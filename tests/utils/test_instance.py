@@ -19,13 +19,13 @@ class TestInstanceIdentifier(TestCase):
         ):
             _ = InstanceIdentifier('i1,')
 
-    def test_check_id_valid_pattern(self) -> None:
+    def test_check_id_valid(self) -> None:
         identifier = InstanceIdentifier('i1')
         id_ = identifier._check_id('i1')
 
         self.assertEqual(id_, 'i1')
 
-    def test_check_id_invalid_pattern(self) -> None:
+    def test_check_id_invalid(self) -> None:
         identifier = InstanceIdentifier('i1')
 
         with self.assertRaisesRegex(
@@ -34,16 +34,6 @@ class TestInstanceIdentifier(TestCase):
             r'underscore and/or dash\): id_ == i1\.'
         ):
             _ = identifier._check_id('i1.')
-
-    def test_check_id_empty_pattern(self) -> None:
-        identifier = InstanceIdentifier('i1')
-
-        with self.assertRaisesRegex(
-            InstanceError, 
-            r'id_ does not match the pattern \(only letters, digits, '
-            r'underscore and/or dash\): id_ == '
-        ):
-            _ = identifier._check_id('')
 
 
 class MockClass1:
