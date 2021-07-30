@@ -3,6 +3,30 @@ from typing import Dict, List
 from ..exceptions import SortingError
 
 
+def sort_dag_topo(graph: Dict[str, list]) -> List[list]:
+    topo_order = []
+    ind_nodes_qty = 0
+    in_conns_qty = _create_in_conns_qty(graph)
+    ind_node_ids = _create_ind_node_ids(in_conns_qty)
+
+    while ind_node_ids:
+        next_node_ids = []
+        topo_order.append(ind_node_ids)
+
+        for src_node_id in ind_node_ids:
+            for dst_node_id in graph[src_node_id]:
+                in_conns_qty[dst_node_id] -= 1
+
+                if in_conns_qty[dst_node_id] == 0:
+                    next_node_ids.append(dst_node_id)
+
+            ind_nodes_qty += 1
+        ind_node_ids = next_node_ids
+    _check_diff_nodes_qty(len(graph), ind_nodes_qty)
+
+    return topo_order
+
+
 def _create_in_conns_qty(graph: Dict[str, list]) -> Dict[str, int]:
     in_conns_qty = dict.fromkeys(graph, 0)
 
@@ -29,8 +53,8 @@ def _create_ind_node_ids(in_conns_qty: Dict[str, int]) -> List[str]:
     return ind_node_ids
 
 
-def _check_diff_nodes_qty(exp_nodes_qty: int, curr_nodes_qty: int) -> None:
-    if exp_nodes_qty != curr_nodes_qty:
+def _check_diff_nodes_qty(exp_nodes_qty: int, ind_nodes_qty: int) -> None:
+    if exp_nodes_qty != ind_nodes_qty:
         raise SortingError(
-            'circular dependency found', f'curr_nodes_qty == {curr_nodes_qty}'
+            'circular dependency found', f'ind_nodes_qty == {ind_nodes_qty}'
         )
