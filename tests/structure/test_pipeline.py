@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.exceptions import InstanceError, PipelineError
+from ipipeline.exceptions import PipelineError, InstanceError
 from ipipeline.structure.pipeline import BasePipeline, Pipeline
 
 
@@ -39,12 +39,12 @@ class TestBasePipeline(TestCase):
         )
 
 
-def mock_sum(num1: int, num2: int) -> int:
-    return num1 + num2
+def mock_sum(param1: int, param2: int) -> int:
+    return param1 + param2
 
 
-def mock_sub(num1: int, num2: int) -> int:
-    return num1 - num2
+def mock_sub(param1: int, param2: int) -> int:
+    return param1 - param2
 
 
 class TestPipeline(TestCase):
@@ -57,13 +57,13 @@ class TestPipeline(TestCase):
         
         self.assertIsInstance(pipeline, BasePipeline)
 
-    def test_add_node_unique_ids(self) -> None:
+    def test_add_node_inexistent_ids(self) -> None:
         pipeline = Pipeline('p1')
         pipeline.add_node(
-            'n1', mock_sum, inputs={'num1': 7, 'num2': 3}, outputs=['sum']
+            'n1', mock_sum, inputs={'param1': 7, 'param2': 3}, outputs=['sum']
         )
         pipeline.add_node(
-            'n2', mock_sub, inputs={'num1': 7, 'num2': 3}, outputs=['sub']
+            'n2', mock_sub, inputs={'param1': 7, 'param2': 3}, outputs=['sub']
         )
 
         self.assertListEqual(
@@ -79,17 +79,20 @@ class TestPipeline(TestCase):
             list(pipeline.graph.values()), [[], []]
         )
 
-    def test_add_node_duplicate_ids(self) -> None:
+    def test_add_node_existent_ids(self) -> None:
         pipeline = Pipeline('p1')
         pipeline.add_node(
-            'n1', mock_sum, inputs={'num1': 7, 'num2': 3}, outputs=['sum']
+            'n1', mock_sum, inputs={'param1': 7, 'param2': 3}, outputs=['sum']
         )
 
         with self.assertRaisesRegex(
             PipelineError, r'existent node_id found: node_id == n1'
         ):
             pipeline.add_node(
-                'n1', mock_sub, inputs={'num1': 7, 'num2': 3}, outputs=['sub']
+                'n1', 
+                mock_sub, 
+                inputs={'param1': 7, 'param2': 3}, 
+                outputs=['sub']
             )
 
     def test_check_existent_node_id_existent(self) -> None:
@@ -107,7 +110,7 @@ class TestPipeline(TestCase):
 
         self.assertTrue(True)
 
-    def test_add_conn_unique_ids(self) -> None:
+    def test_add_conn_inexistent_ids(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = self._nodes
         pipeline._graph = self._graph
@@ -128,7 +131,7 @@ class TestPipeline(TestCase):
             list(pipeline.graph.values()), [['n2', 'n3'], ['n4'], [], []]
         )
 
-    def test_add_conn_duplicate_ids(self) -> None:
+    def test_add_conn_existent_ids(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = self._nodes
         pipeline._graph = self._graph
