@@ -50,7 +50,7 @@ func(
 
 ```python
 # line length <= 79
-class Class:    
+class Class:
     def method(self, param1, param2=[1, 2]):
         pass
 
@@ -162,7 +162,7 @@ def func():
 def func():
     """Function 
     docstring.
-    """   
+    """
 ```
 
 Prefer short but meaningful names and if necessary, use an underscore as a separator. Use nouns and others (except verb) to define the name of variables, constants, classes, modules and packages and verb for functions and methods. The indentation must be equal to 4 spaces.
