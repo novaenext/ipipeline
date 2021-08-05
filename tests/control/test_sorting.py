@@ -29,7 +29,7 @@ class TestSortDagTopo(TestCase):
             [['n1', 'n2'], ['n4', 'n5'], ['n3', 'n7', 'n8'], ['n6', 'n9']]
         )
 
-    def test_dcg_with_linear_top(self) -> None:
+    def test_dcg_with_linear_topo(self) -> None:
         with self.assertRaisesRegex(
             SortingError, r'circular dependency found: ind_nodes_qty == 0'
         ):
@@ -37,7 +37,7 @@ class TestSortDagTopo(TestCase):
                 {'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n1']}
             )
 
-    def test_dcg_with_nonlinear_top(self) -> None:
+    def test_dcg_with_nonlinear_topo(self) -> None:
         with self.assertRaisesRegex(
             SortingError, r'circular dependency found: ind_nodes_qty == 3'
         ):
