@@ -10,7 +10,7 @@ class TestConfigLogJson(TestCase):
     def setUp(self) -> None:
         self._path = Path(__file__).parents[0] / 'data'
 
-    def test_valid_config_with_file_handler(self) -> None:
+    def test_config_with_file_handler(self) -> None:
         config_log_json(
             str(self._path), 
             'logging_with_file_handler.json',
@@ -23,13 +23,13 @@ class TestConfigLogJson(TestCase):
         self.assertTrue(log_path.exists())
         log_path.unlink()
 
-    def test_valid_config_with_stream_handler(self) -> None:
+    def test_config_with_stream_handler(self) -> None:
         config_log_json(str(self._path), 'logging_with_stream_handler.json')
         logging.info('test_valid_config_with_stream_handler')
 
         self.assertTrue(True)
 
-    def test_invalid_config_without_version(self) -> None:
+    def test_config_without_version(self) -> None:
         with self.assertRaisesRegex(
             RecordError, 
             r'logging not configured: config_name == '
