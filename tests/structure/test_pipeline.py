@@ -1,4 +1,5 @@
 from unittest import TestCase
+from unittest.mock import Mock
 
 from ipipeline.exceptions import PipelineError, InstanceError
 from ipipeline.structure.pipeline import BasePipeline, Pipeline
@@ -49,8 +50,19 @@ def mock_sub(param1: int, param2: int) -> int:
 
 class TestPipeline(TestCase):
     def setUp(self) -> None:
-        self._nodes = {'n1': None, 'n2': None, 'n3': None, 'n4': None}
-        self._graph = {'n1': [], 'n2': [], 'n3': [], 'n4': []}
+        self._mock_nodes = {}
+        self._mock_graph = {}
+
+        for node_id in ['n1', 'n2', 'n3', 'n4']:
+            self._mock_nodes[node_id] = Mock(
+                spec=['id', 'func', 'inputs', 'outputs', 'props', 'tags']
+            )
+            self._mock_graph[node_id] = []
+
+        self._mock_node = self._mock_nodes['n1']
+        self._mock_conn = Mock(
+            spec=['id', 'src_id', 'dst_id', 'weight', 'tags']
+        )
 
     def test_new_valid_args(self) -> None:
         pipeline = Pipeline('p1')
@@ -97,7 +109,7 @@ class TestPipeline(TestCase):
 
     def test_check_existent_node_id_existent(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._nodes = {'n1': None}
+        pipeline._nodes = {'n1': self._mock_node}
 
         with self.assertRaisesRegex(
             PipelineError, r'existent node_id found: node_id == n1'
@@ -112,8 +124,8 @@ class TestPipeline(TestCase):
 
     def test_add_conn_inexistent_ids(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
+        pipeline._nodes = self._mock_nodes
+        pipeline._graph = self._mock_graph
         pipeline.add_conn('c1', 'n1', 'n2')
         pipeline.add_conn('c2', 'n1', 'n3')
         pipeline.add_conn('c3', 'n2', 'n4')
@@ -133,8 +145,8 @@ class TestPipeline(TestCase):
 
     def test_add_conn_existent_ids(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
+        pipeline._nodes = self._mock_nodes
+        pipeline._graph = self._mock_graph
         pipeline.add_conn('c1', 'n1', 'n2')
 
         with self.assertRaisesRegex(
@@ -144,8 +156,8 @@ class TestPipeline(TestCase):
 
     def test_add_conn_missing_src_id(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
+        pipeline._nodes = self._mock_nodes
+        pipeline._graph = self._mock_graph
 
         with self.assertRaisesRegex(
             PipelineError, 
@@ -155,8 +167,8 @@ class TestPipeline(TestCase):
 
     def test_add_conn_missing_dst_id(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
+        pipeline._nodes = self._mock_nodes
+        pipeline._graph = self._mock_graph
 
         with self.assertRaisesRegex(
             PipelineError, 
@@ -166,7 +178,7 @@ class TestPipeline(TestCase):
 
     def test_check_existent_conn_id_existent(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._conns = {'c1': None}
+        pipeline._conns = {'c1': self._mock_conn}
 
         with self.assertRaisesRegex(
             PipelineError, r'existent conn_id found: conn_id == c1'
@@ -181,7 +193,7 @@ class TestPipeline(TestCase):
 
     def test_check_inexistent_node_id_inexistent(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._conns = {'c1': None}
+        pipeline._conns = {'c1': self._mock_conn}
 
         with self.assertRaisesRegex(
             PipelineError, 
@@ -191,8 +203,8 @@ class TestPipeline(TestCase):
 
     def test_check_inexistent_node_id_existent(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline._nodes = {'n1': None}
-        pipeline._conns = {'c1': None}
+        pipeline._nodes = {'n1': self._mock_node}
+        pipeline._conns = {'c1': self._mock_conn}
         pipeline._check_inexistent_node_id('c1', 'n1')
 
         self.assertTrue(True)
