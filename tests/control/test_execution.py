@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import Mock
 
 from ipipeline.exceptions import ExecutionError, InstanceError
 from ipipeline.control.execution import BaseExecutor, SequentialExecutor
@@ -45,20 +45,25 @@ def mock_print(param3: int) -> None:
 
 class TestSequentialExecutor(TestCase):
     def setUp(self) -> None:
-        self._nodes = {'n1': MagicMock(), 'n2': MagicMock()}
+        mock_nodes = {}
 
-        for id, func, inputs, outputs in  [
+        for node_id, func, inputs, outputs in [
             ['n1', mock_mul, {'param1': 7, 'param2': 2}, ['param3']],
             ['n2', mock_print, {'n1': ['param3']}, []]
         ]:
-            self._nodes[id].id = id
-            self._nodes[id].func = func
-            self._nodes[id].inputs = inputs
-            self._nodes[id].outputs = outputs
+            mock_nodes[node_id] = Mock(
+                spec=['id', 'func', 'inputs', 'outputs', 'props', 'tags']
+            )
+            mock_nodes[node_id].id = node_id
+            mock_nodes[node_id].func = func
+            mock_nodes[node_id].inputs = inputs
+            mock_nodes[node_id].outputs = outputs
 
-        self._pipeline = MagicMock()
-        self._pipeline.id = 'p1'
-        self._pipeline.nodes = self._nodes
+        self._mock_pipeline = Mock(
+            spec=['id', 'nodes', 'conns', 'graph', 'tags']
+        )
+        self._mock_pipeline.id = 'p1'
+        self._mock_pipeline.nodes = mock_nodes
 
     def test_new_valid_args(self) -> None:
         executor = SequentialExecutor('e1')
@@ -67,7 +72,7 @@ class TestSequentialExecutor(TestCase):
 
     def test_execute_pipeline_valid_topo_order(self) -> None:
         executor = SequentialExecutor('e1')
-        items = executor.execute_pipeline(self._pipeline, ['n1', 'n2'])
+        items = executor.execute_pipeline(self._mock_pipeline, ['n1', 'n2'])
 
         self.assertDictEqual(items, {'n1': {'param3': 14}})
 
@@ -77,11 +82,11 @@ class TestSequentialExecutor(TestCase):
         with self.assertRaisesRegex(
             ExecutionError, r'node_func not executed: node_id == n2'
         ):
-            _ = executor.execute_pipeline(self._pipeline, ['n2', 'n1'])
+            _ = executor.execute_pipeline(self._mock_pipeline, ['n2', 'n1'])
 
     def test_execute_pipeline_empty_topo_order(self) -> None:
         executor = SequentialExecutor('e1')
-        items = executor.execute_pipeline(self._pipeline, [])
+        items = executor.execute_pipeline(self._mock_pipeline, [])
 
         self.assertDictEqual(items, {})
 
