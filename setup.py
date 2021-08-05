@@ -27,7 +27,7 @@ setup(
         'Programming Language :: Python :: 3', 
         'Topic :: Scientific/Engineering'
     ], 
-    packages=find_packages(exclude=('tests',)), 
+    packages=find_packages(exclude=('tests*',)), 
     install_requires=requirements, 
     long_description=readme, 
     long_description_content_type='text/markdown'
