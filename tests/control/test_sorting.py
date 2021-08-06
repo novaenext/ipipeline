@@ -1,12 +1,12 @@
 from unittest import TestCase
 
-from ipipeline.exceptions import SortingError
 from ipipeline.control.sorting import (
     sort_dag_topo, 
     _create_in_conns_qty, 
     _create_ind_node_ids, 
     _check_diff_nodes_qty
 )
+from ipipeline.exceptions import SortingError
 
 
 class TestSortDagTopo(TestCase):
