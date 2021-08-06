@@ -2,10 +2,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
 
-from .catalog import Catalog
-from ..exceptions import ExecutionError
-from ..structure.pipeline import BasePipeline
-from ..utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.control.catalog import Catalog
+from ipipeline.exceptions import ExecutionError
+from ipipeline.structure.pipeline import BasePipeline
+from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
 
 
 logger = logging.getLogger(name=__name__)

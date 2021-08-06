@@ -1,7 +1,7 @@
 from itertools import chain
 from typing import List
 
-from ..exceptions import SequenceError
+from ipipeline.exceptions import SequenceError
 
 
 def flatten_nested_list(nested_list: List[list]) -> list:

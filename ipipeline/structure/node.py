@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Any, Callable, Dict, List
 
-from ..utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
 
 
 class BaseNode(ABC, InstanceIdentifier):

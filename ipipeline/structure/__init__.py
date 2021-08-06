@@ -1,1 +1,1 @@
-from .pipeline import Pipeline
+from ipipeline.structure.pipeline import Pipeline
