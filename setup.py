@@ -13,7 +13,9 @@ with open(Path(__file__).parents[0] / 'requirements.txt') as requirements_file:
 setup(
     name='ipipeline', 
     version=__version__, 
-    description='a micro framework to build pipelines of different scopes', 
+    description=(
+        'a micro framework to build and execute pipelines of different scopes'
+    ), 
     url='https://github.com/novaenext/ipipeline', 
     author='novaenext', 
     author_email='contato@novaenext.com', 
