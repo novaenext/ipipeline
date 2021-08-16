@@ -31,8 +31,6 @@ class SequentialExecutor(BaseExecutor):
     def execute_pipeline(
         self, pipeline: BasePipeline, topo_order: List[str]
     ) -> Dict[str, dict]:
-        logger.info(f'executing pipeline: pipeline.id == {pipeline.id}')
-
         for node_id in topo_order:
             node = pipeline.nodes[node_id]
             logger.info(f'executing node: node.id == {node.id}')
