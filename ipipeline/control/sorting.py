@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from ..exceptions import SortingError
+from ipipeline.exceptions import SortingError
 
 
 def sort_dag_topo(graph: Dict[str, list]) -> List[list]:

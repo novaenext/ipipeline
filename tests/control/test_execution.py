@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from ipipeline.exceptions import ExecutionError, InstanceError
 from ipipeline.control.execution import BaseExecutor, SequentialExecutor
+from ipipeline.exceptions import ExecutionError, InstanceError
 
 
 class MockBaseExecutor(BaseExecutor):

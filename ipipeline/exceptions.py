@@ -27,13 +27,5 @@ class InstanceError(BaseError):
     pass
 
 
-class RecordError(BaseError):
-    pass
-
-
 class SequenceError(BaseError):
-    pass
-
-
-class SystemError(BaseError):
     pass

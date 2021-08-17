@@ -2,10 +2,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
 
-from .catalog import Catalog
-from ..exceptions import ExecutionError
-from ..structure.pipeline import BasePipeline
-from ..utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.control.catalog import Catalog
+from ipipeline.exceptions import ExecutionError
+from ipipeline.structure.pipeline import BasePipeline
+from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
 
 
 logger = logging.getLogger(name=__name__)
@@ -31,8 +31,6 @@ class SequentialExecutor(BaseExecutor):
     def execute_pipeline(
         self, pipeline: BasePipeline, topo_order: List[str]
     ) -> Dict[str, dict]:
-        logger.info(f'executing pipeline: pipeline.id == {pipeline.id}')
-
         for node_id in topo_order:
             node = pipeline.nodes[node_id]
             logger.info(f'executing node: node.id == {node.id}')

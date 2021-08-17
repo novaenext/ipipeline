@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
 
-from .node import BaseNode, Node
-from .conn import BaseConn, Conn
-from ..exceptions import PipelineError
-from ..utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.exceptions import PipelineError
+from ipipeline.structure.node import BaseNode, Node
+from ipipeline.structure.conn import BaseConn, Conn
+from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
 
 
 class BasePipeline(ABC, InstanceIdentifier):
