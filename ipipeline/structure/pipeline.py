@@ -34,18 +34,17 @@ class BasePipeline(ABC, InstanceIdentifier):
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
-        props: Dict[str, Any] = {}, 
         tags: List[str] = []
     ) -> None:
         pass
 
     @abstractmethod
     def add_conn(
-        self,
+        self, 
         id_: str, 
-        src_id: str,
-        dst_id: str,
-        weight: int = 0,
+        src_id: str, 
+        dst_id: str, 
+        value: Any = None, 
         tags: List[str] = []
     ) -> None:
         pass
@@ -58,11 +57,10 @@ class Pipeline(BasePipeline):
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
-        props: Dict[str, Any] = {}, 
         tags: List[str] = []
     ) -> None:
         self._check_existent_node_id(id_)
-        node = Node(id_, func, inputs, outputs, props, tags)
+        node = Node(id_, func, inputs, outputs, tags)
 
         self._nodes[node.id] = node
         self._graph[node.id] = []
@@ -78,13 +76,13 @@ class Pipeline(BasePipeline):
         id_: str, 
         src_id: str, 
         dst_id: str, 
-        weight: int = 0, 
+        value: Any = None, 
         tags: List[str] = []
     ) -> None:
         self._check_existent_conn_id(id_)
         self._check_inexistent_node_id(id_, src_id)
         self._check_inexistent_node_id(id_, dst_id)
-        conn = Conn(id_, src_id, dst_id, weight, tags)
+        conn = Conn(id_, src_id, dst_id, value, tags)
 
         self._conns[conn.id] = conn
         self._graph[conn.src_id].append(conn.dst_id)
