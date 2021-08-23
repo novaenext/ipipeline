@@ -7,7 +7,7 @@ from ipipeline.exceptions import InstanceError
 
 class InstanceIdentifier:
     def __init__(self, id_: str, tags: List[str] = []) -> None:
-        self._id = self._check_id(id_)
+        self._id = self._check_id_pattern(id_)
         self._tags = tags
 
     @property
@@ -18,7 +18,7 @@ class InstanceIdentifier:
     def tags(self) -> List[str]:
         return self._tags
 
-    def _check_id(self, id_: str) -> str:
+    def _check_id_pattern(self, id_: str) -> str:
         if re.fullmatch(r'[\w-]+', id_):
             return id_
         else:
@@ -27,6 +27,9 @@ class InstanceIdentifier:
                 '(letters, digits, underscore and/or dash)',
                 f'id_ == {id_}'
             )
+
+    def __repr__(self) -> str:
+        return create_instance_repr(self)
 
 
 def create_instance_repr(instance: object) -> str:
