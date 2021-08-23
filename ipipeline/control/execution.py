@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List
 from ipipeline.control.building import Builder
 from ipipeline.control.catalog import Catalog
 from ipipeline.exceptions import ExecutionError
+from ipipeline.structure.node import BaseNode
 from ipipeline.structure.pipeline import BasePipeline
 from ipipeline.utils.instance import InstanceIdentifier
 
@@ -14,6 +15,12 @@ logger = logging.getLogger(name=__name__)
 
 class BaseExecutor(ABC, InstanceIdentifier):
     @abstractmethod
+    def flag_nodes(
+        self, pipeline: BasePipeline, node_ids: List[str], flag: str
+    ) -> None:
+        pass
+
+    @abstractmethod
     def execute_pipeline(
         self, pipeline: BasePipeline, topo_order: List[Any]
     ) -> Any:
@@ -22,6 +29,7 @@ class BaseExecutor(ABC, InstanceIdentifier):
 
 class SequentialExecutor(BaseExecutor):
     def __init__(self, id_: str, tags: List[str] = []) -> None:
+        self._flagged_nodes = {}
         self._builder = Builder()
         self._catalog = Catalog()
 
@@ -30,6 +38,35 @@ class SequentialExecutor(BaseExecutor):
     @property
     def catalog(self) -> Catalog:
         return self._catalog
+
+    def flag_nodes(
+        self, pipeline: BasePipeline, node_ids: List[str], flag: str
+    ) -> None:
+        self._check_invalid_flag(flag)
+
+        for node_id in node_ids:
+            self._check_inexistent_node_id(pipeline.nodes, node_id)
+
+            if node_id not in self._flagged_nodes:
+                self._flagged_nodes[node_id] = {}
+
+            self._flagged_nodes[node_id][flag] = True
+
+    def _check_invalid_flag(self, flag: str) -> None:
+        valid_flags = ['skip']
+
+        if flag not in valid_flags:
+            raise ExecutionError(
+                'flag not found in the valid_flags', f'flag == {flag}'
+            )
+
+    def _check_inexistent_node_id(
+        self, nodes: Dict[str, BaseNode], node_id: str
+    ) -> None:
+        if node_id not in nodes:
+            raise ExecutionError(
+                'node_id not found in the nodes', f'node_id == {node_id}'
+            )
 
     def execute_pipeline(
         self, pipeline: BasePipeline, topo_order: List[str]
