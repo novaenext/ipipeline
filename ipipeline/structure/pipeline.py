@@ -34,7 +34,7 @@ class BasePipeline(ABC, InstanceIdentifier):
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
-        props: List[str] = [], 
+        props: Dict[str, Any] = {}, 
         tags: List[str] = []
     ) -> None:
         pass
@@ -61,7 +61,7 @@ class Pipeline(BasePipeline):
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
-        props: List[str] = [], 
+        props: Dict[str, Any] = {}, 
         tags: List[str] = []
     ) -> None:
         self._check_existent_node_id(id_)
