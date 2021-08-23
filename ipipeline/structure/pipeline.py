@@ -73,7 +73,7 @@ class Pipeline(BasePipeline):
     def _check_existent_node_id(self, node_id: str) -> None:
         if node_id in self._nodes:
             raise PipelineError(
-                'existent node_id found', f'node_id == {node_id}'
+                'node_id found in the _nodes', f'node_id == {node_id}'
             )
 
     def add_conn(
@@ -95,12 +95,12 @@ class Pipeline(BasePipeline):
     def _check_existent_conn_id(self, conn_id: str) -> None:
         if conn_id in self._conns:
             raise PipelineError(
-                'existent conn_id found', f'conn_id == {conn_id}'
+                'conn_id found in the _conns', f'conn_id == {conn_id}'
             )
 
     def _check_inexistent_node_id(self, conn_id: str, node_id: str) -> None:
         if node_id not in self._nodes:
             raise PipelineError(
-                'inexistent node_id found',
+                'node_id not found in the _nodes',
                 f'conn_id == {conn_id} and node_id == {node_id}'
             )
