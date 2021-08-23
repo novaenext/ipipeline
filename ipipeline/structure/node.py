@@ -11,7 +11,7 @@ class BaseNode(ABC, InstanceIdentifier):
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
-        props: List[str] = [], 
+        props: Dict[str, Any] = {}, 
         tags: List[str] = []
     ) -> None:
         self._func = func
@@ -34,7 +34,7 @@ class BaseNode(ABC, InstanceIdentifier):
         return self._outputs
 
     @property
-    def props(self) -> List[str]:
+    def props(self) -> Dict[str, Any]:
         return self._props
 
     def __repr__(self) -> str:
