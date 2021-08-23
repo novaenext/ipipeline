@@ -56,5 +56,7 @@ def _create_ind_node_ids(in_conns_qty: Dict[str, int]) -> List[str]:
 def _check_diff_nodes_qty(exp_nodes_qty: int, ind_nodes_qty: int) -> None:
     if exp_nodes_qty != ind_nodes_qty:
         raise SortingError(
-            'circular dependency found', f'ind_nodes_qty == {ind_nodes_qty}'
+            'circular dependency found', 
+            f'exp_nodes_qty == {exp_nodes_qty} '
+            f'and ind_nodes_qty == {ind_nodes_qty}'
         )
