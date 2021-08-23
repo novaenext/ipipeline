@@ -9,15 +9,11 @@ class BaseCatalog(ABC):
         self._items = {}
 
     @property
-    def items(self) -> Dict[str, dict]:
+    def items(self) -> Dict[str, Any]:
         return self._items
 
     @abstractmethod
-    def add_item(self, id_: str, item: Dict[str, Any]) -> None:
-        pass
-
-    @abstractmethod
-    def update_item(self, id_: str, item: Dict[str, Any]) -> None:
+    def add_item(self, id_: str, item: Any) -> None:
         pass
 
     @abstractmethod
@@ -25,7 +21,7 @@ class BaseCatalog(ABC):
         pass
    
     @abstractmethod
-    def obtain_item(self, id_: str) -> Dict[str, Any]:
+    def obtain_item(self, id_: str) -> Any:
         pass
 
     @abstractmethod
@@ -34,19 +30,13 @@ class BaseCatalog(ABC):
 
 
 class Catalog(BaseCatalog):
-    def add_item(self, id_: str, item: Dict[str, Any]) -> None:
+    def add_item(self, id_: str, item: Any) -> None:
         self._items[id_] = item
-
-    def update_item(self, id_: str, item: Dict[str, Any]) -> None:
-        try:
-            self._items[id_].update(item)
-        except KeyError as error:
-            raise CatalogError('id_ not found', f'id_ == {id_}') from error
 
     def check_item(self, id_: str) -> bool:
         return id_ in self._items
 
-    def obtain_item(self, id_: str) -> Dict[str, Any]:
+    def obtain_item(self, id_: str) -> Any:
         try:
             return self._items[id_]
         except KeyError as error:
