@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import List
 
-from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.utils.instance import InstanceIdentifier
 
 
 class BaseConn(ABC, InstanceIdentifier):
@@ -30,9 +30,6 @@ class BaseConn(ABC, InstanceIdentifier):
     @property
     def weight(self) -> int:
         return self._weight
-
-    def __repr__(self) -> str:
-        return create_instance_repr(self)
 
 
 class Conn(BaseConn):

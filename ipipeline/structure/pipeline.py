@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List
 from ipipeline.exceptions import PipelineError
 from ipipeline.structure.node import BaseNode, Node
 from ipipeline.structure.conn import BaseConn, Conn
-from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.utils.instance import InstanceIdentifier
 
 
 class BasePipeline(ABC, InstanceIdentifier):
@@ -49,9 +49,6 @@ class BasePipeline(ABC, InstanceIdentifier):
         tags: List[str] = []
     ) -> None:
         pass
-
-    def __repr__(self) -> str:
-        return create_instance_repr(self)
 
 
 class Pipeline(BasePipeline):

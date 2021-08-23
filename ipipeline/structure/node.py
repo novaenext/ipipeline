@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Any, Callable, Dict, List
 
-from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.utils.instance import InstanceIdentifier
 
 
 class BaseNode(ABC, InstanceIdentifier):
@@ -36,9 +36,6 @@ class BaseNode(ABC, InstanceIdentifier):
     @property
     def props(self) -> Dict[str, Any]:
         return self._props
-
-    def __repr__(self) -> str:
-        return create_instance_repr(self)
 
 
 class Node(BaseNode):
