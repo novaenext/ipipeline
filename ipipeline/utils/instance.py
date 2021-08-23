@@ -24,7 +24,7 @@ class InstanceIdentifier:
         else:
             raise InstanceError(
                 'id_ does not match the pattern '
-                '(only letters, digits, underscore and/or dash)',
+                '(letters, digits, underscore and/or dash)',
                 f'id_ == {id_}'
             )
 
