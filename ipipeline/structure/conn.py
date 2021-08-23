@@ -1,6 +1,5 @@
 from abc import ABC
-from typing import List
-
+from typing import Any, List
 from ipipeline.utils.instance import InstanceIdentifier
 
 
@@ -10,12 +9,12 @@ class BaseConn(ABC, InstanceIdentifier):
         id_: str, 
         src_id: str, 
         dst_id: str, 
-        weight: int = 0, 
+        value: Any = None, 
         tags: List[str] = []
     ) -> None:
         self._src_id = src_id
         self._dst_id = dst_id
-        self._weight = weight
+        self._value = value
 
         super().__init__(id_, tags)
 
@@ -28,8 +27,8 @@ class BaseConn(ABC, InstanceIdentifier):
         return self._dst_id
 
     @property
-    def weight(self) -> int:
-        return self._weight
+    def value(self) -> Any:
+        return self._value
 
 
 class Conn(BaseConn):
