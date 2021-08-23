@@ -47,8 +47,7 @@ class SequentialExecutor(BaseExecutor):
             )
 
             if func_outputs:
-                for out_key, out_value in func_outputs.items():
-                    self._catalog.add_item(out_key, out_value)
+                self._catalog_outputs(func_outputs)
 
         return self._catalog.items
 
@@ -61,3 +60,7 @@ class SequentialExecutor(BaseExecutor):
             raise ExecutionError(
                 'func not executed', f'id == {id_}'
             ) from error
+
+    def _catalog_outputs(self, outputs: Dict[str, Any]) -> None:
+        for out_key, out_value in outputs.items():
+            self._catalog.add_item(out_key, out_value)
