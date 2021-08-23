@@ -40,10 +40,14 @@ class Catalog(BaseCatalog):
         try:
             return self._items[id_]
         except KeyError as error:
-            raise CatalogError('id_ not found', f'id_ == {id_}') from error
+            raise CatalogError(
+                'id_ not found in the _items', f'id_ == {id_}'
+            ) from error
 
     def remove_item(self, id_: str) -> None:
         try:
             del self._items[id_]
         except KeyError as error:
-            raise CatalogError('id_ not found', f'id_ == {id_}') from error
+            raise CatalogError(
+                'id_ not found in the _items', f'id_ == {id_}'
+            ) from error
