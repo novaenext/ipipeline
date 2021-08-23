@@ -72,19 +72,20 @@ class SequentialExecutor(BaseExecutor):
         self, pipeline: BasePipeline, topo_order: List[str]
     ) -> Dict[str, Any]:
         for node_id in topo_order:
-            node = pipeline.nodes[node_id]
-            logger.info(f'node.id: {node.id}')
+            if not self._flagged_nodes.get(node_id, {}).get('skip', False):
+                node = pipeline.nodes[node_id]
+                logger.info(f'node.id: {node.id}')
 
-            func_inputs = self._builder.build_func_inputs(
-                node.inputs, self._catalog
-            )
-            results = self._execute_func(node.id, node.func, func_inputs)
-            func_outputs = self._builder.build_func_outputs(
-                node.outputs, results
-            )
+                func_inputs = self._builder.build_func_inputs(
+                    node.inputs, self._catalog
+                )
+                results = self._execute_func(node.id, node.func, func_inputs)
+                func_outputs = self._builder.build_func_outputs(
+                    node.outputs, results
+                )
 
-            if func_outputs:
-                self._catalog_outputs(func_outputs)
+                if func_outputs:
+                    self._catalog_outputs(func_outputs)
 
         return self._catalog.items
 
