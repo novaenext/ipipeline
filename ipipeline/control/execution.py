@@ -15,7 +15,7 @@ logger = logging.getLogger(name=__name__)
 
 class BaseExecutor(ABC, InstanceIdentifier):
     @abstractmethod
-    def flag_node(self, node_id: str, flag: str) -> None:
+    def flag_node(self, node_id: str, flag: str, status: bool) -> None:
         pass
 
     @abstractmethod
@@ -37,12 +37,12 @@ class SequentialExecutor(BaseExecutor):
     def catalog(self) -> Catalog:
         return self._catalog
 
-    def flag_node(self, node_id: str, flag: str) -> None:
+    def flag_node(self, node_id: str, flag: str, status: bool) -> None:
         self._check_invalid_flag(flag)
 
         if node_id not in self._flagged_nodes:
             self._flagged_nodes[node_id] = {}
-        self._flagged_nodes[node_id][flag] = True
+        self._flagged_nodes[node_id][flag] = status
 
     def _check_invalid_flag(self, flag: str) -> None:
         valid_flags = ['skip']
@@ -50,14 +50,6 @@ class SequentialExecutor(BaseExecutor):
         if flag not in valid_flags:
             raise ExecutionError(
                 'flag not found in the valid_flags', f'flag == {flag}'
-            )
-
-    def _check_inexistent_node_id(
-        self, nodes: Dict[str, BaseNode], node_id: str
-    ) -> None:
-        if node_id not in nodes:
-            raise ExecutionError(
-                'node_id not found in the nodes', f'node_id == {node_id}'
             )
 
     def execute_pipeline(
