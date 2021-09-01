@@ -15,9 +15,7 @@ logger = logging.getLogger(name=__name__)
 
 class BaseExecutor(ABC, InstanceIdentifier):
     @abstractmethod
-    def flag_node(
-        self, pipeline: BasePipeline, node_id: str, flag: str
-    ) -> None:
+    def flag_node(self, node_id: str, flag: str) -> None:
         pass
 
     @abstractmethod
@@ -39,10 +37,7 @@ class SequentialExecutor(BaseExecutor):
     def catalog(self) -> Catalog:
         return self._catalog
 
-    def flag_node(
-        self, pipeline: BasePipeline, node_id: str, flag: str
-    ) -> None:
-        self._check_inexistent_node_id(pipeline.nodes, node_id)
+    def flag_node(self, node_id: str, flag: str) -> None:
         self._check_invalid_flag(flag)
 
         if node_id not in self._flagged_nodes:
