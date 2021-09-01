@@ -15,15 +15,15 @@ logger = logging.getLogger(name=__name__)
 
 class BaseExecutor(ABC, InstanceIdentifier):
     @abstractmethod
-    def flag_nodes(
-        self, pipeline: BasePipeline, node_ids: List[str], flag: str
+    def flag_node(
+        self, pipeline: BasePipeline, node_id: str, flag: str
     ) -> None:
         pass
 
     @abstractmethod
     def execute_pipeline(
-        self, pipeline: BasePipeline, topo_order: List[Any]
-    ) -> Any:
+        self, pipeline: BasePipeline, topo_order: list
+    ) -> dict:
         pass
 
 
@@ -39,18 +39,15 @@ class SequentialExecutor(BaseExecutor):
     def catalog(self) -> Catalog:
         return self._catalog
 
-    def flag_nodes(
-        self, pipeline: BasePipeline, node_ids: List[str], flag: str
+    def flag_node(
+        self, pipeline: BasePipeline, node_id: str, flag: str
     ) -> None:
+        self._check_inexistent_node_id(pipeline.nodes, node_id)
         self._check_invalid_flag(flag)
 
-        for node_id in node_ids:
-            self._check_inexistent_node_id(pipeline.nodes, node_id)
-
-            if node_id not in self._flagged_nodes:
-                self._flagged_nodes[node_id] = {}
-
-            self._flagged_nodes[node_id][flag] = True
+        if node_id not in self._flagged_nodes:
+            self._flagged_nodes[node_id] = {}
+        self._flagged_nodes[node_id][flag] = True
 
     def _check_invalid_flag(self, flag: str) -> None:
         valid_flags = ['skip']
@@ -74,7 +71,7 @@ class SequentialExecutor(BaseExecutor):
         for node_id in topo_order:
             if not self._flagged_nodes.get(node_id, {}).get('skip', False):
                 node = pipeline.nodes[node_id]
-                logger.info(f'node.id: {node.id}')
+                logger.info(f'node - id: {node.id}, tags: {node.tags}')
 
                 func_inputs = self._builder.build_func_inputs(
                     node.inputs, self._catalog
