@@ -23,7 +23,7 @@ class BaseExecutor(ABC, InstanceIdentifier):
     @abstractmethod
     def execute_pipeline(
         self, pipeline: BasePipeline, topo_order: list
-    ) -> dict:
+    ) -> None:
         pass
 
 
@@ -67,7 +67,7 @@ class SequentialExecutor(BaseExecutor):
 
     def execute_pipeline(
         self, pipeline: BasePipeline, topo_order: List[str]
-    ) -> Dict[str, Any]:
+    ) -> None:
         for node_id in topo_order:
             if not self._flagged_nodes.get(node_id, {}).get('skip', False):
                 node = pipeline.nodes[node_id]
@@ -83,8 +83,6 @@ class SequentialExecutor(BaseExecutor):
 
                 if func_outputs:
                     self._catalog_outputs(func_outputs)
-
-        return self._catalog.items
 
     def _execute_func(
         self, id_: str, func: Callable, inputs: Dict[str, Any]
