@@ -17,7 +17,7 @@ class BaseNode(ABC, InstanceIdentifier):
         self._inputs = inputs
         self._outputs = outputs
 
-        super().__init__(id_, tags)
+        super().__init__(id_, tags=tags)
 
     @property
     def func(self) -> Callable:

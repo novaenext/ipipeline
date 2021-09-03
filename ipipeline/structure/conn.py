@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import Any, List
+
 from ipipeline.utils.instance import InstanceIdentifier
 
 
@@ -16,7 +17,7 @@ class BaseConn(ABC, InstanceIdentifier):
         self._dst_id = dst_id
         self._value = value
 
-        super().__init__(id_, tags)
+        super().__init__(id_, tags=tags)
 
     @property
     def src_id(self) -> str:
