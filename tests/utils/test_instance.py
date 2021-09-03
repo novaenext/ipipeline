@@ -78,3 +78,12 @@ class TestInstanceIdentifier(TestCase):
             r'and/or dash\): id_ == i\.1'
         ):
             _ = InstanceIdentifier._check_valid_id(None, 'i.1')
+
+    def test_repr(self) -> None:
+        identifier = InstanceIdentifier('i1', tags=['t1', 't2'])
+        instance_repr = identifier.__repr__()
+
+        self.assertEqual(
+            instance_repr, 
+            'InstanceIdentifier(id_=\'i1\', tags=[\'t1\', \'t2\'])'
+        )
