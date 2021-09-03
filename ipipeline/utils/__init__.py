@@ -1,1 +1,1 @@
-from ipipeline.utils.sequence import flatten_nested_list
+from ipipeline.utils.sequence import flatten_nested_seq
