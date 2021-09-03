@@ -13,7 +13,7 @@ class BasePipeline(ABC, InstanceIdentifier):
         self._conns = {}
         self._graph = {}
 
-        super().__init__(id_, tags)
+        super().__init__(id_, tags=tags)
 
     @property
     def nodes(self) -> Dict[str, BaseNode]:
