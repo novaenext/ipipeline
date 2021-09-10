@@ -14,7 +14,7 @@ class BaseBuilder(ABC):
 
     @abstractmethod
     def build_func_outputs(
-        self, outputs: List[str], results: Any
+        self, outputs: List[str], returns: Any
     ) -> Dict[str, Any]:
         pass
 
@@ -26,9 +26,9 @@ class Builder(BaseBuilder):
         func_inputs = {}
 
         for in_key, in_value in inputs.items():
-            if isinstance(in_value, str) and in_value.startswith('i.'):
+            if isinstance(in_value, str) and in_value.startswith('c.'):
                 func_inputs[in_key] = catalog.obtain_item(
-                    in_value.replace('i.', '')
+                    in_value.replace('c.', '')
                 )
             else:
                 func_inputs[in_key] = in_value
@@ -36,27 +36,29 @@ class Builder(BaseBuilder):
         return func_inputs
 
     def build_func_outputs(
-        self, outputs: List[str], results: Any
+        self, outputs: List[str], returns: Any
     ) -> Dict[str, Any]:
         outputs_qty = len(outputs)
 
         if outputs_qty > 0:
             if outputs_qty == 1:
-                results = [results]
+                returns = [returns]
 
-            results_qty = len(results)
-            self._check_diff_outputs_qty(outputs_qty, results_qty)
+            try:
+                returns_qty = len(returns)
+            except TypeError:
+                returns_qty = 1
 
-            return dict(zip(outputs, results))
+            self._check_diff_outputs_qty(outputs_qty, returns_qty)
+
+            return dict(zip(outputs, returns))
         else:
             return {}
 
     def _check_diff_outputs_qty(
-        self, outputs_qty: int, results_qty: int
+        self, outputs_qty: int, returns_qty: int
     ) -> None:
-        if outputs_qty != results_qty:
+        if outputs_qty != returns_qty:
             raise BuildingError(
-                'outputs did not match', 
-                f'outputs_qty == {outputs_qty} '
-                f'and results_qty == {results_qty}'
+                'outputs did not match', f'{outputs_qty} != {returns_qty}'
             )
