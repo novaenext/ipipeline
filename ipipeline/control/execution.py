@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 
 from ipipeline.control.building import build_func_inputs, build_func_outputs
 from ipipeline.control.catalog import Catalog
@@ -15,6 +15,12 @@ logger = logging.getLogger(name=__name__)
 class BaseExecutor(ABC, InstanceIdentifier):
     @abstractmethod
     def flag_node(self, node_id: str, flag: str, status: bool) -> None:
+        pass
+
+    @abstractmethod
+    def execute_node(
+        self, pipeline: BasePipeline, node_id: str
+    ) -> Dict[str, Any]:
         pass
 
     @abstractmethod
@@ -50,25 +56,30 @@ class SequentialExecutor(BaseExecutor):
                 'flag not found in the valid_flags', f'flag == {flag}'
             )
 
+    def execute_node(
+        self, pipeline: BasePipeline, node_id: str
+    ) -> Dict[str, Any]:
+        try:
+            node = pipeline.nodes[node_id]
+            logger.info(f'node - id: {node.id}, tags: {node.tags}')
+
+            func_inputs = build_func_inputs(node.inputs, self._catalog.items)
+            returns = node.func(**func_inputs)
+            func_outputs = build_func_outputs(node.outputs, returns)
+
+            return func_outputs
+        except Exception as error:
+            raise ExecutionError(
+                'node not executed', f'node_id == {node_id}'
+            ) from error
+
     def execute_pipeline(
         self, pipeline: BasePipeline, topo_order: List[str]
     ) -> None:
         for node_id in topo_order:
-            if self._flagged.get(node_id, {}).get('skip', False):
-                continue
+            if not self._flagged.get(node_id, {}).get('skip', False):
+                outputs = self.execute_node(pipeline, node_id)
 
-            try:
-                node = pipeline.nodes[node_id]
-                logger.info(f'node - id: {node.id}, tags: {node.tags}')
-
-                func_inputs = build_func_inputs(node.inputs, self._catalog.items)
-                returns = node.func(**func_inputs)
-                func_outputs = build_func_outputs(node.outputs, returns)
-
-                if func_outputs:
-                    for out_key, out_value in func_outputs.items():
+                if outputs:
+                    for out_key, out_value in outputs.items():
                         self._catalog.add_item(out_key, out_value)
-            except Exception as error:
-                raise ExecutionError(
-                    'node not executed', f'node_id == {node_id}'
-                ) from error
