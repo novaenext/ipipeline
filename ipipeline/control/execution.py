@@ -59,31 +59,16 @@ class SequentialExecutor(BaseExecutor):
 
             try:
                 node = pipeline.nodes[node_id]
-            except KeyError as error:
+                logger.info(f'node - id: {node.id}, tags: {node.tags}')
+
+                func_inputs = build_func_inputs(node.inputs, self._catalog.items)
+                returns = node.func(**func_inputs)
+                func_outputs = build_func_outputs(node.outputs, returns)
+
+                if func_outputs:
+                    for out_key, out_value in func_outputs.items():
+                        self._catalog.add_item(out_key, out_value)
+            except Exception as error:
                 raise ExecutionError(
-                    'node_id not found in the pipeline.nodes', 
-                    f'node_id == {node_id}'
+                    'node not executed', f'node_id == {node_id}'
                 ) from error
-
-            logger.info(f'node - id: {node.id}, tags: {node.tags}')
-
-            func_inputs = build_func_inputs(node.inputs, self._catalog.items)
-            returns = self._execute_func(node.id, node.func, func_inputs)
-            func_outputs = build_func_outputs(node.outputs, returns)
-
-            if func_outputs:
-                self._catalog_outputs(func_outputs)
-
-    def _execute_func(
-        self, id_: str, func: Callable, inputs: Dict[str, Any]
-    ) -> Any:
-        try:
-            return func(**inputs)
-        except Exception as error:
-            raise ExecutionError(
-                'func not executed', f'id_ == {id_}'
-            ) from error
-
-    def _catalog_outputs(self, outputs: Dict[str, Any]) -> None:
-        for out_key, out_value in outputs.items():
-            self._catalog.add_item(out_key, out_value)
