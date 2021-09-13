@@ -31,7 +31,7 @@ class TestSortDagTopo(TestCase):
 
     def test_dcg_with_linear_topo(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, r'circular dependency found: ind_nodes_qty == 0'
+            SortingError, r'circular dependency found: 4 != 0'
         ):
             _ = sort_dag_topo(
                 {'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n1']}
@@ -39,7 +39,7 @@ class TestSortDagTopo(TestCase):
 
     def test_dcg_with_nonlinear_topo(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, r'circular dependency found: ind_nodes_qty == 3'
+            SortingError, r'circular dependency found: 9 != 3'
         ):
             _ = sort_dag_topo({
                 'n1': ['n3', 'n4', 'n6'], 'n2': ['n5'], 'n3': ['n6'], 
@@ -91,7 +91,7 @@ class TestCreateIndNodeIds(TestCase):
 class TestCheckDiffNodesQty(TestCase):
     def test_diff_nodes_qty(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, r'circular dependency found: ind_nodes_qty == 4'
+            SortingError, r'circular dependency found: 7 != 4'
         ):
             _check_diff_nodes_qty(7, 4)
 
