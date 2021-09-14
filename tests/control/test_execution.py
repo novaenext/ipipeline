@@ -2,41 +2,15 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 from ipipeline.control.execution import BaseExecutor, SequentialExecutor
-from ipipeline.exceptions import ExecutionError, InstanceError
+from ipipeline.exceptions import ExecutionError
 
 
-class MockBaseExecutor(BaseExecutor):
-    def execute_pipeline(self) -> None:
-        pass
+def mock_sum(param1: int, param2: int) -> int:
+    return param1 + param2
 
 
-class TestBaseExecutor(TestCase):
-    def test_init_valid_args(self) -> None:
-        base_executor = MockBaseExecutor('e1', tags=['data'])
-
-        self.assertEqual(base_executor.id, 'e1')
-        self.assertDictEqual(base_executor._catalog._items, {})
-        self.assertListEqual(base_executor.tags, ['data'])
-
-    def test_init_invalid_args(self) -> None:
-        with self.assertRaisesRegex(
-            InstanceError, 
-            r'id_ does not match the pattern \(only letters, digits, '
-            r'underscore and/or dash\): id_ == e1,'
-        ):
-            _ = MockBaseExecutor('e1,')
-
-    def test_repr(self) -> None:
-        base_executor = MockBaseExecutor('e1')
-        instance_repr = base_executor.__repr__()
-
-        self.assertEqual(
-            instance_repr, 'MockBaseExecutor(id_=\'e1\', tags=[])'
-        )
-
-
-def mock_mul(param1: int, param2: int) -> int:
-    return param1 * param2
+def mock_sub(param1: int, param2: int) -> int:
+    return param1 - param2
 
 
 def mock_print(param3: int) -> None:
@@ -47,150 +21,111 @@ class TestSequentialExecutor(TestCase):
     def setUp(self) -> None:
         mock_nodes = {}
 
-        for node_id, func, inputs, outputs in [
-            ['n1', mock_mul, {'param1': 7, 'param2': 2}, ['param3']],
-            ['n2', mock_print, {'n1': ['param3']}, []]
+        for id_, func, inputs, outputs, tags in [
+            ['n1', mock_sum, {'param1': 7, 'param2': 3}, ['sum'], ['sum']],
+            ['n2', mock_sub, {'param1': 7, 'param2': 3}, ['sub'], ['sub']],
+            ['n3', mock_print, {'param3': 'c.sum'}, [], ['print']], 
+            ['n4', mock_print, {'param3': 'c.sub'}, [], ['print']]
         ]:
-            mock_nodes[node_id] = Mock(
-                spec=['id', 'func', 'inputs', 'outputs', 'props', 'tags']
+            mock_nodes[id_] = Mock(
+                spec=['id', 'func', 'inputs', 'outputs', 'tags']
             )
-            mock_nodes[node_id].id = node_id
-            mock_nodes[node_id].func = func
-            mock_nodes[node_id].inputs = inputs
-            mock_nodes[node_id].outputs = outputs
+            mock_nodes[id_].id = id_
+            mock_nodes[id_].func = func
+            mock_nodes[id_].inputs = inputs
+            mock_nodes[id_].outputs = outputs
+            mock_nodes[id_].tags = tags
 
         self._mock_pipeline = Mock(
             spec=['id', 'nodes', 'conns', 'graph', 'tags']
         )
         self._mock_pipeline.id = 'p1'
         self._mock_pipeline.nodes = mock_nodes
+        self._mock_pipeline.graph = {
+            'n1': ['n3'], 'n2': ['n4'], 'n3': [], 'n4': []
+        }
+        self._exe_order = ['n1', 'n2', 'n4', 'n3']
 
-    def test_new_valid_args(self) -> None:
-        executor = SequentialExecutor('e1')
-        
+    def test_new(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+
         self.assertIsInstance(executor, BaseExecutor)
 
-    def test_execute_pipeline_valid_topo_order(self) -> None:
-        executor = SequentialExecutor('e1')
-        items = executor.execute_pipeline(self._mock_pipeline, ['n1', 'n2'])
+    def test_flag_node_inexistent_flag(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+        executor.flag_node('n1', 'skip', True)
 
-        self.assertDictEqual(items, {'n1': {'param3': 14}})
+        self.assertDictEqual(executor._flagged, {'n1': {'skip': True}})
 
-    def test_execute_pipeline_invalid_topo_order(self) -> None:
-        executor = SequentialExecutor('e1')
+    def test_flag_node_existent_flag(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+        executor._flagged = {'n1': {'skip': True}}
+        executor.flag_node('n1', 'skip', False)
+
+        self.assertDictEqual(executor._flagged, {'n1': {'skip': False}})
+
+    def test_flag_node_invalid_flag(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
 
         with self.assertRaisesRegex(
-            ExecutionError, r'node_func not executed: node_id == n2'
+            ExecutionError, r'node not flagged: node_id == n1'
         ):
-            _ = executor.execute_pipeline(self._mock_pipeline, ['n2', 'n1'])
+            executor.flag_node('n1', 'flag', True)
 
-    def test_execute_pipeline_empty_topo_order(self) -> None:
-        executor = SequentialExecutor('e1')
-        items = executor.execute_pipeline(self._mock_pipeline, [])
+    def test_flag_node_inexistent_node_id(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
 
-        self.assertDictEqual(items, {})
+        with self.assertRaisesRegex(
+            ExecutionError, r'node not flagged: node_id == n11'
+        ):
+            executor.flag_node('n11', 'skip', True)
 
-    def test_create_func_inputs_valid_input_keys(self) -> None:
-        executor = SequentialExecutor('e1')
-        func_inputs = executor._create_func_inputs({'param1': 7, 'param2': 2})
-
-        self.assertDictEqual(func_inputs, {'param1': 7, 'param2': 2})
-
-    def test_create_func_inputs_valid_output_keys(self) -> None:
-        executor = SequentialExecutor('e1')
-        executor._catalog._items = {'n1': {'param1': 7}, 'n2': {'param2': 2}}
-        func_inputs = executor._create_func_inputs(
-            {'n1': ['param1'], 'n2': ['param2']}
-        )
-
-        self.assertDictEqual(func_inputs, {'param1': 7, 'param2': 2})
-
-    def test_create_func_inputs_valid_mix_keys(self) -> None:
-        executor = SequentialExecutor('e1')
-        executor._catalog._items = {'n1': {'param1': 7, 'param2': 2}}
-        func_inputs = executor._create_func_inputs(
-            {'n1': ['param1', 'param2'], 'param3': 0}
-        )
-
-        self.assertDictEqual(
-            func_inputs, {'param1': 7, 'param2': 2, 'param3': 0}
-        )
-
-    def test_create_func_inputs_invalid_output_keys(self) -> None:
-        executor = SequentialExecutor('e1')
-        executor._catalog._items = {'n1': {'param1': 7}}
+    def test_check_invalid_flag_invalid_flag(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
 
         with self.assertRaisesRegex(
             ExecutionError, 
-            r'output_key not found: input_key == n1 and output_key == param2'
+            r'flag not found in the valid_flags: flag == flag'
         ):
-            _ = executor._create_func_inputs({'n1': ['param1', 'param2']})
+            executor._check_invalid_flag('flag')
 
-    def test_execute_func_valid_inputs(self) -> None:
-        executor = SequentialExecutor('e1')
-        unnamed_outputs = executor._execute_func(
-            'n1', mock_mul, {'param1': 7, 'param2': 2}
-        )
+    def test_check_invalid_flag_valid_flag(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+        executor._check_invalid_flag('skip')
 
-        self.assertEqual(unnamed_outputs, 14)
+        self.assertTrue(True)
 
-    def test_execute_func_invalid_inputs(self) -> None:
-        executor = SequentialExecutor('e1')
+    def test_execute_node_existent_node_id(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+        outputs = executor.execute_node('n1')
+
+        self.assertDictEqual(outputs, {'sum': 10})
+
+    def test_execute_node_inexistent_node_id(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
 
         with self.assertRaisesRegex(
-            ExecutionError, 
-            r'node_func not executed: node_id == n1'
+            ExecutionError, r'node not executed: node_id == n11'
         ):
-            _ = executor._execute_func(
-                'n1', mock_mul, {'param1': 7, 'param3': 2}
-            )
+            _ = executor.execute_node('n11')
 
-    def test_create_func_outputs_valid_single_output(self) -> None:
-        executor = SequentialExecutor('e1')
-        func_outputs = executor._create_func_outputs(['mul'], 14)
+    def test_obtain_exe_order(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+        exe_order = executor.obtain_exe_order()
 
-        self.assertDictEqual(func_outputs, {'mul': 14})
+        self.assertListEqual(exe_order, ['n1', 'n2', 'n3', 'n4'])
 
-    def test_create_func_outputs_valid_multiple_output(self) -> None:
-        executor = SequentialExecutor('e1')
-        func_outputs = executor._create_func_outputs(
-            ['mul1', 'mul2'], [7, 14]
-        )
+    def test_execute_pipeline_without_flag(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+        executor.execute_pipeline(self._exe_order)
 
-        self.assertDictEqual(func_outputs, {'mul1': 7, 'mul2': 14})
+        self.assertDictEqual(executor.catalog.items, {'sum': 10, 'sub': 4})
 
-    def test_create_func_outputs_valid_empty_output(self) -> None:
-        executor = SequentialExecutor('e1')
-        func_outputs = executor._create_func_outputs([], None)
+    def test_execute_pipeline_with_flag(self) -> None:
+        executor = SequentialExecutor(self._mock_pipeline)
+        executor._flagged = {
+            'n2': {'skip': True}, 'n3': {'skip': False}, 'n4': {'skip': True}
+        }
+        executor.execute_pipeline(self._exe_order)
 
-        self.assertDictEqual(func_outputs, {})
-
-    def test_create_func_outputs_invalid_single_output(self) -> None:
-        executor = SequentialExecutor('e1')
-
-        with self.assertRaisesRegex(
-            ExecutionError, 
-            r'outputs not matched: node_outputs_qty == 2 and '
-            r'unn_outputs_qty == 1'
-        ):
-            _ = executor._create_func_outputs(['mul1', 'mul2'], 7)
-
-    def test_create_func_outputs_invalid_multiple_output(self) -> None:
-        executor = SequentialExecutor('e1')
-
-        with self.assertRaisesRegex(
-            ExecutionError, 
-            r'outputs not matched: node_outputs_qty == 2 and '
-            r'unn_outputs_qty == 3'
-        ):
-            _ = executor._create_func_outputs(['mul1', 'mul2'], [7, 14, 21])
-
-    def test_create_func_outputs_invalid_empty_output(self) -> None:
-        executor = SequentialExecutor('e1')
-
-        with self.assertRaisesRegex(
-            ExecutionError, 
-            r'outputs not matched: node_outputs_qty == 2 and '
-            r'unn_outputs_qty == 1'
-        ):
-            _ = executor._create_func_outputs(['mul1', 'mul2'], None)
+        self.assertDictEqual(executor.catalog.items, {'sum': 10})

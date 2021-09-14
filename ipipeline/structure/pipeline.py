@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List
 from ipipeline.exceptions import PipelineError
 from ipipeline.structure.node import BaseNode, Node
 from ipipeline.structure.conn import BaseConn, Conn
-from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.utils.instance import InstanceIdentifier
 
 
 class BasePipeline(ABC, InstanceIdentifier):
@@ -13,7 +13,7 @@ class BasePipeline(ABC, InstanceIdentifier):
         self._conns = {}
         self._graph = {}
 
-        super().__init__(id_, tags)
+        super().__init__(id_, tags=tags)
 
     @property
     def nodes(self) -> Dict[str, BaseNode]:
@@ -34,24 +34,20 @@ class BasePipeline(ABC, InstanceIdentifier):
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
-        props: List[str] = [], 
         tags: List[str] = []
     ) -> None:
         pass
 
     @abstractmethod
     def add_conn(
-        self,
+        self, 
         id_: str, 
-        src_id: str,
-        dst_id: str,
-        weight: int = 0,
+        src_id: str, 
+        dst_id: str, 
+        value: Any = None, 
         tags: List[str] = []
     ) -> None:
         pass
-
-    def __repr__(self) -> str:
-        return create_instance_repr(self)
 
 
 class Pipeline(BasePipeline):
@@ -61,11 +57,10 @@ class Pipeline(BasePipeline):
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
-        props: List[str] = [], 
         tags: List[str] = []
     ) -> None:
         self._check_existent_node_id(id_)
-        node = Node(id_, func, inputs, outputs, props, tags)
+        node = Node(id_, func, inputs, outputs, tags)
 
         self._nodes[node.id] = node
         self._graph[node.id] = []
@@ -73,7 +68,7 @@ class Pipeline(BasePipeline):
     def _check_existent_node_id(self, node_id: str) -> None:
         if node_id in self._nodes:
             raise PipelineError(
-                'existent node_id found', f'node_id == {node_id}'
+                'node_id found in the _nodes', f'node_id == {node_id}'
             )
 
     def add_conn(
@@ -81,13 +76,13 @@ class Pipeline(BasePipeline):
         id_: str, 
         src_id: str, 
         dst_id: str, 
-        weight: int = 0, 
+        value: Any = None, 
         tags: List[str] = []
     ) -> None:
         self._check_existent_conn_id(id_)
         self._check_inexistent_node_id(id_, src_id)
         self._check_inexistent_node_id(id_, dst_id)
-        conn = Conn(id_, src_id, dst_id, weight, tags)
+        conn = Conn(id_, src_id, dst_id, value, tags)
 
         self._conns[conn.id] = conn
         self._graph[conn.src_id].append(conn.dst_id)
@@ -95,12 +90,12 @@ class Pipeline(BasePipeline):
     def _check_existent_conn_id(self, conn_id: str) -> None:
         if conn_id in self._conns:
             raise PipelineError(
-                'existent conn_id found', f'conn_id == {conn_id}'
+                'conn_id found in the _conns', f'conn_id == {conn_id}'
             )
 
     def _check_inexistent_node_id(self, conn_id: str, node_id: str) -> None:
         if node_id not in self._nodes:
             raise PipelineError(
-                'inexistent node_id found',
+                'node_id not found in the _nodes',
                 f'conn_id == {conn_id} and node_id == {node_id}'
             )

@@ -1,99 +1,93 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 
+from ipipeline.control.building import build_func_inputs, build_func_outputs
 from ipipeline.control.catalog import Catalog
+from ipipeline.control.sorting import sort_dag_topo
 from ipipeline.exceptions import ExecutionError
 from ipipeline.structure.pipeline import BasePipeline
-from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
+from ipipeline.utils.sequence import flatten_nested_seq
 
 
 logger = logging.getLogger(name=__name__)
 
 
-class BaseExecutor(ABC, InstanceIdentifier):
-    def __init__(self, id_: str, tags: List[str] = []) -> None:
-        self._catalog = Catalog()
-
-        super().__init__(id_, tags)
-
+class BaseExecutor(ABC):
     @abstractmethod
-    def execute_pipeline(
-        self, pipeline: BasePipeline, topo_order: list
-    ) -> Dict[str, dict]:
+    def flag_node(self, node_id: str, flag: str, status: bool) -> None:
         pass
 
-    def __repr__(self) -> str:
-        return create_instance_repr(self)
+    @abstractmethod
+    def execute_node(self, node_id: str) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def obtain_exe_order(self) -> list:
+        pass
+
+    @abstractmethod
+    def execute_pipeline(self, exe_order: list) -> None:
+        pass
 
 
 class SequentialExecutor(BaseExecutor):
-    def execute_pipeline(
-        self, pipeline: BasePipeline, topo_order: List[str]
-    ) -> Dict[str, dict]:
-        for node_id in topo_order:
-            node = pipeline.nodes[node_id]
-            logger.info(f'executing node: node.id == {node.id}')
+    def __init__(self, pipeline: BasePipeline) -> None:
+        self._pipeline = pipeline
+        self._catalog = Catalog()
+        self._flagged = {}
 
-            func_inputs = self._create_func_inputs(node.inputs)
-            unn_outputs = self._execute_func(node.id, node.func, func_inputs)
-            func_outputs = self._create_func_outputs(node.outputs, unn_outputs)
+    @property
+    def catalog(self) -> Catalog:
+        return self._catalog
 
-            if func_outputs:
-                self._catalog.add_item(node.id, func_outputs)
-
-        return self._catalog.items
-
-    def _create_func_inputs(
-        self, node_inputs: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        func_inputs = {}
-
-        for input_key, input_value in node_inputs.items():
-            if self._catalog.check_item(input_key):
-                func_outputs = self._catalog.obtain_item(input_key)
-
-                for output_key in input_value:
-                    try:
-                        func_inputs[output_key] = func_outputs[output_key]
-                    except KeyError as error:
-                        raise ExecutionError(
-                            'output_key not found', 
-                            f'input_key == {input_key} '
-                            f'and output_key == {output_key}'
-                        ) from error
-            else:
-                func_inputs[input_key] = input_value
-
-        return func_inputs
-
-    def _execute_func(
-        self, node_id: str, node_func: Callable, func_inputs: Dict[str, Any]
-    ) -> Any:
+    def flag_node(self, node_id: str, flag: str, status: bool) -> None:
         try:
-            return node_func(**func_inputs)
+            self._check_invalid_flag(flag)
+            node = self._pipeline.nodes[node_id]
+
+            if node_id not in self._flagged:
+                self._flagged[node.id] = {}
+            self._flagged[node.id][flag] = status
         except Exception as error:
             raise ExecutionError(
-                'node_func not executed', f'node_id == {node_id}'
+                'node not flagged', f'node_id == {node_id}'
             ) from error
 
-    def _create_func_outputs(
-        self, node_outputs: List[str], unn_outputs: Any
-    ) -> Dict[str, Any]:
-        node_outputs_qty = len(node_outputs)
+    def _check_invalid_flag(self, flag: str) -> None:
+        valid_flags = ['skip']
 
-        if node_outputs_qty == 1:
-            return {node_outputs[0]: unn_outputs}
-        elif node_outputs_qty > 1:
-            unn_outputs_qty = getattr(unn_outputs, '__len__', lambda: 1)()
- 
-            if node_outputs_qty == unn_outputs_qty:
-                return dict(zip(node_outputs, unn_outputs))
-            else:
-                raise ExecutionError(
-                    'outputs not matched', 
-                    f'node_outputs_qty == {node_outputs_qty} '
-                    f'and unn_outputs_qty == {unn_outputs_qty}'
-                )
-        else:
-            return {}
+        if flag not in valid_flags:
+            raise ExecutionError(
+                'flag not found in the valid_flags', f'flag == {flag}'
+            )
+
+    def execute_node(self, node_id: str) -> Dict[str, Any]:
+        try:
+            node = self._pipeline.nodes[node_id]
+            logger.info(f'node - id: {node.id}, tags: {node.tags}')
+
+            func_inputs = build_func_inputs(node.inputs, self._catalog.items)
+            returns = node.func(**func_inputs)
+            func_outputs = build_func_outputs(node.outputs, returns)
+
+            return func_outputs
+        except Exception as error:
+            raise ExecutionError(
+                'node not executed', f'node_id == {node_id}'
+            ) from error
+
+    def obtain_exe_order(self) -> List[str]:
+        exe_order = flatten_nested_seq(sort_dag_topo(self._pipeline.graph))
+        logger.info(f'exe_order: {exe_order}')
+
+        return exe_order
+
+    def execute_pipeline(self, exe_order: List[str]) -> None:
+        for node_id in exe_order:
+            if not self._flagged.get(node_id, {}).get('skip', False):
+                outputs = self.execute_node(node_id)
+
+                if outputs:
+                    for out_key, out_value in outputs.items():
+                        self._catalog.add_item(out_key, out_value)

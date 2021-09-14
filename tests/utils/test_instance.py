@@ -1,39 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.exceptions import InstanceError
-from ipipeline.utils.instance import InstanceIdentifier, create_instance_repr
-
-
-class TestInstanceIdentifier(TestCase):
-    def test_init_valid_args(self) -> None:
-        identifier = InstanceIdentifier('i1', tags=['t1', 't2'])
-
-        self.assertEqual(identifier.id, 'i1')
-        self.assertListEqual(identifier.tags, ['t1', 't2'])
-
-    def test_init_invalid_args(self) -> None:
-        with self.assertRaisesRegex(
-            InstanceError, 
-            r'id_ does not match the pattern \(only letters, digits, '
-            r'underscore and/or dash\): id_ == i1,'
-        ):
-            _ = InstanceIdentifier('i1,')
-
-    def test_check_id_valid(self) -> None:
-        identifier = InstanceIdentifier('i1')
-        id_ = identifier._check_id('i1')
-
-        self.assertEqual(id_, 'i1')
-
-    def test_check_id_invalid(self) -> None:
-        identifier = InstanceIdentifier('i1')
-
-        with self.assertRaisesRegex(
-            InstanceError, 
-            r'id_ does not match the pattern \(only letters, digits, '
-            r'underscore and/or dash\): id_ == i1\.'
-        ):
-            _ = identifier._check_id('i1.')
+from ipipeline.utils.instance import create_instance_repr, InstanceIdentifier
 
 
 class MockClass1:
@@ -89,3 +57,33 @@ class TestCreateInstanceRepr(TestCase):
         instance_repr = create_instance_repr(MockClass4())
 
         self.assertEqual(instance_repr, 'MockClass4()')
+
+
+class TestInstanceIdentifier(TestCase):
+    def test_init(self) -> None:
+        identifier = InstanceIdentifier('i1', tags=['t1', 't2'])
+
+        self.assertEqual(identifier.id, 'i1')
+        self.assertListEqual(identifier.tags, ['t1', 't2'])
+
+    def test_check_valid_id_valid_id(self) -> None:
+        id_ = InstanceIdentifier._check_valid_id(None, 'i1')
+
+        self.assertEqual(id_, 'i1')
+
+    def test_check_valid_id_invalid_id(self) -> None:
+        with self.assertRaisesRegex(
+            InstanceError, 
+            r'id_ does not match the pattern \(letters, digits, underscore '
+            r'and/or dash\): id_ == i\.1'
+        ):
+            _ = InstanceIdentifier._check_valid_id(None, 'i.1')
+
+    def test_repr(self) -> None:
+        identifier = InstanceIdentifier('i1', tags=['t1', 't2'])
+        instance_repr = identifier.__repr__()
+
+        self.assertEqual(
+            instance_repr, 
+            'InstanceIdentifier(id_=\'i1\', tags=[\'t1\', \'t2\'])'
+        )

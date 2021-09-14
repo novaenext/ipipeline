@@ -14,7 +14,8 @@ setup(
     name='ipipeline', 
     version=__version__, 
     description=(
-        'a micro framework to build and execute pipelines of different scopes'
+        'A micro framework to flexibly build and execute pipelines of '
+        'different scopes'
     ), 
     url='https://github.com/novaenext/ipipeline', 
     author='novaenext', 

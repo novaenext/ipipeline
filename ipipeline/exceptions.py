@@ -7,6 +7,10 @@ class BaseError(Exception):
         return f'{self._descr}: {self._detail}'
 
 
+class BuildingError(BaseError):
+    pass
+
+
 class CatalogError(BaseError):
     pass
 
