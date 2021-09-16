@@ -12,3 +12,12 @@ def create_directory(
         raise SystemError(
             'directory not created', f'path == {path}'
         ) from error
+
+
+def create_file(path: str, suppressed: bool = False) -> None:
+    try:
+        Path(path).resolve().touch(exist_ok=suppressed)
+    except FileExistsError as error:
+        raise SystemError(
+            'file not created', f'path == {path}'
+        ) from error
