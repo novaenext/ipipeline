@@ -60,7 +60,7 @@ class TestExecuteProjectCmd(TestCase):
     def test_inexistent_package_files(self) -> None:
         _execute_project_cmd(self._args)
 
-        for package_file in ['__init__.py', 'exceptions.py']:
+        for package_file in ['__init__.py', '__main__.py', 'exceptions.py']:
             self.assertTrue((self._path / 'mock' / package_file).exists())
 
     def test_inexistent_subpackage_dirs(self) -> None:
