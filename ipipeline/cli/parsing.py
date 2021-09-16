@@ -4,6 +4,14 @@ from typing import List
 from ipipeline import __version__
 
 
+def parse_cli_args(args: List[str]) -> Namespace:
+    root_parser, project_parser = _build_parsers()
+    _build_root_args(root_parser)
+    _build_project_args(project_parser)
+
+    return root_parser.parse_args(args=args)
+
+
 def _build_parsers() -> List[ArgumentParser]:
     root_parser = ArgumentParser(
         prog='ipipeline', 
