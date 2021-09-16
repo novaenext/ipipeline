@@ -3,6 +3,11 @@ from argparse import Namespace
 from ipipeline.utils.system import create_directory, create_file
 
 
+def execute_cli_cmds(cmd: str, args: Namespace) -> None:
+    if cmd == 'project':
+        _execute_project_cmd(args)
+
+
 def _execute_project_cmd(args: Namespace) -> None:
     project_path = f'{args.path}/{args.name}'
     create_directory(project_path)
