@@ -33,3 +33,7 @@ class InstanceError(BaseError):
 
 class SequenceError(BaseError):
     pass
+
+
+class SystemError(BaseError):
+    pass
