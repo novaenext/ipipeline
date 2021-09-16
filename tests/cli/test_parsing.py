@@ -1,7 +1,9 @@
 from argparse import ArgumentParser
 from unittest import TestCase
 
-from ipipeline.cli.parsing import _build_parsers, _build_root_args
+from ipipeline.cli.parsing import (
+    _build_parsers, _build_root_args, _build_project_args
+)
 
 
 class TestBuildParsers(TestCase):
@@ -31,7 +33,7 @@ class TestBuildParsers(TestCase):
 
 
 class TestBuildRootArgs(TestCase):
-    def test_help_option(self) -> None:
+    def test_optional_help_arg(self) -> None:
         parser = ArgumentParser(add_help=False)
         _build_root_args(parser)
 
@@ -41,7 +43,7 @@ class TestBuildRootArgs(TestCase):
         with self.assertRaisesRegex(SystemExit, r'0'):
             parser.parse_args(['--help'])
 
-    def test_version_option(self) -> None:
+    def test_optional_version_arg(self) -> None:
         parser = ArgumentParser(add_help=False)
         _build_root_args(parser)
 
@@ -51,9 +53,36 @@ class TestBuildRootArgs(TestCase):
         with self.assertRaisesRegex(SystemExit, r'0'):
             parser.parse_args(['--version'])
 
-    def test_invalid_option(self) -> None:
+    def test_invalid_arg(self) -> None:
         parser = ArgumentParser(add_help=False)
         _build_root_args(parser)
+
+        with self.assertRaisesRegex(SystemExit, r'2'):
+            parser.parse_args(['--invalid'])
+
+
+class TestBuildProjectArgs(TestCase):
+    def test_positional_args(self) -> None:
+        parser = ArgumentParser(add_help=False)
+        _build_project_args(parser)
+        args = parser.parse_args(['mock_path', 'mock_name'])
+
+        self.assertEqual(args.path, 'mock_path')
+        self.assertEqual(args.name, 'mock_name')
+
+    def test_optional_help_arg(self) -> None:
+        parser = ArgumentParser(add_help=False)
+        _build_project_args(parser)
+
+        with self.assertRaisesRegex(SystemExit, r'0'):
+            parser.parse_args(['-h'])
+
+        with self.assertRaisesRegex(SystemExit, r'0'):
+            parser.parse_args(['--help'])
+
+    def test_invalid_arg(self) -> None:
+        parser = ArgumentParser(add_help=False)
+        _build_project_args(parser)
 
         with self.assertRaisesRegex(SystemExit, r'2'):
             parser.parse_args(['--invalid'])
