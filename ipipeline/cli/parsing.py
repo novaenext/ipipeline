@@ -39,3 +39,24 @@ def _build_root_args(parser: ArgumentParser) -> None:
         version=f'ipipeline v{__version__}', 
         help='show the version of the package'
     )
+
+
+def _build_project_args(parser: ArgumentParser) -> None:
+    parser.add_argument(
+        'path', 
+        type=str, 
+        action='store', 
+        help='path where the project should be created'
+    )
+    parser.add_argument(
+        'name', 
+        type=str, 
+        action='store', 
+        help='name of the project directory'
+    )
+    parser.add_argument(
+        '-h', 
+        '--help', 
+        action='help', 
+        help='show the available arguments'
+    )
