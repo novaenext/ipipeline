@@ -1,4 +1,4 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from typing import List
 
 from ipipeline import __version__
@@ -23,3 +23,19 @@ def _build_parsers() -> List[ArgumentParser]:
     )
 
     return root_parser, project_parser
+
+
+def _build_root_args(parser: ArgumentParser) -> None:
+    parser.add_argument(
+        '-h', 
+        '--help', 
+        action='help', 
+        help='show the available arguments'
+    )
+    parser.add_argument(
+        '-v', 
+        '--version', 
+        action='version', 
+        version=f'ipipeline v{__version__}', 
+        help='show the version of the package'
+    )
