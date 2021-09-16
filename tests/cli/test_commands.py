@@ -3,8 +3,26 @@ from pathlib import Path
 from shutil import rmtree
 from unittest import TestCase
 
-from ipipeline.cli.commands import _execute_project_cmd
+from ipipeline.cli.commands import execute_cli_cmds, _execute_project_cmd
 from ipipeline.exceptions import SystemError
+
+
+class TestExecuteCliCmds(TestCase):
+    def setUp(self) -> None:
+        self._path = Path(__file__).resolve().parents[0] / 'mock'
+
+    def test_project_cmd(self) -> None:
+        execute_cli_cmds(
+            'project', Namespace(path=str(self._path.parents[0]), name='mock')
+        )
+
+        self.assertTrue(self._path.exists())
+        rmtree(self._path)
+
+    def test_invalid_cmd(self) -> None:
+        execute_cli_cmds('invalid', Namespace())
+
+        self.assertTrue(True)
 
 
 class TestExecuteProjectCmd(TestCase):
