@@ -25,7 +25,7 @@ def _execute_project_cmd(args: Namespace) -> None:
     ]:
         create_file(f'{project_path}/{root_file}')
 
-    for package_file in ['__init__.py', 'exceptions.py']:
+    for package_file in ['__init__.py', '__main__.py', 'exceptions.py']:
         create_file(f'{project_path}/{args.name}/{package_file}')
 
     for subpackage_dir in ['configs', 'groups', 'tasks']:
