@@ -4,10 +4,12 @@ from setuptools import find_packages, setup
 from ipipeline import __version__
 
 
-with open(Path(__file__).parents[0] / 'README.md') as readme_file:
+project_path = Path(__file__).resolve().parents[0]
+
+with open(project_path / 'README.md') as readme_file:
     readme = readme_file.read()
 
-with open(Path(__file__).parents[0] / 'requirements.txt') as requirements_file:
+with open(project_path / 'requirements.txt') as requirements_file:
     requirements = requirements_file.read().splitlines()
 
 setup(
@@ -22,7 +24,7 @@ setup(
     author_email='contato@novaenext.com', 
     maintainer='novaenext', 
     maintainer_email='contato@novaenext.com', 
-    license='proprietary', 
+    license='BSD-3-Clause', 
     platforms=['any'], 
     python_requires=">=3.5", 
     classifiers=[
