@@ -7,13 +7,15 @@ from ipipeline.utils.system import create_directory, create_file
 
 class TestCreateDirectory(TestCase):
     def setUp(self) -> None:
-        self._path = Path(__file__).parents[0] / 'mock_dir'
+        self._path = Path(__file__).resolve().parents[0] / 'mock_dir'
+
+    def tearDown(self) -> None:
+        self._path.rmdir()
 
     def test_inexistent_directory(self) -> None:
         create_directory(str(self._path))
 
         self.assertTrue(self._path.exists())
-        self._path.rmdir()
 
     def test_existent_directory(self) -> None:
         create_directory(str(self._path))
@@ -22,18 +24,19 @@ class TestCreateDirectory(TestCase):
             SystemError, r'directory not created: path == *'
         ):
             create_directory(str(self._path))
-        self._path.rmdir()
 
 
 class TestCreateFile(TestCase):
     def setUp(self) -> None:
-        self._path = Path(__file__).parents[0] / 'mock_file'
+        self._path = Path(__file__).resolve().parents[0] / 'mock_file'
+
+    def tearDown(self) -> None:
+        self._path.unlink()
 
     def test_inexistent_file(self) -> None:
         create_file(str(self._path))
 
         self.assertTrue(self._path.exists())
-        self._path.unlink()
 
     def test_existent_file(self) -> None:
         create_file(str(self._path))
@@ -42,4 +45,3 @@ class TestCreateFile(TestCase):
             SystemError, r'file not created: path == *'
         ):
             create_file(str(self._path))
-        self._path.unlink()
