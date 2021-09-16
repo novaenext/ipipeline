@@ -2,8 +2,24 @@ from argparse import ArgumentParser
 from unittest import TestCase
 
 from ipipeline.cli.parsing import (
-    _build_parsers, _build_root_args, _build_project_args
+    parse_cli_args, _build_parsers, _build_root_args, _build_project_args
 )
+
+
+class TestParseCliArgs(TestCase):
+    def test_positional_arg(self) -> None:
+        args = parse_cli_args(['project', 'mock_path', 'mock_name'])
+
+        self.assertEqual(args.path, 'mock_path')
+        self.assertEqual(args.name, 'mock_name')
+
+    def test_optional_arg(self) -> None:
+        with self.assertRaisesRegex(SystemExit, r'0'):
+            _ = parse_cli_args(['--help'])
+
+    def test_invalid_arg(self) -> None:
+        with self.assertRaisesRegex(SystemExit, r'2'):
+            _ = parse_cli_args(['--invalid'])
 
 
 class TestBuildParsers(TestCase):
