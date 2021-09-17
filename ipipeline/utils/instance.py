@@ -6,7 +6,7 @@ from ipipeline.exceptions import InstanceError
 
 
 def create_instance_repr(instance: object) -> str:
-    param_reprs = []
+    instance_repr = f'{instance.__class__.__name__}('
 
     for param in signature(instance.__init__).parameters.values():
         value = None
@@ -23,9 +23,9 @@ def create_instance_repr(instance: object) -> str:
 
                 break
 
-        param_reprs.append(f'{param.name}={value}')
+        instance_repr += f'{param.name}={value}, '
 
-    return f'{instance.__class__.__name__}({", ".join(param_reprs)})'
+    return f'{instance_repr})'.replace(', )', ')')
 
 
 class InstanceIdentifier:
