@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.exceptions import InstanceError
-from ipipeline.utils.instance import create_instance_repr, InstanceIdentifier
+from ipipeline.utils.instance import create_instance_repr, Identification
 
 
 class MockClass1:
@@ -59,31 +59,31 @@ class TestCreateInstanceRepr(TestCase):
         self.assertEqual(instance_repr, 'MockClass4()')
 
 
-class TestInstanceIdentifier(TestCase):
+class TestIdentification(TestCase):
     def test_init(self) -> None:
-        identifier = InstanceIdentifier('i1', tags=['t1', 't2'])
+        identifier = Identification('i1', tags=['t1', 't2'])
 
         self.assertEqual(identifier.id, 'i1')
         self.assertListEqual(identifier.tags, ['t1', 't2'])
 
     def test_check_valid_id_valid_id(self) -> None:
-        id_ = InstanceIdentifier._check_valid_id(None, 'i1')
+        id_ = Identification._check_valid_id(None, 'i1')
 
         self.assertEqual(id_, 'i1')
 
     def test_check_valid_id_invalid_id(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'id_ does not match the pattern \(letters, digits, underscore '
-            r'and/or dash\): id_ == i\.1'
+            r'id_ not validated according to the pattern \(letters, digits, '
+            r'underscore and/or dash\): id_ == i\.1'
         ):
-            _ = InstanceIdentifier._check_valid_id(None, 'i.1')
+            _ = Identification._check_valid_id(None, 'i.1')
 
     def test_repr(self) -> None:
-        identifier = InstanceIdentifier('i1', tags=['t1', 't2'])
+        identifier = Identification('i1', tags=['t1', 't2'])
         instance_repr = identifier.__repr__()
 
         self.assertEqual(
             instance_repr, 
-            'InstanceIdentifier(id_=\'i1\', tags=[\'t1\', \'t2\'])'
+            'Identification(id_=\'i1\', tags=[\'t1\', \'t2\'])'
         )
