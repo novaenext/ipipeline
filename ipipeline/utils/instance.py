@@ -28,7 +28,7 @@ def create_instance_repr(instance: object) -> str:
     return f'{instance_repr})'.replace(', )', ')')
 
 
-class InstanceIdentifier:
+class Identification:
     def __init__(self, id_: str, tags: List[str] = []) -> None:
         self._id = self._check_valid_id(id_)
         self._tags = tags
@@ -46,7 +46,7 @@ class InstanceIdentifier:
             return id_
         else:
             raise InstanceError(
-                'id_ does not match the pattern '
+                'id_ not validated according to the pattern '
                 '(letters, digits, underscore and/or dash)', 
                 f'id_ == {id_}'
             )
