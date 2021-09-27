@@ -31,9 +31,5 @@ class InstanceError(BaseError):
     pass
 
 
-class SequenceError(BaseError):
-    pass
-
-
 class SystemError(BaseError):
     pass
