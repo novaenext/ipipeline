@@ -21,7 +21,7 @@ class TestCreateDirectory(TestCase):
         create_directory(str(self._path))
 
         with self.assertRaisesRegex(
-            SystemError, r'directory not created: path == *'
+            SystemError, r'directory not created in the file system: path == *'
         ):
             create_directory(str(self._path))
 
@@ -42,6 +42,6 @@ class TestCreateFile(TestCase):
         create_file(str(self._path))
 
         with self.assertRaisesRegex(
-            SystemError, r'file not created: path == *'
+            SystemError, r'file not created in the file system: path == *'
         ):
             create_file(str(self._path))
