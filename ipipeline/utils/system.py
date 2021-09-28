@@ -11,7 +11,7 @@ def create_directory(
         path.mkdir(parents=missing, exist_ok=suppressed)
     except (FileExistsError, FileNotFoundError) as error:
         raise SystemError(
-            'directory not created', f'path == {path}'
+            'directory not created in the file system', f'path == {path}'
         ) from error
 
 
@@ -21,5 +21,5 @@ def create_file(path: str, suppressed: bool = False) -> None:
         path.touch(exist_ok=suppressed)
     except (FileExistsError, FileNotFoundError) as error:
         raise SystemError(
-            'file not created', f'path == {path}'
+            'file not created in the file system', f'path == {path}'
         ) from error
