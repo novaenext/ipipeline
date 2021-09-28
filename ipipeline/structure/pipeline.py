@@ -4,10 +4,10 @@ from typing import Any, Callable, Dict, List
 from ipipeline.exceptions import PipelineError
 from ipipeline.structure.node import BaseNode, Node
 from ipipeline.structure.conn import BaseConn, Conn
-from ipipeline.utils.instance import InstanceIdentifier
+from ipipeline.utils.instance import Identification
 
 
-class BasePipeline(ABC, InstanceIdentifier):
+class BasePipeline(ABC, Identification):
     def __init__(self, id_: str, tags: List[str] = []) -> None:
         self._nodes = {}
         self._conns = {}

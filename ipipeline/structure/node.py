@@ -1,10 +1,10 @@
 from abc import ABC
 from typing import Any, Callable, Dict, List
 
-from ipipeline.utils.instance import InstanceIdentifier
+from ipipeline.utils.instance import Identification
 
 
-class BaseNode(ABC, InstanceIdentifier):
+class BaseNode(ABC, Identification):
     def __init__(
         self, 
         id_: str, 

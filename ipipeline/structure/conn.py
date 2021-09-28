@@ -1,10 +1,10 @@
 from abc import ABC
 from typing import Any, List
 
-from ipipeline.utils.instance import InstanceIdentifier
+from ipipeline.utils.instance import Identification
 
 
-class BaseConn(ABC, InstanceIdentifier):
+class BaseConn(ABC, Identification):
     def __init__(
         self, 
         id_: str, 
