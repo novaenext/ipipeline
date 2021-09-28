@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.control.sorting import (
-    sort_dag_topo, 
+    sort_graph_topo, 
     _create_in_conns_qty, 
     _create_ind_node_ids, 
     _check_diff_nodes_qty
@@ -9,16 +9,16 @@ from ipipeline.control.sorting import (
 from ipipeline.exceptions import SortingError
 
 
-class TestSortDagTopo(TestCase):
+class TestSortGraphTopo(TestCase):
     def test_dag_with_linear_topo(self) -> None:
-        topo_order = sort_dag_topo(
+        topo_order = sort_graph_topo(
             {'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': []}
         )
 
         self.assertListEqual(topo_order, [['n1'], ['n2'], ['n3'], ['n4']])
 
     def test_dag_with_nonlinear_topo(self) -> None:
-        topo_order = sort_dag_topo({
+        topo_order = sort_graph_topo({
             'n1': ['n3', 'n4', 'n6'], 'n2': ['n5'], 'n3': ['n6'], 
             'n4': ['n3', 'n6', 'n7', 'n8'], 'n5': ['n8'], 'n6': [], 
             'n7': ['n9'], 'n8': [], 'n9': []
@@ -31,17 +31,21 @@ class TestSortDagTopo(TestCase):
 
     def test_dcg_with_linear_topo(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, r'circular dependency found: 4 != 0'
+            SortingError, 
+            r'circular dependency found in the graph: \(nodes_qty := 4\) != '
+            r'\(ind_nodes_qty := 0\)'
         ):
-            _ = sort_dag_topo(
+            _ = sort_graph_topo(
                 {'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n1']}
             )
 
     def test_dcg_with_nonlinear_topo(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, r'circular dependency found: 9 != 3'
+            SortingError, 
+            r'circular dependency found in the graph: \(nodes_qty := 9\) != '
+            r'\(ind_nodes_qty := 3\)'
         ):
-            _ = sort_dag_topo({
+            _ = sort_graph_topo({
                 'n1': ['n3', 'n4', 'n6'], 'n2': ['n5'], 'n3': ['n6'], 
                 'n4': ['n3', 'n6', 'n7', 'n8'], 'n5': ['n8'], 'n6': ['n4'], 
                 'n7': ['n9'], 'n8': [], 'n9': []
@@ -91,7 +95,9 @@ class TestCreateIndNodeIds(TestCase):
 class TestCheckDiffNodesQty(TestCase):
     def test_diff_nodes_qty(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, r'circular dependency found: 7 != 4'
+            SortingError, 
+            r'circular dependency found in the graph: \(nodes_qty := 7\) != '
+            r'\(ind_nodes_qty := 4\)'
         ):
             _check_diff_nodes_qty(7, 4)
 
