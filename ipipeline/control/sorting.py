@@ -3,7 +3,7 @@ from typing import Dict, List
 from ipipeline.exceptions import SortingError
 
 
-def sort_dag_topo(graph: Dict[str, list]) -> List[list]:
+def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
     topo_order = []
     ind_nodes_qty = 0
     in_conns_qty = _create_in_conns_qty(graph)
@@ -53,8 +53,9 @@ def _create_ind_node_ids(in_conns_qty: Dict[str, int]) -> List[str]:
     return ind_node_ids
 
 
-def _check_diff_nodes_qty(exp_nodes_qty: int, ind_nodes_qty: int) -> None:
-    if exp_nodes_qty != ind_nodes_qty:
+def _check_diff_nodes_qty(nodes_qty: int, ind_nodes_qty: int) -> None:
+    if nodes_qty != ind_nodes_qty:
         raise SortingError(
-            'circular dependency found', f'{exp_nodes_qty} != {ind_nodes_qty}'
+            'circular dependency found in the graph', 
+            f'(nodes_qty := {nodes_qty}) != (ind_nodes_qty := {ind_nodes_qty})'
         )
