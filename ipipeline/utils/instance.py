@@ -29,8 +29,8 @@ def create_instance_repr(instance: object) -> str:
 
 
 class Identification:
-    def __init__(self, id_: str, tags: List[str] = []) -> None:
-        self._id = self._check_valid_id(id_)
+    def __init__(self, id: str, tags: List[str] = []) -> None:
+        self._id = self._check_valid_id(id)
         self._tags = tags
 
     @property
@@ -41,14 +41,14 @@ class Identification:
     def tags(self) -> List[str]:
         return self._tags
 
-    def _check_valid_id(self, id_: str) -> str:
-        if re.fullmatch(r'[\w-]+', id_):
-            return id_
+    def _check_valid_id(self, id: str) -> str:
+        if re.fullmatch(r'[\w-]+', id):
+            return id
         else:
             raise InstanceError(
-                'id_ not validated according to the pattern '
+                'id not validated according to the pattern '
                 '(letters, digits, underscore and/or dash)', 
-                f'id_ == {id_}'
+                f'id == {id}'
             )
 
     def __repr__(self) -> str:

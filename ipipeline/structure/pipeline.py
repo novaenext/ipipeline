@@ -8,12 +8,12 @@ from ipipeline.utils.instance import Identification
 
 
 class BasePipeline(ABC, Identification):
-    def __init__(self, id_: str, tags: List[str] = []) -> None:
+    def __init__(self, id: str, tags: List[str] = []) -> None:
         self._nodes = {}
         self._conns = {}
         self._graph = {}
 
-        super().__init__(id_, tags=tags)
+        super().__init__(id, tags=tags)
 
     @property
     def nodes(self) -> Dict[str, BaseNode]:
@@ -30,7 +30,7 @@ class BasePipeline(ABC, Identification):
     @abstractmethod
     def add_node(
         self, 
-        id_: str, 
+        id: str, 
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
@@ -41,7 +41,7 @@ class BasePipeline(ABC, Identification):
     @abstractmethod
     def add_conn(
         self, 
-        id_: str, 
+        id: str, 
         src_id: str, 
         dst_id: str, 
         value: Any = None, 
@@ -53,14 +53,14 @@ class BasePipeline(ABC, Identification):
 class Pipeline(BasePipeline):
     def add_node(
         self, 
-        id_: str, 
+        id: str, 
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
         tags: List[str] = []
     ) -> None:
-        self._check_existent_node_id(id_)
-        node = Node(id_, func, inputs, outputs, tags)
+        self._check_existent_node_id(id)
+        node = Node(id, func, inputs, outputs, tags)
 
         self._nodes[node.id] = node
         self._graph[node.id] = []
@@ -73,16 +73,16 @@ class Pipeline(BasePipeline):
 
     def add_conn(
         self, 
-        id_: str, 
+        id: str, 
         src_id: str, 
         dst_id: str, 
         value: Any = None, 
         tags: List[str] = []
     ) -> None:
-        self._check_existent_conn_id(id_)
-        self._check_inexistent_node_id(id_, src_id)
-        self._check_inexistent_node_id(id_, dst_id)
-        conn = Conn(id_, src_id, dst_id, value, tags)
+        self._check_existent_conn_id(id)
+        self._check_inexistent_node_id(id, src_id)
+        self._check_inexistent_node_id(id, dst_id)
+        conn = Conn(id, src_id, dst_id, value, tags)
 
         self._conns[conn.id] = conn
         self._graph[conn.src_id].append(conn.dst_id)

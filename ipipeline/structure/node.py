@@ -7,7 +7,7 @@ from ipipeline.utils.instance import Identification
 class BaseNode(ABC, Identification):
     def __init__(
         self, 
-        id_: str, 
+        id: str, 
         func: Callable, 
         inputs: Dict[str, Any] = {}, 
         outputs: List[str] = [], 
@@ -17,7 +17,7 @@ class BaseNode(ABC, Identification):
         self._inputs = inputs
         self._outputs = outputs
 
-        super().__init__(id_, tags=tags)
+        super().__init__(id, tags=tags)
 
     @property
     def func(self) -> Callable:
