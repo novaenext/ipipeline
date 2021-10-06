@@ -1,44 +1,30 @@
 import logging
 from abc import ABC, abstractmethod
+from itertools import chain
 from typing import Any, Dict, List
 
 from ipipeline.control.building import build_func_inputs, build_func_outputs
-from ipipeline.control.catalog import Catalog
-from ipipeline.control.sorting import sort_dag_topo
+from ipipeline.control.catalog import BaseCatalog, Catalog
+from ipipeline.control.sorting import sort_graph_topo
 from ipipeline.exceptions import ExecutionError
 from ipipeline.structure.pipeline import BasePipeline
-from ipipeline.utils.sequence import flatten_nested_seq
 
 
 logger = logging.getLogger(name=__name__)
 
 
 class BaseExecutor(ABC):
-    @abstractmethod
-    def flag_node(self, node_id: str, flag: str, status: bool) -> None:
-        pass
-
-    @abstractmethod
-    def execute_node(self, node_id: str) -> Dict[str, Any]:
-        pass
-
-    @abstractmethod
-    def obtain_exe_order(self) -> list:
-        pass
-
-    @abstractmethod
-    def execute_pipeline(self, exe_order: list) -> None:
-        pass
-
-
-class SequentialExecutor(BaseExecutor):
-    def __init__(self, pipeline: BasePipeline) -> None:
+    def __init__(self, pipeline: BasePipeline, catalog: BaseCatalog) -> None:
         self._pipeline = pipeline
-        self._catalog = Catalog()
-        self._flagged = {}
+        self._catalog = catalog
+        self._flags = {}
 
     @property
-    def catalog(self) -> Catalog:
+    def pipeline(self) -> BasePipeline:
+        return self._pipeline
+
+    @property
+    def catalog(self) -> BaseCatalog:
         return self._catalog
 
     def flag_node(self, node_id: str, flag: str, status: bool) -> None:
@@ -46,12 +32,12 @@ class SequentialExecutor(BaseExecutor):
             self._check_invalid_flag(flag)
             node = self._pipeline.nodes[node_id]
 
-            if node_id not in self._flagged:
-                self._flagged[node.id] = {}
-            self._flagged[node.id][flag] = status
+            if node.id not in self._flags:
+                self._flags[node.id] = {}
+            self._flags[node.id][flag] = status
         except Exception as error:
             raise ExecutionError(
-                'node not flagged', f'node_id == {node_id}'
+                'node not flagged in the _flags', f'node_id == {node_id}'
             ) from error
 
     def _check_invalid_flag(self, flag: str) -> None:
@@ -74,20 +60,35 @@ class SequentialExecutor(BaseExecutor):
             return func_outputs
         except Exception as error:
             raise ExecutionError(
-                'node not executed', f'node_id == {node_id}'
+                'node not executed by the executor', f'node_id == {node_id}'
             ) from error
 
-    def obtain_exe_order(self) -> List[str]:
-        exe_order = flatten_nested_seq(sort_dag_topo(self._pipeline.graph))
+    def obtain_exe_order(self) -> List[list]:
+        exe_order = sort_graph_topo(self._pipeline.graph)
         logger.info(f'exe_order: {exe_order}')
 
         return exe_order
 
+    @abstractmethod
+    def execute_pipeline(self, exe_order: list) -> None:
+        pass
+
+
+class SequentialExecutor(BaseExecutor):
+    def __init__(
+        self, pipeline: BasePipeline, catalog: BaseCatalog = Catalog()
+    ) -> None:
+        super().__init__(pipeline, catalog)
+
+    def obtain_exe_order(self) -> List[str]:
+        exe_order = super().obtain_exe_order()
+
+        return list(chain(*exe_order))
+
     def execute_pipeline(self, exe_order: List[str]) -> None:
         for node_id in exe_order:
-            if not self._flagged.get(node_id, {}).get('skip', False):
+            if not self._flags.get(node_id, {}).get('skip', False):
                 outputs = self.execute_node(node_id)
 
-                if outputs:
-                    for out_key, out_value in outputs.items():
-                        self._catalog.add_item(out_key, out_value)
+                for out_key, out_value in outputs.items():
+                    self._catalog.add_item(out_key, out_value)
