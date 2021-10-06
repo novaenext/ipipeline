@@ -18,9 +18,9 @@ class TestBasePipeline(TestCase):
         base_pipeline = MockBasePipeline('p1', tags=['data'])
 
         self.assertEqual(base_pipeline.id, 'p1')
-        self.assertDictEqual(base_pipeline._nodes, {})
-        self.assertDictEqual(base_pipeline._conns, {})
-        self.assertDictEqual(base_pipeline._graph, {})
+        self.assertDictEqual(base_pipeline.nodes, {})
+        self.assertDictEqual(base_pipeline.conns, {})
+        self.assertDictEqual(base_pipeline.graph, {})
         self.assertListEqual(base_pipeline.tags, ['data'])
 
 
@@ -39,7 +39,7 @@ class TestPipeline(TestCase):
 
         for node_id in ['n1', 'n2', 'n3', 'n4']:
             self._mock_nodes[node_id] = Mock(
-                spec=['id', 'func', 'inputs', 'outputs', 'props', 'tags']
+                spec=['id', 'func', 'inputs', 'outputs', 'tags']
             )
             self._mock_graph[node_id] = []
 
@@ -47,12 +47,12 @@ class TestPipeline(TestCase):
             spec=['id', 'src_id', 'dst_id', 'value', 'tags']
         )
 
-    def test_new(self) -> None:
+    def test_deriv(self) -> None:
         pipeline = Pipeline('p1')
 
         self.assertIsInstance(pipeline, BasePipeline)
 
-    def test_add_node_inexistent_ids(self) -> None:
+    def test_add_inexistent_nodes(self) -> None:
         pipeline = Pipeline('p1')
         pipeline.add_node(
             'n1', mock_sum, inputs={'param1': 7, 'param2': 3}, outputs=['sum']
@@ -74,7 +74,7 @@ class TestPipeline(TestCase):
             list(pipeline.graph.values()), [[], []]
         )
 
-    def test_add_node_existent_ids(self) -> None:
+    def test_add_existent_nodes(self) -> None:
         pipeline = Pipeline('p1')
         pipeline.add_node(
             'n1', mock_sum, inputs={'param1': 7, 'param2': 3}, outputs=['sum']
@@ -90,7 +90,7 @@ class TestPipeline(TestCase):
                 outputs=['sub']
             )
 
-    def test_check_existent_node_id_existent_node_id(self) -> None:
+    def test_check_existent_node_id(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = {'n1': self._mock_nodes['n1']}
 
@@ -99,13 +99,13 @@ class TestPipeline(TestCase):
         ):
             pipeline._check_existent_node_id('n1')
 
-    def test_check_existent_node_id_inexistent_node_id(self) -> None:
+    def test_check_inexistent_node_id(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._check_existent_node_id('n1')
 
         self.assertTrue(True)
 
-    def test_add_conn_inexistent_ids(self) -> None:
+    def test_add_inexistent_conns(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = self._mock_nodes
         pipeline._graph = self._mock_graph
@@ -126,7 +126,7 @@ class TestPipeline(TestCase):
             list(pipeline.graph.values()), [['n2', 'n3'], ['n4'], [], []]
         )
 
-    def test_add_conn_existent_ids(self) -> None:
+    def test_add_existent_conns(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = self._mock_nodes
         pipeline._graph = self._mock_graph
@@ -138,7 +138,7 @@ class TestPipeline(TestCase):
         ):
             pipeline.add_conn('c1', 'n2', 'n4')
 
-    def test_add_conn_inexistent_src_id(self) -> None:
+    def test_add_inexistent_src_node(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = self._mock_nodes
         pipeline._graph = self._mock_graph
@@ -149,7 +149,7 @@ class TestPipeline(TestCase):
         ):
             pipeline.add_conn('c1', 'n7', 'n2')
 
-    def test_add_conn_inexistent_dst_id(self) -> None:
+    def test_add_inexistent_dst_node(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = self._mock_nodes
         pipeline._graph = self._mock_graph
@@ -160,7 +160,7 @@ class TestPipeline(TestCase):
         ):
             pipeline.add_conn('c1', 'n1', 'n9')
 
-    def test_check_existent_conn_id_existent_conn_id(self) -> None:
+    def test_check_existent_conn_id(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._conns = {'c1': self._mock_conn}
 
@@ -169,13 +169,13 @@ class TestPipeline(TestCase):
         ):
             pipeline._check_existent_conn_id('c1')
 
-    def test_check_existent_conn_id_inexistent_conn_id(self) -> None:
+    def test_check_inexistent_conn_id(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._check_existent_conn_id('c1')
 
         self.assertTrue(True)
 
-    def test_check_inexistent_node_id_inexistent_node_id(self) -> None:
+    def test_check_inexistent_node_id_with_conn_id(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._conns = {'c1': self._mock_conn}
 
@@ -185,7 +185,7 @@ class TestPipeline(TestCase):
         ):
             pipeline._check_inexistent_node_id('c1', 'n1')
 
-    def test_check_inexistent_node_id_existent_node_id(self) -> None:
+    def test_check_existent_node_id_with_conn_id(self) -> None:
         pipeline = Pipeline('p1')
         pipeline._nodes = {'n1': self._mock_nodes['n1']}
         pipeline._conns = {'c1': self._mock_conn}

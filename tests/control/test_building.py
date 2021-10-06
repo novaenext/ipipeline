@@ -28,7 +28,7 @@ class TestBuildFuncInputs(TestCase):
 
         self.assertDictEqual(func_inputs, {'i1': 7, 'i2': '0'})
 
-    def test_empty_inputs(self) -> None:
+    def test_inputs_without_defaults(self) -> None:
         func_inputs = build_func_inputs({}, {'i1': 7, 'i2': 0})
 
         self.assertDictEqual(func_inputs, {})
@@ -52,13 +52,15 @@ class TestBuildFuncOutputs(TestCase):
 
     def test_diff_outputs1(self) -> None:
         with self.assertRaisesRegex(
-            BuildingError, r'outputs did not match: 2 != 1'
+            BuildingError, 
+            r'outputs_qty is not equal to the returns_qty: 2 != 1'
         ):
             _ = build_func_outputs(['o1', 'o2'], 7)
 
     def test_diff_outputs2(self) -> None:
         with self.assertRaisesRegex(
-            BuildingError, r'outputs did not match: 2 != 3'
+            BuildingError, 
+            r'outputs_qty is not equal to the returns_qty: 2 != 3'
         ):
             _ = build_func_outputs(['o1', 'o2'], [7, 0, 7])
 
@@ -66,7 +68,8 @@ class TestBuildFuncOutputs(TestCase):
 class TestCheckDiffOutputsQty(TestCase):
     def test_diff_qty(self) -> None:
         with self.assertRaisesRegex(
-            BuildingError, r'outputs did not match: 2 != 1'
+            BuildingError, 
+            r'outputs_qty is not equal to the returns_qty: 2 != 1'
         ):
             _check_diff_outputs_qty(2, 1)
 

@@ -66,16 +66,16 @@ class TestIdentification(TestCase):
         self.assertEqual(identifier.id, 'i1')
         self.assertListEqual(identifier.tags, ['t1', 't2'])
 
-    def test_check_valid_id_valid_id(self) -> None:
-        id_ = Identification._check_valid_id(None, 'i1')
+    def test_check_valid_id(self) -> None:
+        id = Identification._check_valid_id(None, 'i1')
 
-        self.assertEqual(id_, 'i1')
+        self.assertEqual(id, 'i1')
 
-    def test_check_valid_id_invalid_id(self) -> None:
+    def test_check_invalid_id(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'id_ not validated according to the pattern \(letters, digits, '
-            r'underscore and/or dash\): id_ == i\.1'
+            r'id not validated according to the pattern \(letters, '
+            r'digits, underscore and/or dash\): id == i\.1'
         ):
             _ = Identification._check_valid_id(None, 'i.1')
 
@@ -85,5 +85,5 @@ class TestIdentification(TestCase):
 
         self.assertEqual(
             instance_repr, 
-            'Identification(id_=\'i1\', tags=[\'t1\', \'t2\'])'
+            'Identification(id=\'i1\', tags=[\'t1\', \'t2\'])'
         )

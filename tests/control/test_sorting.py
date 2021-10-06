@@ -31,9 +31,7 @@ class TestSortGraphTopo(TestCase):
 
     def test_dcg_with_linear_topo(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, 
-            r'circular dependency found in the graph: \(nodes_qty := 4\) != '
-            r'\(ind_nodes_qty := 0\)'
+            SortingError, r'circular dependency found in the graph: 4 != 0'
         ):
             _ = sort_graph_topo(
                 {'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n1']}
@@ -41,9 +39,7 @@ class TestSortGraphTopo(TestCase):
 
     def test_dcg_with_nonlinear_topo(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, 
-            r'circular dependency found in the graph: \(nodes_qty := 9\) != '
-            r'\(ind_nodes_qty := 3\)'
+            SortingError, r'circular dependency found in the graph: 9 != 3'
         ):
             _ = sort_graph_topo({
                 'n1': ['n3', 'n4', 'n6'], 'n2': ['n5'], 'n3': ['n6'], 
@@ -73,7 +69,8 @@ class TestCreateInConnsQty(TestCase):
 
     def test_dag_without_src_node_ids(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, r'dst_node_id without src_node_id: dst_node_id == n4'
+            SortingError, 
+            r'dst_node_id not specified as src_node_id: dst_node_id == n4'
         ):
             _ = _create_in_conns_qty(
                 {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4']}
@@ -95,9 +92,7 @@ class TestCreateIndNodeIds(TestCase):
 class TestCheckDiffNodesQty(TestCase):
     def test_diff_nodes_qty(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, 
-            r'circular dependency found in the graph: \(nodes_qty := 7\) != '
-            r'\(ind_nodes_qty := 4\)'
+            SortingError, r'circular dependency found in the graph: 7 != 4'
         ):
             _check_diff_nodes_qty(7, 4)
 

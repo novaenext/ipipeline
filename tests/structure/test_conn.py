@@ -15,7 +15,7 @@ class TestBaseConn(TestCase):
 
 
 class TestConn(TestCase):
-    def test_new(self) -> None:
+    def test_deriv(self) -> None:
         conn = Conn('c1', 'n1', 'n2')
 
         self.assertIsInstance(conn, BaseConn)
