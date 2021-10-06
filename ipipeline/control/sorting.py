@@ -36,7 +36,7 @@ def _create_in_conns_qty(graph: Dict[str, list]) -> Dict[str, int]:
                 in_conns_qty[dst_node_id] += 1
             except KeyError as error:
                 raise SortingError(
-                    'dst_node_id without src_node_id', 
+                    'dst_node_id not specified as src_node_id', 
                     f'dst_node_id == {dst_node_id}'
                 ) from error
 
@@ -57,5 +57,5 @@ def _check_diff_nodes_qty(nodes_qty: int, ind_nodes_qty: int) -> None:
     if nodes_qty != ind_nodes_qty:
         raise SortingError(
             'circular dependency found in the graph', 
-            f'(nodes_qty := {nodes_qty}) != (ind_nodes_qty := {ind_nodes_qty})'
+            f'{nodes_qty} != {ind_nodes_qty}'
         )
