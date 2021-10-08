@@ -5,29 +5,6 @@ from typing import List
 from ipipeline.exceptions import InstanceError
 
 
-def create_instance_repr(instance: object) -> str:
-    instance_repr = f'{instance.__class__.__name__}('
-
-    for param in signature(instance.__init__).parameters.values():
-        value = None
-
-        for attr in [
-            f'_{param.name}', param.name, 
-            f'_{param.name[:-1]}', param.name[:-1]
-        ]:
-            if attr in instance.__dict__:
-                value = getattr(instance, attr)
-
-                if isinstance(value, str):
-                    value = f'\'{value}\''
-
-                break
-
-        instance_repr += f'{param.name}={value}, '
-
-    return f'{instance_repr})'.replace(', )', ')')
-
-
 class Identification:
     def __init__(self, id: str, tags: List[str] = []) -> None:
         self._id = self._check_valid_id(id)
@@ -53,3 +30,26 @@ class Identification:
 
     def __repr__(self) -> str:
         return create_instance_repr(self)
+
+
+def create_instance_repr(instance: object) -> str:
+    instance_repr = f'{instance.__class__.__name__}('
+
+    for param in signature(instance.__init__).parameters.values():
+        value = None
+
+        for attr in [
+            f'_{param.name}', param.name, 
+            f'_{param.name[:-1]}', param.name[:-1]
+        ]:
+            if attr in instance.__dict__:
+                value = getattr(instance, attr)
+
+                if isinstance(value, str):
+                    value = f'\'{value}\''
+
+                break
+
+        instance_repr += f'{param.name}={value}, '
+
+    return f'{instance_repr})'.replace(', )', ')')

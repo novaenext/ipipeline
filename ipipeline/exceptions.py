@@ -19,7 +19,7 @@ class ExecutionError(BaseError):
     pass
 
 
-class SortingError(BaseError):
+class InstanceError(BaseError):
     pass
 
 
@@ -27,7 +27,7 @@ class PipelineError(BaseError):
     pass
 
 
-class InstanceError(BaseError):
+class SortingError(BaseError):
     pass
 
 
