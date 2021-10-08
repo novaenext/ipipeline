@@ -5,9 +5,9 @@ from ipipeline.exceptions import (
     BuildingError, 
     CatalogError, 
     ExecutionError, 
-    SortingError, 
-    PipelineError, 
     InstanceError, 
+    PipelineError, 
+    SortingError, 
     SystemError
 )
 
@@ -47,9 +47,9 @@ class TestExecutionError(TestCase):
         self.assertIsInstance(error, BaseError)
 
 
-class TestSortingError(TestCase):
+class TestInstanceError(TestCase):
     def test_deriv(self) -> None:
-        error = SortingError('', '')
+        error = InstanceError('', '')
 
         self.assertIsInstance(error, BaseError)
 
@@ -61,9 +61,9 @@ class TestPipelineError(TestCase):
         self.assertIsInstance(error, BaseError)
 
 
-class TestInstanceError(TestCase):
+class TestSortingError(TestCase):
     def test_deriv(self) -> None:
-        error = InstanceError('', '')
+        error = SortingError('', '')
 
         self.assertIsInstance(error, BaseError)
 

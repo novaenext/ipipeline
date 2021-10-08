@@ -1,7 +1,37 @@
 from unittest import TestCase
 
 from ipipeline.exceptions import InstanceError
-from ipipeline.utils.instance import create_instance_repr, Identification
+from ipipeline.utils.instance import Identification, create_instance_repr
+
+
+class TestIdentification(TestCase):
+    def test_init(self) -> None:
+        identifier = Identification('i1', tags=['t1', 't2'])
+
+        self.assertEqual(identifier.id, 'i1')
+        self.assertListEqual(identifier.tags, ['t1', 't2'])
+
+    def test_check_valid_id(self) -> None:
+        id = Identification._check_valid_id(None, 'i1')
+
+        self.assertEqual(id, 'i1')
+
+    def test_check_invalid_id(self) -> None:
+        with self.assertRaisesRegex(
+            InstanceError, 
+            r'id not validated according to the pattern \(letters, '
+            r'digits, underscore and/or dash\): id == i\.1'
+        ):
+            _ = Identification._check_valid_id(None, 'i.1')
+
+    def test_repr(self) -> None:
+        identifier = Identification('i1', tags=['t1', 't2'])
+        instance_repr = identifier.__repr__()
+
+        self.assertEqual(
+            instance_repr, 
+            'Identification(id=\'i1\', tags=[\'t1\', \'t2\'])'
+        )
 
 
 class MockClass1:
@@ -57,33 +87,3 @@ class TestCreateInstanceRepr(TestCase):
         instance_repr = create_instance_repr(MockClass4())
 
         self.assertEqual(instance_repr, 'MockClass4()')
-
-
-class TestIdentification(TestCase):
-    def test_init(self) -> None:
-        identifier = Identification('i1', tags=['t1', 't2'])
-
-        self.assertEqual(identifier.id, 'i1')
-        self.assertListEqual(identifier.tags, ['t1', 't2'])
-
-    def test_check_valid_id(self) -> None:
-        id = Identification._check_valid_id(None, 'i1')
-
-        self.assertEqual(id, 'i1')
-
-    def test_check_invalid_id(self) -> None:
-        with self.assertRaisesRegex(
-            InstanceError, 
-            r'id not validated according to the pattern \(letters, '
-            r'digits, underscore and/or dash\): id == i\.1'
-        ):
-            _ = Identification._check_valid_id(None, 'i.1')
-
-    def test_repr(self) -> None:
-        identifier = Identification('i1', tags=['t1', 't2'])
-        instance_repr = identifier.__repr__()
-
-        self.assertEqual(
-            instance_repr, 
-            'Identification(id=\'i1\', tags=[\'t1\', \'t2\'])'
-        )

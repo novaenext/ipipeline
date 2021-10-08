@@ -11,9 +11,9 @@ from ipipeline.exceptions import SortingError
 
 class TestSortGraphTopo(TestCase):
     def test_dag_with_linear_topo(self) -> None:
-        topo_order = sort_graph_topo(
-            {'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': []}
-        )
+        topo_order = sort_graph_topo({
+            'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': []
+        })
 
         self.assertListEqual(topo_order, [['n1'], ['n2'], ['n3'], ['n4']])
 
@@ -33,9 +33,9 @@ class TestSortGraphTopo(TestCase):
         with self.assertRaisesRegex(
             SortingError, r'circular dependency found in the graph: 4 != 0'
         ):
-            _ = sort_graph_topo(
-                {'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n1']}
-            )
+            _ = sort_graph_topo({
+                'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n1']
+            })
 
     def test_dcg_with_nonlinear_topo(self) -> None:
         with self.assertRaisesRegex(
