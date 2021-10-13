@@ -2,11 +2,11 @@ from unittest import TestCase
 
 from ipipeline.control.sorting import (
     sort_graph_topo, 
-    _create_in_conns_qty, 
-    _create_ind_node_ids, 
+    _obtain_in_conns_qty, 
+    _find_ind_node_ids, 
     _check_diff_nodes_qty
 )
-from ipipeline.exceptions import SortingError
+from ipipeline.exception import SortingError
 
 
 class TestSortGraphTopo(TestCase):
@@ -48,9 +48,9 @@ class TestSortGraphTopo(TestCase):
             })
 
 
-class TestCreateInConnsQty(TestCase):
+class TestObtainInConnsQty(TestCase):
     def test_dag_with_dst_node_ids(self) -> None:
-        in_conns_qty = _create_in_conns_qty(
+        in_conns_qty = _obtain_in_conns_qty(
             {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4'], 'n4': []}
         )
 
@@ -59,7 +59,7 @@ class TestCreateInConnsQty(TestCase):
         )
 
     def test_dag_without_dst_node_ids(self) -> None:
-        in_conns_qty = _create_in_conns_qty(
+        in_conns_qty = _obtain_in_conns_qty(
             {'n1': [], 'n2': [], 'n3': [], 'n4': []}
         )
 
@@ -72,19 +72,19 @@ class TestCreateInConnsQty(TestCase):
             SortingError, 
             r'dst_node_id not specified as src_node_id: dst_node_id == n4'
         ):
-            _ = _create_in_conns_qty(
+            _ = _obtain_in_conns_qty(
                 {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4']}
             )
 
 
-class TestCreateIndNodeIds(TestCase):
+class TestFindIndNodeIds(TestCase):
     def test_node_ids_without_in_conns(self) -> None:
-        ind_node_ids = _create_ind_node_ids({'n1': 0, 'n2': 0})
+        ind_node_ids = _find_ind_node_ids({'n1': 0, 'n2': 0})
 
         self.assertListEqual(ind_node_ids, ['n1', 'n2'])
 
     def test_node_ids_with_in_conns(self) -> None:
-        ind_node_ids = _create_ind_node_ids({'n1': 1, 'n2': 2})
+        ind_node_ids = _find_ind_node_ids({'n1': 1, 'n2': 2})
 
         self.assertListEqual(ind_node_ids, [])
 
