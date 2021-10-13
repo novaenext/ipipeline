@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from ipipeline.exceptions import InstanceError
-from ipipeline.utils.instance import Identification, create_instance_repr
+from ipipeline.exception import InstanceError
+from ipipeline.util.instance import Identification, build_instance_repr
 
 
 class TestIdentification(TestCase):
@@ -64,9 +64,9 @@ class MockClass4:
         pass
 
 
-class TestCreateInstanceRepr(TestCase):
+class TestBuildInstanceRepr(TestCase):
     def test_instance_with_params_with_attrs(self) -> None:
-        instance_repr = create_instance_repr(MockClass1(1, '2'))
+        instance_repr = build_instance_repr(MockClass1(1, '2'))
 
         self.assertEqual(
             instance_repr, 
@@ -74,16 +74,16 @@ class TestCreateInstanceRepr(TestCase):
         )
 
     def test_instance_with_params_without_attrs(self) -> None:
-        instance_repr = create_instance_repr(MockClass2(1, '2'))
+        instance_repr = build_instance_repr(MockClass2(1, '2'))
 
         self.assertEqual(instance_repr, 'MockClass2(param1=None, param2=None)')
 
     def test_instance_without_params_with_attrs(self) -> None:
-        instance_repr = create_instance_repr(MockClass3())
+        instance_repr = build_instance_repr(MockClass3())
 
         self.assertEqual(instance_repr, 'MockClass3()')
 
     def test_instance_without_params_without_attrs(self) -> None:
-        instance_repr = create_instance_repr(MockClass4())
+        instance_repr = build_instance_repr(MockClass4())
 
         self.assertEqual(instance_repr, 'MockClass4()')
