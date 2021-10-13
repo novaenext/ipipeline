@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Any, List
 
-from ipipeline.utils.instance import Identification
+from ipipeline.util.instance import Identification
 
 
 class BaseConn(ABC, Identification):

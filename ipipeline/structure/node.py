@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Any, Callable, Dict, List
 
-from ipipeline.utils.instance import Identification
+from ipipeline.util.instance import Identification
 
 
 class BaseNode(ABC, Identification):

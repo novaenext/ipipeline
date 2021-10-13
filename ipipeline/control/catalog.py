@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict
 
-from ipipeline.exceptions import CatalogError
+from ipipeline.exception import CatalogError
 
 
 class BaseCatalog(ABC):

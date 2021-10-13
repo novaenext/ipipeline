@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
 
-from ipipeline.exceptions import PipelineError
+from ipipeline.exception import PipelineError
 from ipipeline.structure.conn import BaseConn, Conn
 from ipipeline.structure.node import BaseNode, Node
-from ipipeline.utils.instance import Identification
+from ipipeline.util.instance import Identification
 
 
 class BasePipeline(ABC, Identification):

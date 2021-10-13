@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from ipipeline.exceptions import BuildingError
+from ipipeline.exception import BuildingError
 
 
 def build_func_inputs(
