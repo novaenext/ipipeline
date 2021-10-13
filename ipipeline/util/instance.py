@@ -29,10 +29,10 @@ class Identification:
             )
 
     def __repr__(self) -> str:
-        return create_instance_repr(self)
+        return build_instance_repr(self)
 
 
-def create_instance_repr(instance: object) -> str:
+def build_instance_repr(instance: object) -> str:
     instance_repr = f'{instance.__class__.__name__}('
 
     for param in signature(instance.__init__).parameters.values():
