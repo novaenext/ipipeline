@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.control.catalog import BaseCatalog, Catalog
-from ipipeline.exceptions import CatalogError
+from ipipeline.exception import CatalogError
 
 
 class MockBaseCatalog(BaseCatalog):

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from ipipeline.exceptions import PipelineError
+from ipipeline.exception import PipelineError
 from ipipeline.structure.pipeline import BasePipeline, Pipeline
 
 

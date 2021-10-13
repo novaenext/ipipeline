@@ -3,7 +3,7 @@ from unittest import TestCase
 from ipipeline.control.building import (
     build_func_inputs, build_func_outputs, _check_diff_outputs_qty
 )
-from ipipeline.exceptions import BuildingError
+from ipipeline.exception import BuildingError
 
 
 class TestBuildFuncInputs(TestCase):
