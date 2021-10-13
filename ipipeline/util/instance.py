@@ -2,7 +2,7 @@ import re
 from inspect import signature
 from typing import List
 
-from ipipeline.exceptions import InstanceError
+from ipipeline.exception import InstanceError
 
 
 class Identification:

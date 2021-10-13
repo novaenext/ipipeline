@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ipipeline.exceptions import SystemError
+from ipipeline.exception import SystemError
 
 
 def create_directory(
