@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 from ipipeline.control.execution import BaseExecutor, SequentialExecutor
-from ipipeline.exceptions import ExecutionError
+from ipipeline.exception import ExecutionError
 
 
 def mock_sum(param1: int, param2: int) -> int:
@@ -40,7 +40,7 @@ class TestBaseExecutor(TestCase):
         self._mock_pipeline.graph = {'n1': []}
 
         self._mock_catalog = Mock(spec=['items'])
-        self._mock_catalog.items = {}
+        self._mock_catalog.items = {'i1': 7}
 
     def test_init(self) -> None:
         base_executor = MockBaseExecutor(
@@ -48,7 +48,23 @@ class TestBaseExecutor(TestCase):
         )
 
         self.assertDictEqual(base_executor.pipeline.graph, {'n1': []})
-        self.assertDictEqual(base_executor.catalog.items, {})
+        self.assertDictEqual(base_executor.catalog.items, {'i1': 7})
+
+    def test_check_empty_catalog(self) -> None:
+        base_executor = MockBaseExecutor(
+            self._mock_pipeline, None
+        )
+        catalog = base_executor._check_empty_catalog(None)
+
+        self.assertDictEqual(catalog.items, {})
+
+    def test_check_non_empty_catalog(self) -> None:
+        base_executor = MockBaseExecutor(
+            self._mock_pipeline, self._mock_catalog
+        )
+        catalog = base_executor._check_empty_catalog(self._mock_catalog)
+
+        self.assertDictEqual(catalog.items, {'i1': 7})
 
     def test_flag_inexistent_node(self) -> None:
         base_executor = MockBaseExecutor(
