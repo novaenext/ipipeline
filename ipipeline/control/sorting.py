@@ -6,8 +6,8 @@ from ipipeline.exception import SortingError
 def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
     topo_order = []
     ind_nodes_qty = 0
-    in_conns_qty = _create_in_conns_qty(graph)
-    ind_node_ids = _create_ind_node_ids(in_conns_qty)
+    in_conns_qty = _obtain_in_conns_qty(graph)
+    ind_node_ids = _find_ind_node_ids(in_conns_qty)
 
     while ind_node_ids:
         next_node_ids = []
@@ -27,7 +27,7 @@ def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
     return topo_order
 
 
-def _create_in_conns_qty(graph: Dict[str, list]) -> Dict[str, int]:
+def _obtain_in_conns_qty(graph: Dict[str, list]) -> Dict[str, int]:
     in_conns_qty = dict.fromkeys(graph.keys(), 0)
 
     for dst_node_ids in graph.values():
@@ -43,7 +43,7 @@ def _create_in_conns_qty(graph: Dict[str, list]) -> Dict[str, int]:
     return in_conns_qty
 
 
-def _create_ind_node_ids(in_conns_qty: Dict[str, int]) -> List[str]:
+def _find_ind_node_ids(in_conns_qty: Dict[str, int]) -> List[str]:
     ind_node_ids = []
 
     for node_id, in_qty in in_conns_qty.items():
