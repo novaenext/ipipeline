@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 from ipipeline.control.building import build_func_inputs, build_func_outputs
 from ipipeline.control.catalog import BaseCatalog, Catalog
 from ipipeline.control.sorting import sort_graph_topo
-from ipipeline.exceptions import ExecutionError
+from ipipeline.exception import ExecutionError
 from ipipeline.structure.pipeline import BasePipeline
 
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(name=__name__)
 class BaseExecutor(ABC):
     def __init__(self, pipeline: BasePipeline, catalog: BaseCatalog) -> None:
         self._pipeline = pipeline
-        self._catalog = catalog
+        self._catalog = self._check_empty_catalog(catalog)
         self._flags = {}
 
     @property
@@ -26,6 +26,12 @@ class BaseExecutor(ABC):
     @property
     def catalog(self) -> BaseCatalog:
         return self._catalog
+
+    def _check_empty_catalog(self, catalog: BaseCatalog) -> BaseCatalog:
+        if catalog:
+            return catalog
+        else:
+            return Catalog()
 
     def flag_node(self, node_id: str, flag: str, status: bool) -> None:
         try:
@@ -76,7 +82,7 @@ class BaseExecutor(ABC):
 
 class SequentialExecutor(BaseExecutor):
     def __init__(
-        self, pipeline: BasePipeline, catalog: BaseCatalog = Catalog()
+        self, pipeline: BasePipeline, catalog: BaseCatalog = None
     ) -> None:
         super().__init__(pipeline, catalog)
 
