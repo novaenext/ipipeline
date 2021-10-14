@@ -38,10 +38,7 @@ def build_instance_repr(instance: object) -> str:
     for param in signature(instance.__init__).parameters.values():
         value = None
 
-        for attr in [
-            f'_{param.name}', param.name, 
-            f'_{param.name[:-1]}', param.name[:-1]
-        ]:
+        for attr in [f'_{param.name}', param.name]:
             if attr in instance.__dict__:
                 value = getattr(instance, attr)
 
