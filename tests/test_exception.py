@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from ipipeline.exception import (
     BaseError, 
+    ActionError, 
     BuildingError, 
     CatalogError, 
     ExecutionError, 
@@ -24,6 +25,13 @@ class TestBaseError(TestCase):
         error_str = error.__str__()
 
         self.assertEqual(error_str, 'error msg: error == value')
+
+
+class TestActionError(TestCase):
+    def test_deriv(self) -> None:
+        error = ActionError('', '')
+
+        self.assertIsInstance(error, BaseError)
 
 
 class TestBuildingError(TestCase):
