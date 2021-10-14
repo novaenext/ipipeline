@@ -18,7 +18,7 @@ def create_project(path: str, name: str) -> None:
             'CONTRIBUTING.md', 
             'LICENSE.md', 
             'README.md', 
-            'requirements.txt', 
+            'requirement.txt', 
             'setup.py'
         ]:
             create_file(f'{proj_path}/{proj_file}')
@@ -34,4 +34,24 @@ def create_project(path: str, name: str) -> None:
     except Exception as error:
         raise ActionError(
             'project not created in the file system', f'path == {path}'
+        ) from error
+
+
+def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
+    try:
+        pipeline = getattr(import_module(mod_name), func_name)()
+    except (ModuleNotFoundError, AttributeError) as error:
+        raise ActionError(
+            'func not found in the module', f'func_name == {func_name}'
+        ) from error
+
+    try:
+        executor = getattr(
+            import_module('ipipeline.control.execution'), 
+            f'{exe_type.capitalize()}Executor'
+        )(pipeline)
+        executor.execute_pipeline(executor.obtain_exe_order())
+    except AttributeError as error:
+        raise ActionError(
+            'executor not found in the module', f'exe_type == {exe_type}'
         ) from error
