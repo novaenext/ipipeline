@@ -35,28 +35,20 @@ class TestIdentification(TestCase):
 
 
 class MockClass1:
-    def __init__(
-        self, 
-        param1_: int, 
-        param2_: str, 
-        param3_: int = 3, 
-        param4_: str = '4'
-    ) -> None:
-        self._param1_ = param1_
-        self.param2_ = param2_
-        self._param3 = param3_
-        self.param4 = param4_
+    def __init__(self, param1: int, param2: str = '2') -> None:
+        self._param1 = param1
+        self.param2 = param2
 
 
 class MockClass2:
-    def __init__(self, param1: int, param2: str) -> None:
+    def __init__(self, param1: int, param2: str = '2') -> None:
         pass
 
 
 class MockClass3:
     def __init__(self) -> None:
         self._param1 = 1
-        self._param2 = '2'
+        self.param2 = '2'
 
 
 class MockClass4:
@@ -66,15 +58,12 @@ class MockClass4:
 
 class TestBuildInstanceRepr(TestCase):
     def test_instance_with_params_with_attrs(self) -> None:
-        instance_repr = build_instance_repr(MockClass1(1, '2'))
+        instance_repr = build_instance_repr(MockClass1(1))
 
-        self.assertEqual(
-            instance_repr, 
-            'MockClass1(param1_=1, param2_=\'2\', param3_=3, param4_=\'4\')'
-        )
+        self.assertEqual(instance_repr, 'MockClass1(param1=1, param2=\'2\')')
 
     def test_instance_with_params_without_attrs(self) -> None:
-        instance_repr = build_instance_repr(MockClass2(1, '2'))
+        instance_repr = build_instance_repr(MockClass2(1))
 
         self.assertEqual(instance_repr, 'MockClass2(param1=None, param2=None)')
 
