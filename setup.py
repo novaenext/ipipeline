@@ -9,8 +9,8 @@ project_path = Path(__file__).resolve().parents[0]
 with open(project_path / 'README.md') as readme_file:
     readme = readme_file.read()
 
-with open(project_path / 'requirements.txt') as requirements_file:
-    requirements = requirements_file.read().splitlines()
+with open(project_path / 'requirement.txt') as requirement_file:
+    requirement = requirement_file.read().splitlines()
 
 setup(
     name='ipipeline', 
@@ -32,8 +32,8 @@ setup(
         'Programming Language :: Python :: 3', 
         'Topic :: Scientific/Engineering'
     ], 
-    packages=find_packages(exclude=('tests*',)), 
-    install_requires=requirements, 
+    packages=find_packages(exclude=('test*',)), 
+    install_requires=requirement, 
     long_description=readme, 
     long_description_content_type='text/markdown'
 )

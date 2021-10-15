@@ -1,10 +1,17 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict
 
-from ipipeline.exceptions import CatalogError
+from ipipeline.exception import CatalogError
 
 
 class BaseCatalog(ABC):
+    def __init__(self) -> None:
+        self._items = {}
+
+    @property
+    def items(self) -> Dict[str, Any]:
+        return self._items
+
     @abstractmethod
     def add_item(self, id_: str, item: Any) -> None:
         pass
@@ -23,13 +30,6 @@ class BaseCatalog(ABC):
 
 
 class Catalog(BaseCatalog):
-    def __init__(self) -> None:
-        self._items = {}
-
-    @property
-    def items(self) -> Dict[str, Any]:
-        return self._items
-
     def add_item(self, id_: str, item: Any) -> None:
         self._items[id_] = item
 

@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from ipipeline.exceptions import BuildingError
+from ipipeline.exception import BuildingError
 
 
 def build_func_inputs(
@@ -45,5 +45,6 @@ def build_func_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
 def _check_diff_outputs_qty(outputs_qty: int, returns_qty: int) -> None:
     if outputs_qty != returns_qty:
         raise BuildingError(
-            'outputs did not match', f'{outputs_qty} != {returns_qty}'
+            'outputs_qty is not equal to the returns_qty', 
+            f'{outputs_qty} != {returns_qty}'
         )

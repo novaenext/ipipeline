@@ -1,13 +1,13 @@
 from abc import ABC
 from typing import Any, List
 
-from ipipeline.utils.instance import InstanceIdentifier
+from ipipeline.util.instance import Identification
 
 
-class BaseConn(ABC, InstanceIdentifier):
+class BaseConn(ABC, Identification):
     def __init__(
         self, 
-        id_: str, 
+        id: str, 
         src_id: str, 
         dst_id: str, 
         value: Any = None, 
@@ -17,7 +17,7 @@ class BaseConn(ABC, InstanceIdentifier):
         self._dst_id = dst_id
         self._value = value
 
-        super().__init__(id_, tags=tags)
+        super().__init__(id, tags=tags)
 
     @property
     def src_id(self) -> str:

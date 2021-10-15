@@ -25,7 +25,7 @@ class TestBaseNode(TestCase):
 
 
 class TestNode(TestCase):
-    def test_new(self) -> None:
+    def test_deriv(self) -> None:
         node = Node('n1', None)
 
         self.assertIsInstance(node, BaseNode)

@@ -7,6 +7,10 @@ class BaseError(Exception):
         return f'{self._descr}: {self._detail}'
 
 
+class ActionError(BaseError):
+    pass
+
+
 class BuildingError(BaseError):
     pass
 
@@ -19,7 +23,7 @@ class ExecutionError(BaseError):
     pass
 
 
-class SortingError(BaseError):
+class InstanceError(BaseError):
     pass
 
 
@@ -27,11 +31,7 @@ class PipelineError(BaseError):
     pass
 
 
-class InstanceError(BaseError):
-    pass
-
-
-class SequenceError(BaseError):
+class SortingError(BaseError):
     pass
 
 
