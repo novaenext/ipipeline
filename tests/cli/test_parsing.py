@@ -1,104 +1,121 @@
 from argparse import ArgumentParser
 from unittest import TestCase
+from unittest.mock import Mock
 
-from ipipeline.cli.parsing import (
-    parse_cli_args, _build_parsers, _build_root_args, _build_project_args
-)
-
-
-class TestParseCliArgs(TestCase):
-    def test_positional_arg(self) -> None:
-        args = parse_cli_args(['project', 'mock_path', 'mock_name'])
-
-        self.assertEqual(args.path, 'mock_path')
-        self.assertEqual(args.name, 'mock_name')
-
-    def test_optional_arg(self) -> None:
-        with self.assertRaisesRegex(SystemExit, r'0'):
-            _ = parse_cli_args(['--help'])
-
-    def test_invalid_arg(self) -> None:
-        with self.assertRaisesRegex(SystemExit, r'2'):
-            _ = parse_cli_args(['--invalid'])
+from ipipeline.cli.parsing import create_parser, _add_pos_args, _add_opt_args
 
 
-class TestBuildParsers(TestCase):
-    def test_root_parser(self) -> None:
-        root_parser, _ = _build_parsers()
+class TestCreateParser(TestCase):
+    def setUp(self) -> None:
+        help_arg = Mock(spec=['name', 'descr', 'action', 'type', 'key_args'])
+        help_arg.name = 'help'
+        help_arg.descr = 'help descr'
+        help_arg.action = 'help'
+        help_arg.type = None
+        help_arg.key_args = {}
+        self._mock_cmds = []
 
-        self.assertEqual(root_parser.prog, 'ipipeline')
-        self.assertEqual(root_parser.usage, 'ipipeline <command> [options]')
-        self.assertEqual(root_parser.description, 'ipipeline cli')
-        self.assertEqual(root_parser.add_help, False)
+        for name, descr, action, pos_args, opt_args, key_args in [
+            ['root_cmd', 'root_cmd descr', None, [], [help_arg], {}], 
+            ['sub_cmd', 'sub_cmd descr', None, [], [help_arg], {}]
+        ]:
+            mock_cmd = Mock(spec=[
+                'name', 'descr', 'action', 'pos_args', 'opt_args', 'key_args'
+            ])
+            mock_cmd.name = name
+            mock_cmd.descr = descr
+            mock_cmd.action = action
+            mock_cmd.pos_args = pos_args
+            mock_cmd.opt_args = opt_args
+            mock_cmd.key_args = key_args
+            self._mock_cmds.append(mock_cmd)
 
-    def test_project_parser(self) -> None:
-        _, project_parser = _build_parsers()
-
-        self.assertEqual(
-            project_parser.prog, 'ipipeline project'
-        )
-        self.assertEqual(
-            project_parser.usage, 'ipipeline project <arguments> [options]'
-        )
-        self.assertEqual(
-            project_parser.description, 'create the standard project structure'
-        )
-        self.assertEqual(
-            project_parser.add_help, False
-        )
-
-
-class TestBuildRootArgs(TestCase):
-    def test_optional_help_arg(self) -> None:
-        parser = ArgumentParser(add_help=False)
-        _build_root_args(parser)
+    def test_valid_cmds(self) -> None:
+        parser = create_parser(*self._mock_cmds)
 
         with self.assertRaisesRegex(SystemExit, r'0'):
-            parser.parse_args(['-h'])
+            _ = parser.parse_args(['-h'])
 
         with self.assertRaisesRegex(SystemExit, r'0'):
-            parser.parse_args(['--help'])
+            _ = parser.parse_args(['sub_cmd', '-h'])
 
-    def test_optional_version_arg(self) -> None:
-        parser = ArgumentParser(add_help=False)
-        _build_root_args(parser)
-
-        with self.assertRaisesRegex(SystemExit, r'0'):
-            parser.parse_args(['-v'])
-
-        with self.assertRaisesRegex(SystemExit, r'0'):
-            parser.parse_args(['--version'])
-
-    def test_invalid_arg(self) -> None:
-        parser = ArgumentParser(add_help=False)
-        _build_root_args(parser)
+    def test_invalid_cmds(self) -> None:
+        parser = create_parser(*self._mock_cmds)
 
         with self.assertRaisesRegex(SystemExit, r'2'):
-            parser.parse_args(['--invalid'])
-
-
-class TestBuildProjectArgs(TestCase):
-    def test_positional_args(self) -> None:
-        parser = ArgumentParser(add_help=False)
-        _build_project_args(parser)
-        args = parser.parse_args(['mock_path', 'mock_name'])
-
-        self.assertEqual(args.path, 'mock_path')
-        self.assertEqual(args.name, 'mock_name')
-
-    def test_optional_help_arg(self) -> None:
-        parser = ArgumentParser(add_help=False)
-        _build_project_args(parser)
-
-        with self.assertRaisesRegex(SystemExit, r'0'):
-            parser.parse_args(['-h'])
-
-        with self.assertRaisesRegex(SystemExit, r'0'):
-            parser.parse_args(['--help'])
-
-    def test_invalid_arg(self) -> None:
-        parser = ArgumentParser(add_help=False)
-        _build_project_args(parser)
+            _ = parser.parse_args(['-i'])
 
         with self.assertRaisesRegex(SystemExit, r'2'):
-            parser.parse_args(['--invalid'])
+            _ = parser.parse_args(['sub_cmd', '-i'])
+
+
+class TestAddPosArgs(TestCase):
+    def setUp(self) -> None:
+        self._mock_pos_args = []
+
+        for name, descr, action, type, key_args in [
+            ['arg1', 'arg1 descr', 'store', str, {}], 
+            ['arg2', 'arg2 descr', 'store', int, {}]
+        ]:
+            mock_pos_arg = Mock(
+                spec=['name', 'descr', 'action', 'type', 'key_args']
+            )
+            mock_pos_arg.name = name
+            mock_pos_arg.descr = descr
+            mock_pos_arg.action = action
+            mock_pos_arg.type = type
+            mock_pos_arg.key_args = key_args
+            self._mock_pos_args.append(mock_pos_arg)
+
+    def test_valid_args(self) -> None:
+        parser = ArgumentParser()
+        _add_pos_args(parser, self._mock_pos_args)
+        args = parser.parse_args(args=['7', '3'])
+
+        self.assertEqual(args.arg1, '7')
+        self.assertEqual(args.arg2, 3)
+
+    def test_invalid_args(self) -> None:
+        parser = ArgumentParser()
+        _add_pos_args(parser, self._mock_pos_args)
+
+        with self.assertRaisesRegex(SystemExit, r'2'):
+            _ = parser.parse_args(args=['7', '3', '0'])
+
+
+class TestAddOptArgs(TestCase):
+    def setUp(self) -> None:
+        self._mock_opt_args = []
+
+        for name, descr, action, type, key_args in [
+            ['help', 'help descr', 'help', None, {}]
+        ]:
+            mock_opt_arg = Mock(
+                spec=['name', 'descr', 'action', 'type', 'key_args']
+            )
+            mock_opt_arg.name = name
+            mock_opt_arg.descr = descr
+            mock_opt_arg.action = action
+            mock_opt_arg.type = type
+            mock_opt_arg.key_args = key_args
+            self._mock_opt_args.append(mock_opt_arg)
+
+    def test_valid_args(self) -> None:
+        parser = ArgumentParser(add_help=False)
+        _add_opt_args(parser, self._mock_opt_args)
+
+        with self.assertRaisesRegex(SystemExit, r'0'):
+            _ = parser.parse_args(['-h'])
+
+        with self.assertRaisesRegex(SystemExit, r'0'):
+            _ = parser.parse_args(['--help'])
+
+    def test_invalid_args(self) -> None:
+        parser = ArgumentParser(add_help=False)
+        _add_opt_args(parser, self._mock_opt_args)
+
+        with self.assertRaisesRegex(SystemExit, r'2'):
+            _ = parser.parse_args(['-i'])
+
+        with self.assertRaisesRegex(SystemExit, r'2'):
+            _ = parser.parse_args(['--invalid'])
