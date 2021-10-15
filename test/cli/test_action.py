@@ -78,7 +78,7 @@ def mock_build_pipeline() -> Mock:
 class TestExecutePipeline(TestCase):
     def test_valid_func_name(self) -> None:
         execute_pipeline(
-            'tests.cli.test_action', 'mock_build_pipeline', 'sequential'
+            'test.cli.test_action', 'mock_build_pipeline', 'sequential'
         )
 
         self.assertTrue(True)
@@ -89,7 +89,7 @@ class TestExecutePipeline(TestCase):
             r'func not found in the module: func_name == mock_build_pipelines'
         ):
             execute_pipeline(
-                'tests.cli.test_action', 'mock_build_pipelines', 'sequential'
+                'test.cli.test_action', 'mock_build_pipelines', 'sequential'
             )
 
     def test_invalid_mod_name(self) -> None:
@@ -98,7 +98,7 @@ class TestExecutePipeline(TestCase):
             r'func not found in the module: func_name == mock_build_pipeline'
         ):
             execute_pipeline(
-                'tests.cli.test_actions', 'mock_build_pipeline', 'sequential'
+                'test.cli.test_actions', 'mock_build_pipeline', 'sequential'
             )
 
     def test_invalid_exe_type(self) -> None:
@@ -107,5 +107,5 @@ class TestExecutePipeline(TestCase):
             r'executor not found in the module: exe_type == sequentials'
         ):
             execute_pipeline(
-                'tests.cli.test_action', 'mock_build_pipeline', 'sequentials'
+                'test.cli.test_action', 'mock_build_pipeline', 'sequentials'
             )
