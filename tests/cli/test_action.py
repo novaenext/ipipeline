@@ -56,16 +56,12 @@ class TestCreateProject(TestCase):
             create_project(str(self._path.parents[0]), 'mock_proj')
 
 
-def mock_sum(param1: int, param2: int) -> int:
-    return param1 + param2
-
-
 def mock_build_pipeline() -> Mock:
     mock_node = Mock(
         spec=['id', 'func', 'inputs', 'outputs', 'tags']
     )
     mock_node.id = 'n1'
-    mock_node.func = mock_sum
+    mock_node.func = lambda param1, param2: param1 + param2
     mock_node.inputs = {'param1': 7, 'param2': 3}
     mock_node.outputs = ['sum']
     mock_node.tags = ['math']
