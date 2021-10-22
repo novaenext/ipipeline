@@ -14,7 +14,9 @@ logger = logging.getLogger(name=__name__)
 
 
 class BaseExecutor(ABC):
-    def __init__(self, pipeline: BasePipeline, catalog: BaseCatalog) -> None:
+    def __init__(
+        self, pipeline: BasePipeline, catalog: BaseCatalog = None
+    ) -> None:
         self._pipeline = pipeline
         self._catalog = self._check_empty_catalog(catalog)
         self._flags = {}
@@ -81,11 +83,6 @@ class BaseExecutor(ABC):
 
 
 class SequentialExecutor(BaseExecutor):
-    def __init__(
-        self, pipeline: BasePipeline, catalog: BaseCatalog = None
-    ) -> None:
-        super().__init__(pipeline, catalog)
-
     def obtain_exe_order(self) -> List[str]:
         exe_order = super().obtain_exe_order()
 
@@ -94,7 +91,7 @@ class SequentialExecutor(BaseExecutor):
     def execute_pipeline(self, exe_order: List[str]) -> None:
         for node_id in exe_order:
             if not self._flags.get(node_id, {}).get('skip', False):
-                outputs = self.execute_node(node_id)
+                func_outputs = self.execute_node(node_id)
 
-                for out_key, out_value in outputs.items():
-                    self._catalog.add_item(out_key, out_value)
+                for id, item in func_outputs.items():
+                    self._catalog.add_item(id, item)
