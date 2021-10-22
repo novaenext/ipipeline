@@ -71,25 +71,25 @@ class BaseExecutor(ABC):
                 'node not executed by the executor', f'node_id == {node_id}'
             ) from error
 
-    def obtain_exe_order(self) -> List[list]:
-        exe_order = sort_graph_topo(self._pipeline.graph)
-        logger.info(f'exe_order: {exe_order}')
+    def obtain_topo_order(self) -> List[list]:
+        topo_order = sort_graph_topo(self._pipeline.graph)
+        logger.info(f'topo_order: {topo_order}')
 
-        return exe_order
+        return topo_order
 
     @abstractmethod
-    def execute_pipeline(self, exe_order: list) -> None:
+    def execute_pipeline(self, topo_order: List[list]) -> None:
         pass
 
 
 class SequentialExecutor(BaseExecutor):
-    def obtain_exe_order(self) -> List[str]:
-        exe_order = super().obtain_exe_order()
+    def obtain_topo_order(self) -> List[str]:
+        topo_order = super().obtain_topo_order()
 
-        return list(chain(*exe_order))
+        return list(chain(*topo_order))
 
-    def execute_pipeline(self, exe_order: List[str]) -> None:
-        for node_id in exe_order:
+    def execute_pipeline(self, topo_order: List[str]) -> None:
+        for node_id in topo_order:
             if not self._flags.get(node_id, {}).get('skip', False):
                 func_outputs = self.execute_node(node_id)
 
