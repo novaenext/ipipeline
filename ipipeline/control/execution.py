@@ -18,7 +18,7 @@ class BaseExecutor(ABC):
         self, pipeline: BasePipeline, catalog: BaseCatalog = None
     ) -> None:
         self._pipeline = pipeline
-        self._catalog = self._check_empty_catalog(catalog)
+        self._catalog = self._check_inexistent_catalog(catalog)
         self._flags = {}
 
     @property
@@ -29,7 +29,7 @@ class BaseExecutor(ABC):
     def catalog(self) -> BaseCatalog:
         return self._catalog
 
-    def _check_empty_catalog(self, catalog: BaseCatalog) -> BaseCatalog:
+    def _check_inexistent_catalog(self, catalog: BaseCatalog) -> BaseCatalog:
         if catalog:
             return catalog
         else:
@@ -83,15 +83,11 @@ class BaseExecutor(ABC):
 
 
 class SequentialExecutor(BaseExecutor):
-    def obtain_topo_order(self) -> List[str]:
-        topo_order = super().obtain_topo_order()
+    def execute_pipeline(self, topo_order: List[list]) -> None:
+        for group in topo_order:
+            for node_id in group:
+                if not self._flags.get(node_id, {}).get('skip', False):
+                    func_outputs = self.execute_node(node_id)
 
-        return list(chain(*topo_order))
-
-    def execute_pipeline(self, topo_order: List[str]) -> None:
-        for node_id in topo_order:
-            if not self._flags.get(node_id, {}).get('skip', False):
-                func_outputs = self.execute_node(node_id)
-
-                for id, item in func_outputs.items():
-                    self._catalog.add_item(id, item)
+                    for id, item in func_outputs.items():
+                        self._catalog.add_item(id, item)
