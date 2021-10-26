@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from ipipeline.cli.parsing import create_parser, _add_pos_args, _add_opt_args
 
 
-class TestCreateParser(TestCase):
+class TestCreateCliParser(TestCase):
     def setUp(self) -> None:
         help_arg = Mock(spec=['name', 'descr', 'action', 'type', 'key_args'])
         help_arg.name = 'help'
