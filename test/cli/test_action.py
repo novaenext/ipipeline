@@ -86,7 +86,8 @@ class TestExecutePipeline(TestCase):
     def test_invalid_func_name(self) -> None:
         with self.assertRaisesRegex(
             ActionError, 
-            r'func not found in the module: func_name == mock_build_pipelines'
+            r'func_name not found in the module: func_name == '
+            r'mock_build_pipelines'
         ):
             execute_pipeline(
                 'test.cli.test_action', 'mock_build_pipelines', 'sequential'
@@ -95,7 +96,8 @@ class TestExecutePipeline(TestCase):
     def test_invalid_mod_name(self) -> None:
         with self.assertRaisesRegex(
             ActionError, 
-            r'func not found in the module: func_name == mock_build_pipeline'
+            r'func_name not found in the module: func_name == '
+            r'mock_build_pipeline'
         ):
             execute_pipeline(
                 'test.cli.test_actions', 'mock_build_pipeline', 'sequential'
@@ -104,7 +106,7 @@ class TestExecutePipeline(TestCase):
     def test_invalid_exe_type(self) -> None:
         with self.assertRaisesRegex(
             ActionError, 
-            r'executor not found in the module: exe_type == sequentials'
+            r'exe_type not found in the module: exe_type == sequentials'
         ):
             execute_pipeline(
                 'test.cli.test_action', 'mock_build_pipeline', 'sequentials'

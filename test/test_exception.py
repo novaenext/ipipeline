@@ -22,9 +22,9 @@ class TestBaseError(TestCase):
 
     def test_str(self) -> None:
         error = BaseError('error descr', 'error == value')
-        error_str = error.__str__()
+        error_msg = error.__str__()
 
-        self.assertEqual(error_str, 'error descr: error == value')
+        self.assertEqual(error_msg, 'error descr: error == value')
 
 
 class TestActionError(TestCase):

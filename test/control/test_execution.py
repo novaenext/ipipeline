@@ -50,19 +50,19 @@ class TestBaseExecutor(TestCase):
         self.assertDictEqual(base_executor.pipeline.graph, {'n1': []})
         self.assertDictEqual(base_executor.catalog.items, {'i1': 7})
 
-    def test_check_empty_catalog(self) -> None:
+    def test_check_inexistent_catalog(self) -> None:
         base_executor = MockBaseExecutor(
             self._mock_pipeline, None
         )
-        catalog = base_executor._check_empty_catalog(None)
+        catalog = base_executor._check_inexistent_catalog(None)
 
         self.assertDictEqual(catalog.items, {})
 
-    def test_check_non_empty_catalog(self) -> None:
+    def test_check_existent_catalog(self) -> None:
         base_executor = MockBaseExecutor(
             self._mock_pipeline, self._mock_catalog
         )
-        catalog = base_executor._check_empty_catalog(self._mock_catalog)
+        catalog = base_executor._check_inexistent_catalog(self._mock_catalog)
 
         self.assertDictEqual(catalog.items, {'i1': 7})
 
@@ -140,13 +140,13 @@ class TestBaseExecutor(TestCase):
         ):
             _ = base_executor.execute_node('n11')
 
-    def test_obtain_exe_order(self) -> None:
+    def test_obtain_topo_order(self) -> None:
         base_executor = MockBaseExecutor(
             self._mock_pipeline, self._mock_catalog
         )
-        exe_order = base_executor.obtain_exe_order()
+        topo_order = base_executor.obtain_topo_order()
 
-        self.assertListEqual(exe_order, [['n1']])
+        self.assertListEqual(topo_order, [['n1']])
 
 
 class TestSequentialExecutor(TestCase):
@@ -175,22 +175,16 @@ class TestSequentialExecutor(TestCase):
         self._mock_pipeline.graph = {
             'n1': ['n3'], 'n2': ['n4'], 'n3': [], 'n4': []
         }
-        self._exe_order = ['n1', 'n2', 'n3', 'n4']
+        self._topo_order = [['n1', 'n2'], ['n3', 'n4']]
 
     def test_deriv(self) -> None:
         executor = SequentialExecutor(self._mock_pipeline)
 
         self.assertIsInstance(executor, BaseExecutor)
 
-    def test_obtain_exe_order(self) -> None:
-        executor = SequentialExecutor(self._mock_pipeline)
-        exe_order = executor.obtain_exe_order()
-
-        self.assertListEqual(exe_order, ['n1', 'n2', 'n3', 'n4'])
-
     def test_execute_pipeline_without_flag(self) -> None:
         executor = SequentialExecutor(self._mock_pipeline)
-        executor.execute_pipeline(self._exe_order)
+        executor.execute_pipeline(self._topo_order)
 
         self.assertDictEqual(executor.catalog.items, {'sum': 10, 'sub': 4})
 
@@ -199,6 +193,6 @@ class TestSequentialExecutor(TestCase):
         executor._flags = {
             'n2': {'skip': True}, 'n3': {'skip': False}, 'n4': {'skip': True}
         }
-        executor.execute_pipeline(self._exe_order)
+        executor.execute_pipeline(self._topo_order)
 
         self.assertDictEqual(executor.catalog.items, {'sum': 10})

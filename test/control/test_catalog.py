@@ -68,7 +68,7 @@ class TestCatalog(TestCase):
         catalog = Catalog()
 
         with self.assertRaisesRegex(
-            CatalogError, r'id_ not found in the _items: id_ == i1'
+            CatalogError, r'id not found in the _items: id == i1'
         ):
             _ = catalog.obtain_item('i1')
 
@@ -83,6 +83,6 @@ class TestCatalog(TestCase):
         catalog = Catalog()
 
         with self.assertRaisesRegex(
-            CatalogError, r'id_ not found in the _items: id_ == i1'
+            CatalogError, r'id not found in the _items: id == i1'
         ):
             catalog.remove_item('i1')

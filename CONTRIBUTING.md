@@ -167,7 +167,7 @@ def func():
 
 Prefer short but meaningful names and if necessary, use an underscore as a separator. Use nouns and others (except verb) to define the name of variables, constants, classes, modules and packages and verb for functions and methods. The indentation must be equal to 4 spaces.
 
-[PEP 484](https://www.python.org/dev/peps/pep-0484/), [PEP 257](https://www.python.org/dev/peps/pep-0257/) and [a guide to NumPy documentation](https://numpy.org/doc/stable/docs/howto_document.html) must be followed to create readable documentation.
+[PEP 484](https://www.python.org/dev/peps/pep-0484/), [PEP 257](https://www.python.org/dev/peps/pep-0257/) and [NumPy style guide](https://numpydoc.readthedocs.io/en/latest/format.html) must be followed to create readable documentation.
 
 ### Versioning
 

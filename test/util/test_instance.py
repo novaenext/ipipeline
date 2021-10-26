@@ -20,7 +20,7 @@ class TestIdentification(TestCase):
         with self.assertRaisesRegex(
             InstanceError, 
             r'id not validated according to the pattern \(letters, '
-            r'digits, underscore and/or dash\): id == i\.1'
+            r'digits, underscores and/or dashes\): id == i\.1'
         ):
             _ = Identification._check_valid_id(None, 'i.1')
 
