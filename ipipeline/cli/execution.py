@@ -1,3 +1,5 @@
+"""Function related to the execution procedures."""
+
 import sys
 from typing import List
 
@@ -6,6 +8,23 @@ from ipipeline.cli.parsing import create_parser
 
 
 def execute_cli(args: List[str]) -> None:
+    """Executes the CLI.
+
+    Parameters
+    ----------
+    args : List[str]
+        Arguments from the CLI.
+
+    Raises
+    ------
+    SystemExit
+        Informs an exit code about the execution.
+
+        0: success.
+        1: failure due to an action error.
+        2: failure due to a syntax error.
+    """
+
     try:
         if len(args) == 0:
             args.append('--help')
