@@ -1,3 +1,5 @@
+"""Package execution procedures."""
+
 import sys
 
 from ipipeline.cli.execution import execute_cli

@@ -1,1 +1,7 @@
-__version__ = '0.7.0'
+"""Package initialization procedures.
+
+The ipipeline package is a micro framework to flexibly build and 
+execute pipelines from different domains.
+"""
+
+__version__ = '0.8.0'
