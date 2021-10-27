@@ -4,8 +4,7 @@ __pycache__/
 .pytest_cache/
 build/
 dist/
-itrading.egg-info/
-tmp/
+ipipeline.egg-info/
 
 # files
 .env
