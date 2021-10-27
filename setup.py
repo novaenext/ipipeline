@@ -4,13 +4,13 @@ from setuptools import find_packages, setup
 from ipipeline import __version__
 
 
-project_path = Path(__file__).resolve().parents[0]
+root_path = Path(__file__).resolve().parents[0]
 
-with open(project_path / 'README.md') as readme_file:
+with open(root_path / 'README.md') as readme_file:
     readme = readme_file.read()
 
-with open(project_path / 'requirement.txt') as requirement_file:
-    requirement = requirement_file.read().splitlines()
+with open(root_path / 'requirement' / 'prod.txt') as requirement_file:
+    requirements = requirement_file.read().splitlines()
 
 setup(
     name='ipipeline', 
@@ -31,7 +31,7 @@ setup(
         'Operating System :: OS Independent'
     ], 
     packages=find_packages(exclude=['test*']), 
-    install_requires=requirement, 
+    install_requires=requirements, 
     long_description=readme, 
     long_description_content_type='text/markdown'
 )
