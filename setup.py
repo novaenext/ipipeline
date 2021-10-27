@@ -21,18 +21,16 @@ setup(
     ), 
     url='https://github.com/novaenext/ipipeline', 
     author='novaenext', 
-    author_email='contato@novaenext.com', 
     maintainer='novaenext', 
-    maintainer_email='contato@novaenext.com', 
     license='BSD-3-Clause', 
     platforms=['any'], 
     python_requires=">=3.5", 
     classifiers=[
-        'Operating System :: OS Independent', 
         'Programming Language :: Python :: 3', 
-        'Topic :: Scientific/Engineering'
+        'License :: OSI Approved :: BSD License', 
+        'Operating System :: OS Independent'
     ], 
-    packages=find_packages(exclude=('test*',)), 
+    packages=find_packages(exclude=['test*']), 
     install_requires=requirement, 
     long_description=readme, 
     long_description_content_type='text/markdown'
