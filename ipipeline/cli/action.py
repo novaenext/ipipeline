@@ -1,6 +1,8 @@
 """Functions related to the action procedures."""
 
+import sys
 from importlib import import_module
+from pathlib import Path
 
 from ipipeline.exception import ActionError
 from ipipeline.util.system import create_directory, create_file
@@ -78,6 +80,8 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
     ActionError
         Informs that the exe_type was not found in the module.
     """
+
+    sys.path.append(str(Path(f'./{mod_name.split(".")[0]}').resolve()))
 
     try:
         pipeline = getattr(import_module(mod_name), func_name)()
