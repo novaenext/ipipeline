@@ -6,29 +6,28 @@ from ipipeline import __version__
 
 root_path = Path(__file__).resolve().parents[0]
 
-with open(root_path / 'README.md') as readme_file:
+with open(str(root_path / 'README.md')) as readme_file:
     readme = readme_file.read()
 
-with open(root_path / 'requirement' / 'prod.txt') as requirement_file:
+with open(str(root_path / 'requirement' / 'prod.txt')) as requirement_file:
     requirements = requirement_file.read().splitlines()
 
 setup(
     name='ipipeline', 
     version=__version__, 
     description=(
-        'A micro framework to flexibly build and execute pipelines from '
+        'A micro framework for building and executing pipelines from '
         'different domains.'
     ), 
     url='https://github.com/novaenext/ipipeline', 
     author='novaenext', 
-    maintainer='novaenext', 
     license='BSD-3-Clause', 
     platforms=['any'], 
-    python_requires=">=3.5", 
+    python_requires=">=3.6", 
     classifiers=[
-        'Programming Language :: Python :: 3', 
         'License :: OSI Approved :: BSD License', 
-        'Operating System :: OS Independent'
+        'Operating System :: OS Independent', 
+        'Programming Language :: Python :: 3'
     ], 
     packages=find_packages(exclude=['test*']), 
     install_requires=requirements, 
