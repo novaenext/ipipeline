@@ -1,18 +1,18 @@
 # ipipeline
 
-A micro framework to flexibly build and execute pipelines from different domains.
+A micro framework for building and executing pipelines from different domains.
 
 ## Features
 
-- **Simplicity:** high-level classes with a simple interface that can be used to perform complex tasks.
+- **Simplicity:** high-level interfaces that can be used to perform complex tasks.
 
-- **Flexibility:** freedom to build the relationships of the pipeline nodes and change the states of a given node at runtime if necessary.
+- **Flexibility:** freedom to build the pipeline according to the requirements of the problem.
 
-- **Scalability:** execution of the pipeline nodes through concurrency or parallelism as dependencies between them are resolved (coming soon).
+- **Scalability:** pipeline execution through concurrency or parallelism (coming soon).
 
 ## Installation
 
-ipipeline is installed from the Python Package Index (PyPI) via the command:
+ipipeline is installed from the Python Package Index (PyPI).
 
 ```shell
 pip install ipipeline
@@ -32,11 +32,11 @@ To learn about the legal rights linked to this repository, follow the [license](
 
 ## Example
 
-While the documentation is being written, this example will cover the main features of the package. The code will be divided into sections where each of them will be explained separately for a better understanding.
+This example was divided into sections to explain the main features of the package. In case of questions about a specific detail the package contains docstrings for all modules, classes, methods and functions.
 
-**Configurations:**
+**Imports:**
 
-The ipipeline package offers two high-level interfaces that do all the complex work in a simplified way. The first is the pipeline interface represented by the Pipeline class and the second is the execution interface represented by the SequentialExecutor class.
+The ipipeline package tries to keep things simple, therefore all the work is done through the pipeline interface imported as Pipeline and the execution interface imported as SequentialExecutor.
 
 ```python
 import logging
@@ -73,9 +73,9 @@ def display(x: int, y: int, z: int) -> None:
     print(f'results - x: {x}, y: {y}, z: {z}')
 ```
 
-**Building:**
+**Pipeline:**
 
-The pipeline instance is the entry point for the user code, through it nodes (tasks) and connections (relationships between tasks) can be added. This process internally builds a graph (workflow) that is not directly used by the user.
+A pipeline is the entry point for the user code, through it the nodes (tasks) and connections (relationships between tasks) added are represented as a graph (workflow). The graph is used by the executor and is not visible to the user.
 
 ```python
 pipeline = Pipeline('p1', tags=['example'])
@@ -97,28 +97,24 @@ pipeline.add_conn('c3', 'n2', 'n4')
 pipeline.add_conn('c4', 'n3', 'n4')
 ```
 
-Based on the workflow defined in the Tasks section, the pipeline instance was built with four nodes and four connections. Two aspects deserve attention here, the inputs and outputs parameters of the add_node method.
+Based on the workflow defined in the declarations section, the pipeline was built with four nodes and four connections. Two aspects deserve attention here, the inputs and outputs parameters of the add_node method.
 
-When declared, the outputs parameter indicates that a node will return one or more values that will be stored in the catalog (not visible to the user) as items during the pipeline execution. For example, the outputs parameter of the 'n1' node expects the collect function to return a sequence with two elements that will be stored in the catalog with the names 'x' and 'y'.
+The outputs parameter, when declared, indicates that during the pipeline execution, the function returns must be stored in the catalog with specific names. For example, the outputs parameter of the 'n1' node expects to store two items in the catalog with the names 'x' and 'y' which are obtained from the returns of the collect function.
 
-When declared, the inputs parameter indicates that a node will receive a dictionary with the function arguments. The dictionary can have default values or values obtained from the catalog during the pipeline execution. For example, the inputs parameter of the 'n4' node expects the 'c.x' ('c.<item_id>') value to be obtained from the catalog. Note, the 'c.' prefix assumes that there is an item in the catalog that was stored by a predecessor node.
+The inputs parameter, when declared, indicates that during the pipeline execution, the function receives a dictionary with its arguments. For example, the inputs parameter of the 'n4' node expects to receive a dictionary where the 'x' and 'y' values are obtained from the catalog ('c.<item_id>') and the 'z' value is obtained directly. The 'c.' prefix assumes the existence of an item in the catalog stored by a predecessor node.
 
-The connections help determine the order in which the nodes will be executed. For example, 'c1' connection defines that there is a relationship between 'n1' node and 'n2' node where the 'n2' node depends on the execution of the 'n1' node. Note, a node can be declared dependent on another node even though it does not use the outputs of its predecessor node.
+The connections determine the order in which the nodes are executed. For example, 'c1' connection indicates a relationship between 'n1' node (source) and 'n2' node (destination) where the 'n2' node depends on the execution of the 'n1' node. A node can dependent on another node even though it does not use the outputs of its predecessor.
 
-**Execution:**
+**Executor:**
 
-Once the pipeline was built, it can be inserted into an executor. Through the graph inside the pipeline the execution order (topological order) of the nodes is determined by the dependencies between them. Therefore, it is expected that the connections between the nodes form a DAG (Directed Acyclic Graph), if this does not happen, an error will be raised.
+An executor is responsible for executing a pipeline from the topological order (execution order) of the graph. Therefore, it is expected that the connections between the nodes form a DAG (Directed Acyclic Graph), if this does not happen, an error is raised. Behind the scenes, a catalog is created to store the node returns that are requested by other nodes during the execution.
 
 ```python
 executor = SequentialExecutor(pipeline)
 executor.execute_pipeline(executor.obtain_topo_order())
 ```
 
-Currently, only the sequential execution is supported, but soon the executions through concurrency and parallelism will be added.
-
-**Results:**
-
-Below are the log results generated by the pipeline execution. In cases where there are a lot of nodes or the pipeline is called many times inside a loop, it is recommended to turn off the logs.
+Below are the log results generated by the execution. It is recommended to turn off the logs in cases where there are many nodes or the pipeline is called many times inside a loop.
 
 ```shell
 [2021-10-26 12:00:21] INFO ipipeline.control.execution - topo_order: [['n1'], ['n2', 'n3'], ['n4']]
@@ -129,4 +125,4 @@ Below are the log results generated by the pipeline execution. In cases where th
 results - x: 2, y: 4, z: 8
 ```
 
-According to the defined workflow, the nodes were executed in the expected order. The inner lists of the topological order must always be executed in order, however, the elements within them can be executed simultaneously. As in this case the SequentialExecutor class was used, the nodes will be executed as if the topological order were a flat list.
+According to the defined workflow, the nodes were executed in the expected order. The inner lists of the topological order must always be executed in order, however, the elements within them can be executed simultaneously. As in this example the SequentialExecutor class was used, the nodes were executed as if the topological order were a flat list.
