@@ -58,7 +58,7 @@ def create_project(path: str, name: str) -> None:
 
 
 def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
-    """Executes a pipeline.
+    """Executes a pipeline according to an executor.
 
     The pipeline is obtained from the return of a function declared in 
     a module.
@@ -66,11 +66,13 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
     Parameters
     ----------
     mod_name : str
-        Name of the module where the function is declared.
+        Name of the module.
     func_name : str
-        Name of the function responsible for returning a pipeline.
+        Name of the function.
     exe_type : {'sequential'}
-        Type of the executor to execute the pipeline.
+        Type of the executor.
+
+        sequential: executes a pipeline sequentially.
 
     Raises
     ------
