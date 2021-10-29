@@ -1,6 +1,8 @@
 """Functions related to the action procedures."""
 
+import sys
 from importlib import import_module
+from pathlib import Path
 
 from ipipeline.exception import ActionError
 from ipipeline.util.system import create_directory, create_file
@@ -28,26 +30,23 @@ def create_project(path: str, name: str) -> None:
     try:
         proj_path = f'{path}/{name}'
         pkg_path = f'{proj_path}/{name}'
-        create_directory(proj_path)
+        create_directory(proj_path, missing=True, suppressed=True)
 
-        for proj_dir in ['io', 'test', name]:
+        for proj_dir in ['io', 'requirement', 'test', name]:
             create_directory(f'{proj_path}/{proj_dir}')
 
         for proj_file in [
             '.gitignore', 
             'CONTRIBUTING.md', 
             'LICENSE.md', 
+            'MANIFEST.in', 
             'README.md', 
-            'requirement.txt', 
             'setup.py'
         ]:
             create_file(f'{proj_path}/{proj_file}')
 
         for pkg_dir in ['config', 'group', 'task']:
             create_directory(f'{pkg_path}/{pkg_dir}')
-
-            for sub_file in ['__init__.py']:
-                create_file(f'{pkg_path}/{pkg_dir}/{sub_file}')
 
         for pkg_file in ['exception.py', '__init__.py', '__main__.py']:
             create_file(f'{pkg_path}/{pkg_file}')
@@ -58,7 +57,7 @@ def create_project(path: str, name: str) -> None:
 
 
 def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
-    """Executes a pipeline.
+    """Executes a pipeline according to an executor.
 
     The pipeline is obtained from the return of a function declared in 
     a module.
@@ -66,11 +65,13 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
     Parameters
     ----------
     mod_name : str
-        Name of the module where the function is declared.
+        Name of the module.
     func_name : str
-        Name of the function responsible for returning a pipeline.
+        Name of the function.
     exe_type : {'sequential'}
-        Type of the executor to execute the pipeline.
+        Type of the executor.
+
+        sequential: executes a pipeline sequentially.
 
     Raises
     ------
@@ -79,6 +80,8 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
     ActionError
         Informs that the exe_type was not found in the module.
     """
+
+    sys.path.append(str(Path(f'./{mod_name.split(".")[0]}').resolve()))
 
     try:
         pipeline = getattr(import_module(mod_name), func_name)()

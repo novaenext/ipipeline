@@ -143,7 +143,7 @@ class Argument(BaseArgument):
 
 path_arg = Argument(
     'path', 
-    'path of the project', 
+    'path of the project.', 
     'store', 
     str
 )
@@ -151,7 +151,7 @@ path_arg = Argument(
 
 name_arg = Argument(
     'name', 
-    'name of the project', 
+    'name of the project.', 
     'store', 
     str
 )
@@ -159,7 +159,7 @@ name_arg = Argument(
 
 mod_name_arg = Argument(
     'mod_name', 
-    'name of the module where the function is declared', 
+    'name of the module.', 
     'store', 
     str
 )
@@ -167,7 +167,7 @@ mod_name_arg = Argument(
 
 func_name_arg = Argument(
     'func_name', 
-    'name of the function responsible for returning a pipeline', 
+    'name of the function.', 
     'store', 
     str
 )
@@ -175,7 +175,7 @@ func_name_arg = Argument(
 
 exe_type_arg = Argument(
     'exe_type', 
-    'type of the executor to execute the pipeline', 
+    'type of the executor.\n\nsequential: executes a pipeline sequentially.', 
     'store', 
     str
 )
@@ -183,7 +183,7 @@ exe_type_arg = Argument(
 
 help_arg = Argument(
     'help', 
-    'show the available arguments', 
+    'shows the available arguments.', 
     'help', 
     None
 )
@@ -191,8 +191,8 @@ help_arg = Argument(
 
 version_arg = Argument(
     'version', 
-    'show the version of the package', 
+    'shows the version of the package.', 
     'version', 
     None, 
-    version=f'ipipeline v{__version__}'
+    version=__version__
 )

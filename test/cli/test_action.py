@@ -21,9 +21,10 @@ class TestCreateProject(TestCase):
             'CONTRIBUTING.md', 
             'io', 
             'LICENSE.md', 
+            'MANIFEST.in', 
             'mock_proj', 
             'README.md', 
-            'requirement.txt', 
+            'requirement', 
             'setup.py', 
             'test'
         ]
@@ -41,11 +42,6 @@ class TestCreateProject(TestCase):
 
         for pkg_item in pkg_items:
             self.assertTrue((self._path / 'mock_proj' / pkg_item).exists())
-
-        for pkg_dir in ['config', 'group', 'task']:
-            self.assertTrue(
-                (self._path / 'mock_proj' / pkg_dir / '__init__.py').exists()
-            )
 
     def test_existent_project(self) -> None:
         create_project(str(self._path.parents[0]), 'mock_proj')

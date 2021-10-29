@@ -5,7 +5,7 @@ only the necessary parameters and performing some common operations
 by default.
 """
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 from typing import List
 
 from ipipeline.cli.argument import BaseArgument
@@ -43,6 +43,7 @@ def create_parser(
         usage=f'{root_cmd.name} <command> [options]', 
         description=root_cmd.descr, 
         add_help=False, 
+        formatter_class=RawTextHelpFormatter, 
         **root_cmd.key_args
     )
     subparsers = parser.add_subparsers(metavar='commands')
@@ -57,6 +58,7 @@ def create_parser(
             description=sub_cmd.descr, 
             help=sub_cmd.descr, 
             add_help=False, 
+            formatter_class=RawTextHelpFormatter, 
             **sub_cmd.key_args
         )
         sub_parser.set_defaults(execute_action=sub_cmd.action)

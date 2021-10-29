@@ -155,7 +155,7 @@ class Command(BaseCommand):
 
 root_cmd = Command(
     'ipipeline', 
-    'ipipeline cli', 
+    'cli of the ipipeline package.', 
     None, 
     [], 
     [help_arg, version_arg]
@@ -164,7 +164,8 @@ root_cmd = Command(
 
 project_cmd = Command(
     'project', 
-    'create the standard project structure', 
+    'creates a project in the file system. the project provides a standard '
+    'structure for organizing the tasks that interact with the package.', 
     create_project, 
     [path_arg, name_arg], 
     [help_arg]
@@ -173,7 +174,8 @@ project_cmd = Command(
 
 execution_cmd = Command(
     'execution', 
-    'execute a pipeline according to an executor', 
+    'executes a pipeline according to an executor. the pipeline is obtained '
+    'from the return of a function declared in a module.', 
     execute_pipeline, 
     [mod_name_arg, func_name_arg, exe_type_arg], 
     [help_arg]
