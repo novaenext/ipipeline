@@ -111,8 +111,11 @@ class BasePipeline(ABC, Identification):
             Function that performs a specific action.
         inputs : Dict[str, Any], default={}
             Inputs of the function. The keys are the function parameters and 
-            the values are anything entered directly and/or obtained from the 
-            catalog in the form of 'c.<item_id>'.
+            the values are any default values and/or items obtained from the 
+            catalog through a specific syntax.
+
+            'c.<item_id>': syntax to obtain a single item.
+            'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
         outputs : List[str], default=[]
             Outputs of the function. The outputs must match the returns in 
             terms of length. If one output is expected, the returns can be of 
@@ -194,8 +197,11 @@ class Pipeline(BasePipeline):
             Function that performs a specific action.
         inputs : Dict[str, Any], default={}
             Inputs of the function. The keys are the function parameters and 
-            the values are anything entered directly and/or obtained from the 
-            catalog in the form of 'c.<item_id>'.
+            the values are any default values and/or items obtained from the 
+            catalog through a specific syntax.
+
+            'c.<item_id>': syntax to obtain a single item.
+            'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
         outputs : List[str], default=[]
             Outputs of the function. The outputs must match the returns in 
             terms of length. If one output is expected, the returns can be of 
