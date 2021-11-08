@@ -85,10 +85,10 @@ class BaseExecutor(ABC):
             Catalog that stores the items from the execution.
         """
 
-        if catalog:
-            return catalog
-        else:
-            return Catalog()
+        if not catalog:
+            catalog = Catalog()
+
+        return catalog
 
     def flag_node(self, node_id: str, flag: str, status: bool) -> None:
         """Flags a node.
@@ -170,7 +170,7 @@ class BaseExecutor(ABC):
             node = self._pipeline.nodes[node_id]
             logger.info(f'node - id: {node.id}, tags: {node.tags}')
 
-            func_inputs = build_func_inputs(node.inputs, self._catalog.items)
+            func_inputs = build_func_inputs(node.inputs, self._catalog)
             returns = node.func(**func_inputs)
             func_outputs = build_func_outputs(node.outputs, returns)
 
