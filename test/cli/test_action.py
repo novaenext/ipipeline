@@ -1,10 +1,10 @@
 from pathlib import Path
 from shutil import rmtree
 from unittest import TestCase
-from unittest.mock import Mock
 
 from ipipeline.cli.action import create_project, execute_pipeline
 from ipipeline.exception import ActionError
+from ipipeline.structure import BasePipeline, Pipeline
 
 
 class TestCreateProject(TestCase):
@@ -52,23 +52,17 @@ class TestCreateProject(TestCase):
             create_project(str(self._path.parents[0]), 'mock_proj')
 
 
-def mock_build_pipeline() -> Mock:
-    mock_node = Mock(
-        spec=['id', 'func', 'inputs', 'outputs', 'tags']
+def mock_build_pipeline() -> BasePipeline:
+    pipeline = Pipeline('p1')
+    pipeline.add_node(
+        'n1', 
+        lambda param1, param2: param1 + param2, 
+        inputs={'param1': 7, 'param2': 3}, 
+        outputs=['sum'], 
+        tags = ['math']
     )
-    mock_node.id = 'n1'
-    mock_node.func = lambda param1, param2: param1 + param2
-    mock_node.inputs = {'param1': 7, 'param2': 3}
-    mock_node.outputs = ['sum']
-    mock_node.tags = ['math']
 
-    mock_pipeline = Mock(
-        spec=['id', 'nodes', 'conns', 'graph', 'tags']
-    )
-    mock_pipeline.nodes = {'n1': mock_node}
-    mock_pipeline.graph = {'n1': []}
-
-    return mock_pipeline
+    return pipeline
 
 
 class TestExecutePipeline(TestCase):
