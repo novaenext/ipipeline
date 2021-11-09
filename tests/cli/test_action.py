@@ -24,9 +24,9 @@ class TestCreateProject(TestCase):
             'MANIFEST.in', 
             'mock_proj', 
             'README.md', 
-            'requirement', 
+            'requirements', 
             'setup.py', 
-            'test'
+            'tests'
         ]
         pkg_items = [
             'config', 
@@ -68,7 +68,7 @@ def mock_build_pipeline() -> BasePipeline:
 class TestExecutePipeline(TestCase):
     def test_valid_func_name(self) -> None:
         execute_pipeline(
-            'test.cli.test_action', 'mock_build_pipeline', 'sequential'
+            'tests.cli.test_action', 'mock_build_pipeline', 'sequential'
         )
 
         self.assertTrue(True)
@@ -80,7 +80,7 @@ class TestExecutePipeline(TestCase):
             r'mock_build_pipelines'
         ):
             execute_pipeline(
-                'test.cli.test_action', 'mock_build_pipelines', 'sequential'
+                'tests.cli.test_action', 'mock_build_pipelines', 'sequential'
             )
 
     def test_invalid_mod_name(self) -> None:
@@ -90,7 +90,7 @@ class TestExecutePipeline(TestCase):
             r'mock_build_pipeline'
         ):
             execute_pipeline(
-                'test.cli.test_actions', 'mock_build_pipeline', 'sequential'
+                'tests.cli.test_actions', 'mock_build_pipeline', 'sequential'
             )
 
     def test_invalid_exe_type(self) -> None:
@@ -99,5 +99,5 @@ class TestExecutePipeline(TestCase):
             r'exe_type not found in the module: exe_type == sequentials'
         ):
             execute_pipeline(
-                'test.cli.test_action', 'mock_build_pipeline', 'sequentials'
+                'tests.cli.test_action', 'mock_build_pipeline', 'sequentials'
             )
