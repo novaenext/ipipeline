@@ -32,7 +32,7 @@ def create_project(path: str, name: str) -> None:
         pkg_path = f'{proj_path}/{name}'
         create_directory(proj_path, missing=True, suppressed=True)
 
-        for proj_dir in ['io', 'requirement', 'test', name]:
+        for proj_dir in ['io', 'requirements', 'tests', name]:
             create_directory(f'{proj_path}/{proj_dir}')
 
         for proj_file in [
