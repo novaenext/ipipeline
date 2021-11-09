@@ -156,9 +156,9 @@ iexample
 |
 |----io
 |
-|----requirement
+|----requirements
 |
-|----test
+|----tests
 |
 |----.gitignore
 |
