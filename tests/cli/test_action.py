@@ -3,8 +3,8 @@ from shutil import rmtree
 from unittest import TestCase
 
 from ipipeline.cli.action import create_project, execute_pipeline
-from ipipeline.exception import ActionError
-from ipipeline.structure import BasePipeline, Pipeline
+from ipipeline.exception import ExecutionError, PipelineError, SystemError
+from ipipeline.structure import Pipeline
 
 
 class TestCreateProject(TestCase):
@@ -47,12 +47,31 @@ class TestCreateProject(TestCase):
         create_project(str(self._path.parents[0]), 'mock_proj')
 
         with self.assertRaisesRegex(
-            ActionError, r'project not created in the file system: path == *'
+            SystemError, r'directory not created in the file system: path == *'
         ):
             create_project(str(self._path.parents[0]), 'mock_proj')
 
 
-def mock_build_pipeline() -> BasePipeline:
+class TestExecutePipeline(TestCase):
+    def test_valid_execution(self) -> None:
+        execute_pipeline(
+            'tests.cli.test_action', 'mock_build_pipeline', 'sequential'
+        )
+
+        self.assertTrue(True)
+
+    def test_invalid_execution(self) -> None:
+        with self.assertRaisesRegex(
+            PipelineError, 
+            r'func_name not found in the module: func_name == '
+            r'mock_build_pipelines'
+        ):
+            execute_pipeline(
+                'tests.cli.test_action', 'mock_build_pipelines', 'sequential'
+            )
+
+
+def mock_build_pipeline() -> Pipeline:
     pipeline = Pipeline('p1')
     pipeline.add_node(
         'n1', 
@@ -63,41 +82,3 @@ def mock_build_pipeline() -> BasePipeline:
     )
 
     return pipeline
-
-
-class TestExecutePipeline(TestCase):
-    def test_valid_func_name(self) -> None:
-        execute_pipeline(
-            'tests.cli.test_action', 'mock_build_pipeline', 'sequential'
-        )
-
-        self.assertTrue(True)
-
-    def test_invalid_func_name(self) -> None:
-        with self.assertRaisesRegex(
-            ActionError, 
-            r'func_name not found in the module: func_name == '
-            r'mock_build_pipelines'
-        ):
-            execute_pipeline(
-                'tests.cli.test_action', 'mock_build_pipelines', 'sequential'
-            )
-
-    def test_invalid_mod_name(self) -> None:
-        with self.assertRaisesRegex(
-            ActionError, 
-            r'func_name not found in the module: func_name == '
-            r'mock_build_pipeline'
-        ):
-            execute_pipeline(
-                'tests.cli.test_actions', 'mock_build_pipeline', 'sequential'
-            )
-
-    def test_invalid_exe_type(self) -> None:
-        with self.assertRaisesRegex(
-            ActionError, 
-            r'exe_type not found in the module: exe_type == sequentials'
-        ):
-            execute_pipeline(
-                'tests.cli.test_action', 'mock_build_pipeline', 'sequentials'
-            )
