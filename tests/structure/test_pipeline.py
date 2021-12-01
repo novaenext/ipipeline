@@ -206,7 +206,7 @@ class TestObtainPipeline(TestCase):
             )
 
 
-def mock_build_pipeline() -> BasePipeline:
+def mock_build_pipeline() -> Pipeline:
     pipeline = Pipeline('p1')
     pipeline.add_node(
         'n1', 

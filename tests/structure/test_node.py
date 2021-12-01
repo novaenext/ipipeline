@@ -3,10 +3,6 @@ from unittest import TestCase
 from ipipeline.structure.node import BaseNode, Node
 
 
-def mock_func(param1: int) -> int:
-    return param1
-
-
 class TestBaseNode(TestCase):
     def test_init(self) -> None:
         base_node = BaseNode(
@@ -29,3 +25,7 @@ class TestNode(TestCase):
         node = Node('n1', None)
 
         self.assertIsInstance(node, BaseNode)
+
+
+def mock_func(param1: int) -> int:
+    return param1
