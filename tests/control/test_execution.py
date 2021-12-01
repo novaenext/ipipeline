@@ -1,21 +1,11 @@
 from unittest import TestCase
 
 from ipipeline.control.catalog import Catalog
-from ipipeline.control.execution import BaseExecutor, SequentialExecutor
+from ipipeline.control.execution import (
+    BaseExecutor, SequentialExecutor, obtain_executor_class
+)
 from ipipeline.exception import ExecutionError
 from ipipeline.structure.pipeline import Pipeline
-
-
-def mock_sum(param1: int, param2: int) -> int:
-    return param1 + param2
-
-
-def mock_sub(param1: int, param2: int) -> int:
-    return param1 - param2
-
-
-def mock_print(param1: int, param2: str = '->') -> None:
-    print(param1, param2)
 
 
 class MockBaseExecutor(BaseExecutor):
@@ -171,3 +161,29 @@ class TestSequentialExecutor(TestCase):
         executor.execute_pipeline(self._topo_order)
 
         self.assertDictEqual(executor.catalog.items, {'sum': 10})
+
+
+class TestObtainExecutorClass(TestCase):
+    def test_valid_type(self) -> None:
+        executor_class = obtain_executor_class('sequential')
+
+        self.assertEqual(executor_class.__name__, 'SequentialExecutor')
+
+    def test_invalid_type(self) -> None:
+        with self.assertRaisesRegex(
+            ExecutionError, 
+            r'type not found in the executors: type == sequentials'
+        ):
+            _ = obtain_executor_class('sequentials')
+
+
+def mock_sum(param1: int, param2: int) -> int:
+    return param1 + param2
+
+
+def mock_sub(param1: int, param2: int) -> int:
+    return param1 - param2
+
+
+def mock_print(param1: int, param2: str = '->') -> None:
+    print(param1, param2)
