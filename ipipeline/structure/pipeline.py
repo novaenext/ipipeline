@@ -1,6 +1,9 @@
 """Classes related to the pipeline procedures."""
 
+import sys
 from abc import ABC, abstractmethod
+from importlib import import_module
+from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 from ipipeline.exception import PipelineError
@@ -320,3 +323,34 @@ class Pipeline(BasePipeline):
                 'node_id not found in the _nodes',
                 f'conn_id == {conn_id} and node_id == {node_id}'
             )
+
+
+def obtain_pipeline(mod_name: str, func_name: str) -> BasePipeline:
+    """Obtains a pipeline from a function declared in a module.
+
+    Parameters
+    ----------
+    mod_name : str
+        Name of the module in absolute terms (pkg.mod).
+    func_name : str
+        Name of the function.
+
+    Returns
+    -------
+    pipeline : BasePipeline
+        Pipeline that stores the graph structure.
+
+    Raises
+    ------
+    PipelineError
+        Informs that the func_name was not found in the module.
+    """
+
+    sys.path.append(str(Path(f'./{mod_name.split(".")[0]}').resolve()))
+
+    try:
+        return getattr(import_module(mod_name), func_name)()
+    except (ModuleNotFoundError, AttributeError) as error:
+        raise PipelineError(
+            'func_name not found in the module', f'func_name == {func_name}'
+        ) from error
