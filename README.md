@@ -101,7 +101,7 @@ Based on the workflow defined, the pipeline was built with four nodes and four c
 
 The outputs parameter, when declared, indicates that during the pipeline execution, the function returns must be stored in the catalog with specific names. For example, the outputs parameter of the 'n1' node expects to store two items in the catalog with the names 'x' and 'y' which are obtained from the returns of the function.
 
-The inputs parameter, when declared, indicates that during the pipeline execution, the function receives a dictionary with its arguments. For example, the inputs parameter of the 'n4' node expects to receive a dictionary where the 'x' and 'y' values are obtained from the catalog ('c.<item_id>') and the 'z' value is obtained directly. The 'c.' prefix assumes the existence of an item in the catalog stored by a predecessor node.
+The inputs parameter, when declared, indicates that during the pipeline execution, the function receives a dictionary with its arguments. For example, the inputs parameter of the 'n4' node expects to receive a dictionary where the 'x' and 'y' values are obtained from the catalog and the 'z' value is obtained directly. The 'c.' prefix assumes the existence of an item ('c.<item_id>') or a list of items ('c.[<item_id>, ..., <item_id>]') in the catalog stored by the predecessor nodes.
 
 The connections determine the order in which the nodes are executed. For example, 'c1' connection indicates a relationship between 'n1' node (source) and 'n2' node (destination) where the 'n2' node depends on the execution of the 'n1' node. A node can dependent on another node even though it does not use the outputs of its predecessor.
 
@@ -175,7 +175,7 @@ iexample
 
 The example code provided would fit into this structure as follows:
 
-- The log configuration is moved to the config package.
+- The configurations is moved to the config package.
 
 - The functions are moved to the task package.
 
@@ -186,7 +186,7 @@ The example code provided would fit into this structure as follows:
 With these modifications this project can be executed with the following command:
 
 ```shell
-python iexample
+python -m iexample
 ```
 
 Another option to execute this project without having to deal with the execution interface would be through the execution command. For this, the pipeline building process must be wrap in a function that returns the pipeline instance. Let's suppose that the wrapper function is called build_pipeline and the module where it was declared is called etl (inside the iexample.group package), therefore the command would be as follows:
