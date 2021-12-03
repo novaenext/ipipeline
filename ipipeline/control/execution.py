@@ -3,13 +3,12 @@
 import logging
 from abc import ABC, abstractmethod
 from importlib import import_module
-from pathlib import Path
 from typing import Any, Dict, List, Type
 
 from ipipeline.control.building import build_func_inputs, build_func_outputs
-from ipipeline.control.catalog import BaseCatalog, Catalog
 from ipipeline.control.sorting import sort_graph_topo
 from ipipeline.exception import ExecutionError
+from ipipeline.structure.catalog import BaseCatalog, Catalog
 from ipipeline.structure.pipeline import BasePipeline
 
 

@@ -2,8 +2,8 @@
 
 from typing import Any, Dict, List
 
-from ipipeline.control import BaseCatalog
 from ipipeline.exception import BuildingError
+from ipipeline.structure.catalog import BaseCatalog
 
 
 def build_func_inputs(
