@@ -3,7 +3,7 @@ from shutil import rmtree
 from unittest import TestCase
 
 from ipipeline.cli.action import create_project, execute_pipeline
-from ipipeline.exception import ExecutionError, PipelineError, SystemError
+from ipipeline.exception import PipelineError, SystemError
 from ipipeline.structure import Pipeline
 
 

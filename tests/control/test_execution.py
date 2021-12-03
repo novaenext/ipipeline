@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from ipipeline.control.catalog import Catalog
 from ipipeline.control.execution import (
     BaseExecutor, SequentialExecutor, obtain_executor_class
 )
 from ipipeline.exception import ExecutionError
+from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 
 

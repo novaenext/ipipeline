@@ -3,8 +3,8 @@ from unittest import TestCase
 from ipipeline.control.building import (
     build_func_inputs, build_func_outputs, _check_diff_outputs_qty
 )
-from ipipeline.control.catalog import Catalog
 from ipipeline.exception import BuildingError, CatalogError
+from ipipeline.structure.catalog import Catalog
 
 
 class TestBuildFuncInputs(TestCase):
