@@ -3,10 +3,11 @@
 from typing import Any, Dict, List
 
 from ipipeline.exception import BuildingError
+from ipipeline.structure.catalog import BaseCatalog
 
 
 def build_func_inputs(
-    inputs: Dict[str, Any], items: Dict[str, Any]
+    inputs: Dict[str, Any], catalog: BaseCatalog
 ) -> Dict[str, Any]:
     """Builds the inputs of a function.
 
@@ -14,38 +15,42 @@ def build_func_inputs(
     ----------
     inputs : Dict[str, Any]
         Inputs of the function. The keys are the function parameters and 
-        the values are anything entered directly and/or obtained from the 
-        catalog in the form of 'c.<item_id>'.
-    items : Dict[str, Any]
-        Items obtained from the executions. The keys are the item IDs 
-        obtained from the outputs and the values are the items obtained 
-        from the returns.
+        the values are any default values and/or items obtained from the 
+        catalog through a specific syntax.
+
+        'c.<item_id>': syntax to obtain a single item.
+        'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
+    catalog : BaseCatalog
+        Catalog that stores the items from the execution.
 
     Returns
     -------
     func_inputs : Dict[str, Any]
-        Inputs of the function built according to the values entered 
-        directly and/or obtained from the catalog. The keys are the 
-        function parameters and the values are anything specified by 
-        the parameters.
+        Inputs of the function built according to the default values 
+        and/or the items obtained from the catalog. The keys are the 
+        function parameters and the values are the function arguments.
 
     Raises
     ------
-    BuildingError
-        Informs that the in_value was not found in the items.
+    CatalogError
+        Informs that the id was not found in the _items.
     """
 
     func_inputs = {}
 
     for in_key, in_value in inputs.items():
         if isinstance(in_value, str) and in_value.startswith('c.'):
-            try:
-                func_inputs[in_key] = items[in_value.replace('c.', '')]
-            except KeyError as error:
-                raise BuildingError(
-                    'in_value not found in the items', 
-                    f'in_value == {in_value}'
-                ) from error
+            in_value = in_value.replace('c.', '')
+
+            if in_value.startswith('[') and in_value.endswith(']'):
+                func_inputs[in_key] = []
+
+                for item_id in in_value[1:-1].split(','):
+                    func_inputs[in_key].append(
+                        catalog.obtain_item(item_id.strip())
+                    )
+            else:
+                func_inputs[in_key] = catalog.obtain_item(in_value)
         else:
             func_inputs[in_key] = in_value
 

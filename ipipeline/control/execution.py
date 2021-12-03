@@ -2,12 +2,13 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from importlib import import_module
+from typing import Any, Dict, List, Type
 
 from ipipeline.control.building import build_func_inputs, build_func_outputs
-from ipipeline.control.catalog import BaseCatalog, Catalog
 from ipipeline.control.sorting import sort_graph_topo
 from ipipeline.exception import ExecutionError
+from ipipeline.structure.catalog import BaseCatalog, Catalog
 from ipipeline.structure.pipeline import BasePipeline
 
 
@@ -85,10 +86,10 @@ class BaseExecutor(ABC):
             Catalog that stores the items from the execution.
         """
 
-        if catalog:
-            return catalog
-        else:
-            return Catalog()
+        if not catalog:
+            catalog = Catalog()
+
+        return catalog
 
     def flag_node(self, node_id: str, flag: str, status: bool) -> None:
         """Flags a node.
@@ -170,7 +171,7 @@ class BaseExecutor(ABC):
             node = self._pipeline.nodes[node_id]
             logger.info(f'node - id: {node.id}, tags: {node.tags}')
 
-            func_inputs = build_func_inputs(node.inputs, self._catalog.items)
+            func_inputs = build_func_inputs(node.inputs, self._catalog)
             returns = node.func(**func_inputs)
             func_outputs = build_func_outputs(node.outputs, returns)
 
@@ -255,3 +256,35 @@ class SequentialExecutor(BaseExecutor):
 
                     for id, item in func_outputs.items():
                         self._catalog.add_item(id, item)
+
+
+def obtain_executor_class(type: str) -> Type[BaseExecutor]:
+    """Obtains an executor class.
+
+    Parameters
+    ----------
+    type : {'sequential'}
+        Type of the executor class.
+
+        sequential: executes a pipeline sequentially.
+
+    Returns
+    -------
+    executor_class : Type[BaseExecutor]
+        Executor class of a given type.
+
+    Raises
+    ------
+    ExecutionError
+        Informs that the type was not found in the executors.
+    """
+
+    try:
+        return getattr(
+            import_module('ipipeline.control.execution'), 
+            f'{type.capitalize()}Executor'
+        )
+    except AttributeError as error:
+        raise ExecutionError(
+            'type not found in the executors', f'type == {type}'
+        ) from error

@@ -42,20 +42,6 @@ class BaseError(Exception):
         return f'{self._descr}: {self._detail}'
 
 
-class ActionError(BaseError):
-    """Informs the occurrence of an error related to the action module.
-
-    Attributes
-    ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
-    """
-
-    pass
-
-
 class BuildingError(BaseError):
     """Informs the occurrence of an error related to the building module.
 
