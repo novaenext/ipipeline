@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.exception import InstanceError
-from ipipeline.util.instance import Identification, build_repr
+from ipipeline.util.instance import Identification, build_repr, obtain_instance
 
 
 class TestIdentification(TestCase):
@@ -75,3 +75,24 @@ class TestBuildRepr(TestCase):
         repr = build_repr(MockClass4())
 
         self.assertEqual(repr, 'MockClass4()')
+
+
+class TestObtainInstance(TestCase):
+    def test_valid_names(self) -> None:
+        mock_class = obtain_instance('tests.util.test_instance', 'MockClass1')
+
+        self.assertEqual(mock_class.__name__, 'MockClass1')
+
+    def test_invalid_mod_name(self) -> None:
+        with self.assertRaisesRegex(
+            InstanceError, 
+            r'inst_name not found in the module: inst_name == MockClass1'
+        ):
+            _ = obtain_instance('tests.util.test_instances', 'MockClass1')
+
+    def test_invalid_inst_name(self) -> None:
+        with self.assertRaisesRegex(
+            InstanceError, 
+            r'inst_name not found in the module: inst_name == MockClass11'
+        ):
+            _ = obtain_instance('tests.util.test_instance', 'MockClass11')
