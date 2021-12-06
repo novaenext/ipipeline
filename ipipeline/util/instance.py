@@ -104,10 +104,10 @@ class Identification:
             Instance representation.
         """
 
-        return build_instance_repr(self)
+        return build_repr(self)
 
 
-def build_instance_repr(instance: object) -> str:
+def build_repr(instance: object) -> str:
     """Builds the representation of an instance.
 
     The class name and the parameters in the initializer signature are 
@@ -120,11 +120,11 @@ def build_instance_repr(instance: object) -> str:
 
     Returns
     -------
-    instance_repr : str
-        Instance representation.
+    repr : str
+        Representation of an instance.
     """
 
-    instance_repr = f'{instance.__class__.__name__}('
+    repr = f'{instance.__class__.__name__}('
 
     for param in signature(instance.__init__).parameters.values():
         value = None
@@ -138,6 +138,6 @@ def build_instance_repr(instance: object) -> str:
 
                 break
 
-        instance_repr += f'{param.name}={value}, '
+        repr += f'{param.name}={value}, '
 
-    return f'{instance_repr})'.replace(', )', ')')
+    return f'{repr})'.replace(', )', ')')
