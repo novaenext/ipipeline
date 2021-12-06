@@ -1,9 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.exception import PipelineError
-from ipipeline.structure.pipeline import (
-    BasePipeline, Pipeline, obtain_pipeline
-)
+from ipipeline.structure.pipeline import BasePipeline, Pipeline
 
 
 class MockBasePipeline(BasePipeline):
@@ -175,48 +173,6 @@ class TestPipeline(TestCase):
         pipeline._check_inexistent_node_id('c1', 'n1')
 
         self.assertTrue(True)
-
-
-class TestObtainPipeline(TestCase):
-    def test_valid_names(self) -> None:
-        pipeline = obtain_pipeline(
-            'tests.structure.test_pipeline', 'mock_build_pipeline'
-        )
-
-        self.assertEqual(pipeline.id, 'p1')
-
-    def test_invalid_mod_name(self) -> None:
-        with self.assertRaisesRegex(
-            PipelineError, 
-            r'func_name not found in the module: func_name == '
-            r'mock_build_pipeline'
-        ):
-            _ = obtain_pipeline(
-                'tests.structure.test_pipelines', 'mock_build_pipeline'
-            )
-
-    def test_invalid_func_name(self) -> None:
-        with self.assertRaisesRegex(
-            PipelineError, 
-            r'func_name not found in the module: func_name == '
-            r'mock_build_pipelines'
-        ):
-            _ = obtain_pipeline(
-                'tests.structure.test_pipeline', 'mock_build_pipelines'
-            )
-
-
-def mock_build_pipeline() -> Pipeline:
-    pipeline = Pipeline('p1')
-    pipeline.add_node(
-        'n1', 
-        lambda param1, param2: param1 + param2, 
-        inputs={'param1': 7, 'param2': 3}, 
-        outputs=['sum'], 
-        tags = ['math']
-    )
-
-    return pipeline
 
 
 def mock_sum(param1: int, param2: int) -> int:
