@@ -1,7 +1,10 @@
 """Classes and functions related to the instance procedures."""
 
 import re
+import sys
+from importlib import import_module
 from inspect import signature
+from pathlib import Path
 from typing import List
 
 from ipipeline.exception import InstanceError
@@ -141,3 +144,34 @@ def build_repr(instance: object) -> str:
         repr += f'{param.name}={value}, '
 
     return f'{repr})'.replace(', )', ')')
+
+
+def obtain_instance(mod_name: str, inst_name: str) -> object:
+    """Obtains an instance declared in a module.
+
+    Parameters
+    ----------
+    mod_name : str
+        Name of the module in absolute terms (pkg.mod).
+    inst_name : str
+        Name of the instance declared in the module.
+
+    Returns
+    -------
+    instance : object
+        Instance of a class.
+
+    Raises
+    ------
+    InstanceError
+        Informs that the inst_name was not found in the module.
+    """
+
+    sys.path.append(str(Path(mod_name.split('.')[0]).resolve()))
+
+    try:
+        return getattr(import_module(mod_name), inst_name)
+    except (ModuleNotFoundError, AttributeError) as error:
+        raise InstanceError(
+            'inst_name not found in the module', f'inst_name == {inst_name}'
+        ) from error
