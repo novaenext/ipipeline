@@ -1,7 +1,6 @@
 """Functions related to the action procedures."""
 
-from ipipeline.control.execution import obtain_executor_class
-from ipipeline.structure.pipeline import obtain_pipeline
+from ipipeline.util.instance import obtain_instance
 from ipipeline.util.system import create_directory, create_file
 
 
@@ -53,15 +52,12 @@ def create_project(path: str, name: str) -> None:
 def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
     """Executes a pipeline according to an executor.
 
-    The pipeline is obtained from the return of a function declared in 
-    a module.
-
     Parameters
     ----------
     mod_name : str
-        Name of the module in absolute terms (pkg.mod).
+        Name of the module (absolute terms) where the function is declared.
     func_name : str
-        Name of the function.
+        Name of the function that returns a pipeline.
     exe_type : {'sequential'}
         Type of the executor class.
 
@@ -69,14 +65,19 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
 
     Raises
     ------
-    PipelineError
-        Informs that the func_name was not found in the module.
-    ExecutionError
-        Informs that the type was not found in the executors.
+    InstanceError
+        Informs that the inst_name was not found in the module.
+    SortingError
+        Informs that the dst_node_id was not specified as src_node_id.
+    SortingError
+        Informs that a circular dependency was found in the graph.
     ExecutionError
         Informs that the node was not executed by the executor.
     """
 
-    pipeline = obtain_pipeline(mod_name, func_name)
-    executor = obtain_executor_class(exe_type)(pipeline)
-    executor.execute_pipeline(executor.obtain_topo_order())
+    pipeline = obtain_instance(mod_name, func_name)()
+    executor = obtain_instance(
+        'ipipeline.control.execution', f'{exe_type.capitalize()}Executor'
+    )(pipeline)
+    topo_order = executor.obtain_topo_order()
+    executor.execute_pipeline(topo_order)
