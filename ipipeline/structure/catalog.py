@@ -168,7 +168,7 @@ class Catalog(BaseCatalog):
             Indicates if an item exists.
         """
 
-        return id in self._items
+        return id in self._items.keys()
 
     def obtain_item(self, id: str) -> Any:
         """Obtains an item.
