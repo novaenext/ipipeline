@@ -9,7 +9,7 @@ from ipipeline.structure.catalog import Catalog
 
 class TestBuildFuncInputs(TestCase):
     def setUp(self) -> None:
-        self._catalog = Catalog()
+        self._catalog = Catalog('c1')
         self._catalog._items = {'i1': 7, 'i2': 0}
 
     def test_single_inputs(self) -> None:
