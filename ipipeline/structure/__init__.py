@@ -6,3 +6,4 @@ outputs of the user tasks.
 
 from ipipeline.structure.catalog import BaseCatalog, Catalog
 from ipipeline.structure.pipeline import BasePipeline, Pipeline
+from ipipeline.structure.signal import BaseSignal, Signal
