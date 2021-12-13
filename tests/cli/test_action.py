@@ -3,7 +3,7 @@ from shutil import rmtree
 from unittest import TestCase
 
 from ipipeline.cli.action import create_project, execute_pipeline
-from ipipeline.exception import PipelineError, SystemError
+from ipipeline.exception import InstanceError, SystemError
 from ipipeline.structure import Pipeline
 
 
@@ -62,8 +62,8 @@ class TestExecutePipeline(TestCase):
 
     def test_invalid_execution(self) -> None:
         with self.assertRaisesRegex(
-            PipelineError, 
-            r'func_name not found in the module: func_name == '
+            InstanceError, 
+            r'inst_name not found in the module: inst_name == '
             r'mock_build_pipelines'
         ):
             execute_pipeline(
