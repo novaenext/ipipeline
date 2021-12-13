@@ -16,7 +16,7 @@ class BaseSignal(ABC, Identification):
     _type : str
         Type of the signal that triggers an action.
     _status : bool
-        Indicates if the signal is enable (True) or disable (False).
+        Indicates if the signal is enable or disable.
     _tags : List[str]
         Tags of the signal to provide more context.
     """
@@ -40,7 +40,7 @@ class BaseSignal(ABC, Identification):
         type : str
             Type of the signal that triggers an action.
         status : bool
-            Indicates if the signal is enable (True) or disable (False).
+            Indicates if the signal is enable or disable.
         tags : List[str]
             Tags of the signal to provide more context.
 
@@ -94,7 +94,7 @@ class BaseSignal(ABC, Identification):
 
 
 class Signal(BaseSignal):
-    """Stores instructions related to an element.
+    """Stores instructions of an element.
 
     Attributes
     ----------
@@ -105,7 +105,7 @@ class Signal(BaseSignal):
     _type : str
         Type of the signal that triggers an action.
     _status : bool
-        Indicates if the signal is enable (True) or disable (False).
+        Indicates if the signal is enable or disable.
     _tags : List[str]
         Tags of the signal to provide more context.
     """
