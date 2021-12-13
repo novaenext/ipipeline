@@ -21,7 +21,7 @@ class TestBaseExecutor(TestCase):
             outputs=['sum'], 
             tags = ['math']
         )
-        self._catalog = Catalog()
+        self._catalog = Catalog('c1')
         self._catalog.add_item('i1', 7)
 
     def test_init(self) -> None:
@@ -29,6 +29,7 @@ class TestBaseExecutor(TestCase):
 
         self.assertDictEqual(base_executor.pipeline.graph, {'n1': []})
         self.assertDictEqual(base_executor.catalog.items, {})
+        self.assertDictEqual(base_executor.signals, {})
 
     def test_check_inexistent_catalog(self) -> None:
         base_executor = MockBaseExecutor(self._pipeline, None)
@@ -42,46 +43,72 @@ class TestBaseExecutor(TestCase):
 
         self.assertDictEqual(catalog.items, {'i1': 7})
 
-    def test_flag_inexistent_node(self) -> None:
+    def test_add_inexistent_signal(self) -> None:
         base_executor = MockBaseExecutor(self._pipeline, self._catalog)
-        base_executor.flag_node('n1', 'skip', True)
+        base_executor.add_signal('s1', 'n1', 'skip', True)
 
-        self.assertDictEqual(base_executor._flags, {'n1': {'skip': True}})
+        self.assertListEqual(list(base_executor.signals.keys()), ['n1'])
+        self.assertListEqual(
+            [signal.elem_id for signal in base_executor.signals.values()], 
+            ['n1']
+        )
+        self.assertTrue(base_executor.signals['n1'].status)
 
-    def test_flag_existent_node(self) -> None:
+    def test_add_existent_signal(self) -> None:
         base_executor = MockBaseExecutor(self._pipeline, self._catalog)
-        base_executor._flags = {'n1': {'skip': True}}
-        base_executor.flag_node('n1', 'skip', False)
+        base_executor.add_signal('s1', 'n1', 'skip', True)
+        base_executor.add_signal('s1', 'n1', 'skip', False)
 
-        self.assertDictEqual(base_executor._flags, {'n1': {'skip': False}})
+        self.assertListEqual(list(base_executor.signals.keys()), ['n1'])
+        self.assertListEqual(
+            [signal.elem_id for signal in base_executor.signals.values()], 
+            ['n1']
+        )
+        self.assertFalse(base_executor.signals['n1'].status)
 
-    def test_flag_invalid_flag(self) -> None:
-        base_executor = MockBaseExecutor(self._pipeline, self._catalog)
-
-        with self.assertRaisesRegex(
-            ExecutionError, r'node not flagged in the _flags: node_id == n1'
-        ):
-            base_executor.flag_node('n1', 'flag', True)
-
-    def test_flag_invalid_node(self) -> None:
-        base_executor = MockBaseExecutor(self._pipeline, self._catalog)
-
-        with self.assertRaisesRegex(
-            ExecutionError, r'node not flagged in the _flags: node_id == n11'
-        ):
-            base_executor.flag_node('n11', 'skip', True)
-
-    def test_check_invalid_flag(self) -> None:
+    def test_add_invalid_signal(self) -> None:
         base_executor = MockBaseExecutor(self._pipeline, self._catalog)
 
         with self.assertRaisesRegex(
-            ExecutionError, r'flag not found in the valid_flags: flag == flag'
+            ExecutionError, r'type not found in the valid_types: type == skips'
         ):
-            base_executor._check_invalid_flag('flag')
+            base_executor.add_signal('s1', 'n1', 'skips', True)
 
-    def test_check_valid_flag(self) -> None:
+    def test_add_invalid_elem(self) -> None:
         base_executor = MockBaseExecutor(self._pipeline, self._catalog)
-        base_executor._check_invalid_flag('skip')
+
+        with self.assertRaisesRegex(
+            ExecutionError, 
+            r'elem_id not found in the _pipeline.nodes: elem_id == n11'
+        ):
+            base_executor.add_signal('s1', 'n11', 'skip', True)
+
+    def test_check_inexistent_elem_id(self) -> None:
+        base_executor = MockBaseExecutor(self._pipeline, self._catalog)
+
+        with self.assertRaisesRegex(
+            ExecutionError, 
+            r'elem_id not found in the _pipeline.nodes: elem_id == n11'
+        ):
+            base_executor._check_inexistent_elem_id('n11')
+
+    def test_check_existent_elem_id(self) -> None:
+        base_executor = MockBaseExecutor(self._pipeline, self._catalog)
+        base_executor._check_inexistent_elem_id('n1')
+
+        self.assertTrue(True)
+
+    def test_check_invalid_type(self) -> None:
+        base_executor = MockBaseExecutor(self._pipeline, self._catalog)
+
+        with self.assertRaisesRegex(
+            ExecutionError, r'type not found in the valid_types: type == skips'
+        ):
+            base_executor._check_invalid_type('skips')
+
+    def test_check_valid_type(self) -> None:
+        base_executor = MockBaseExecutor(self._pipeline, self._catalog)
+        base_executor._check_invalid_type('skip')
 
         self.assertTrue(True)
 
@@ -95,8 +122,7 @@ class TestBaseExecutor(TestCase):
         base_executor = MockBaseExecutor(self._pipeline, self._catalog)
 
         with self.assertRaisesRegex(
-            ExecutionError, 
-            r'node not executed by the executor: node_id == n11'
+            ExecutionError, r'node not executed by the executor: id == n11'
         ):
             _ = base_executor.execute_node('n11')
 
@@ -145,17 +171,17 @@ class TestSequentialExecutor(TestCase):
 
         self.assertIsInstance(executor, BaseExecutor)
 
-    def test_execute_pipeline_without_flag(self) -> None:
+    def test_execute_pipeline_without_signal(self) -> None:
         executor = SequentialExecutor(self._pipeline)
         executor.execute_pipeline(self._topo_order)
 
         self.assertDictEqual(executor.catalog.items, {'sum': 10, 'sub': 4})
 
-    def test_execute_pipeline_with_flag(self) -> None:
+    def test_execute_pipeline_with_signal(self) -> None:
         executor = SequentialExecutor(self._pipeline)
-        executor._flags = {
-            'n2': {'skip': True}, 'n3': {'skip': False}, 'n4': {'skip': True}
-        }
+        executor.add_signal('s1', 'n2', 'skip', True)
+        executor.add_signal('s2', 'n3', 'skip', False)
+        executor.add_signal('s3', 'n4', 'skip', True)
         executor.execute_pipeline(self._topo_order)
 
         self.assertDictEqual(executor.catalog.items, {'sum': 10})
