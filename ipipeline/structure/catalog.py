@@ -1,26 +1,46 @@
 """Classes related to the catalog procedures."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from ipipeline.exception import CatalogError
+from ipipeline.util.instance import Identification
 
 
-class BaseCatalog(ABC):
+class BaseCatalog(ABC, Identification):
     """Provides an interface to the catalog classes.
 
     Attributes
     ----------
+    _id : str
+        ID of the catalog.
     _items : Dict[str, Any]
         Items obtained from the executions. The keys are the item IDs 
         obtained from the outputs and the values are the items obtained 
         from the returns.
+    _tags : List[str]
+        Tags of the catalog to provide more context.
     """
 
-    def __init__(self) -> None:
-        """Initializes the attributes."""
+    def __init__(self, id: str, tags: List[str] = []) -> None:
+        """Initializes the attributes.
+
+        Parameters
+        ----------
+        id : str
+            ID of the catalog.
+        tags : List[str], default=[]
+            Tags of the catalog to provide more context.
+
+        Raises
+        ------
+        InstanceError
+            Informs that the id was not validated according to the pattern.
+        """
 
         self._items = {}
+
+        super().__init__(id, tags=tags)
 
     @property
     def items(self) -> Dict[str, Any]:
@@ -96,16 +116,26 @@ class BaseCatalog(ABC):
 
         pass
 
+    @abstractmethod
+    def clean_items(self) -> None:
+        """Provides an interface to clean the items."""
+
+        pass
+
 
 class Catalog(BaseCatalog):
-    """Catalogs the items from the execution.
+    """Stores the items from an execution.
 
     Attributes
     ----------
+    _id : str
+        ID of the catalog.
     _items : Dict[str, Any]
         Items obtained from the executions. The keys are the item IDs 
         obtained from the outputs and the values are the items obtained 
         from the returns.
+    _tags : List[str]
+        Tags of the catalog to provide more context.
     """
 
     def add_item(self, id: str, item: Any) -> None:
@@ -138,7 +168,7 @@ class Catalog(BaseCatalog):
             Indicates if an item exists.
         """
 
-        return id in self._items
+        return id in self._items.keys()
 
     def obtain_item(self, id: str) -> Any:
         """Obtains an item.
@@ -186,3 +216,8 @@ class Catalog(BaseCatalog):
             raise CatalogError(
                 'id not found in the _items', f'id == {id}'
             ) from error
+
+    def clean_items(self) -> None:
+        """Cleans the items."""
+
+        self._items.clear()

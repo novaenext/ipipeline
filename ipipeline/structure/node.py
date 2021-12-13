@@ -20,8 +20,8 @@ class BaseNode(ABC, Identification):
         the values are any default values and/or items obtained from the 
         catalog through a specific syntax.
 
-        'c.<item_id>': syntax to obtain a single item.
-        'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
+        'c.<item_id>': obtains a single item.
+        'c.[<item_id>, ..., <item_id>]': obtains a list of items.
     _outputs : List[str]
         Outputs of the function. The outputs must match the returns in 
         terms of length. If one output is expected, the returns can be of 
@@ -52,8 +52,8 @@ class BaseNode(ABC, Identification):
             the values are any default values and/or items obtained from the 
             catalog through a specific syntax.
 
-            'c.<item_id>': syntax to obtain a single item.
-            'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
+            'c.<item_id>': obtains a single item.
+            'c.[<item_id>, ..., <item_id>]': obtains a list of items.
         outputs : List[str], default=[]
             Outputs of the function. The outputs must match the returns in 
             terms of length. If one output is expected, the returns can be of 
@@ -97,8 +97,8 @@ class BaseNode(ABC, Identification):
             the values are any default values and/or items obtained from the 
             catalog through a specific syntax.
 
-            'c.<item_id>': syntax to obtain a single item.
-            'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
+            'c.<item_id>': obtains a single item.
+            'c.[<item_id>, ..., <item_id>]': obtains a list of items.
         """
 
         return self._inputs
@@ -133,8 +133,8 @@ class Node(BaseNode):
         the values are any default values and/or items obtained from the 
         catalog through a specific syntax.
 
-        'c.<item_id>': syntax to obtain a single item.
-        'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
+        'c.<item_id>': obtains a single item.
+        'c.[<item_id>, ..., <item_id>]': obtains a list of items.
     _outputs : List[str]
         Outputs of the function. The outputs must match the returns in 
         terms of length. If one output is expected, the returns can be of 

@@ -18,8 +18,8 @@ def build_func_inputs(
         the values are any default values and/or items obtained from the 
         catalog through a specific syntax.
 
-        'c.<item_id>': syntax to obtain a single item.
-        'c.[<item_id>, ..., <item_id>]': syntax to obtain a list of items.
+        'c.<item_id>': obtains a single item.
+        'c.[<item_id>, ..., <item_id>]': obtains a list of items.
     catalog : BaseCatalog
         Catalog that stores the items from the execution.
 

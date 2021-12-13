@@ -2,14 +2,14 @@
 
 import logging
 from abc import ABC, abstractmethod
-from importlib import import_module
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List
 
 from ipipeline.control.building import build_func_inputs, build_func_outputs
 from ipipeline.control.sorting import sort_graph_topo
 from ipipeline.exception import ExecutionError
 from ipipeline.structure.catalog import BaseCatalog, Catalog
 from ipipeline.structure.pipeline import BasePipeline
+from ipipeline.structure.signal import BaseSignal, Signal
 
 
 logger = logging.getLogger(name=__name__)
@@ -24,9 +24,9 @@ class BaseExecutor(ABC):
         Pipeline that stores the graph structure.
     _catalog : BaseCatalog
         Catalog that stores the items from the execution.
-    _flags : Dict[str, dict]
-        Flags linked to the nodes. The keys are the node IDs and values are 
-        the flags and their status.
+    _signals : Dict[str, BaseSignal]
+        Signals of the execution. The keys are the element (node) IDs and 
+        the values are the signal objects where the IDs were obtained.
     """
 
     def __init__(
@@ -44,7 +44,7 @@ class BaseExecutor(ABC):
 
         self._pipeline = pipeline
         self._catalog = self._check_inexistent_catalog(catalog)
-        self._flags = {}
+        self._signals = {}
 
     @property
     def pipeline(self) -> BasePipeline:
@@ -70,6 +70,19 @@ class BaseExecutor(ABC):
 
         return self._catalog
 
+    @property
+    def signals(self) -> Dict[str, BaseSignal]:
+        """Obtains the _signals attribute.
+
+        Returns
+        -------
+        signals : Dict[str, BaseSignal]
+            Signals of the execution. The keys are the element (node) IDs and 
+            the values are the signal objects where the IDs were obtained.
+        """
+
+        return self._signals
+
     def _check_inexistent_catalog(self, catalog: BaseCatalog) -> BaseCatalog:
         """Checks if the catalog does not exist.
 
@@ -87,71 +100,98 @@ class BaseExecutor(ABC):
         """
 
         if not catalog:
-            catalog = Catalog()
+            catalog = Catalog(self._pipeline.id, tags=self._pipeline.tags)
 
         return catalog
 
-    def flag_node(self, node_id: str, flag: str, status: bool) -> None:
-        """Flags a node.
+    def add_signal(
+        self, 
+        id: str, 
+        elem_id: str, 
+        type: str, 
+        status: bool, 
+        tags: List[str] = []
+    ) -> None:
+        """Adds a signal in the execution.
 
         Parameters
         ----------
-        node_id : str
-            ID of the node.
-        flag : {'skip'}
-            Flag that acts as a signal to take some action during execution. 
+        id : str
+            ID of the signal.
+        elem_id : str
+            ID of the element (node).
+        type : {'skip'}
+            Type of the signal that triggers an action.
 
             skip: skips the node execution.
         status : bool
-            Indicates if the flag is enable (True) or disable (False).
+            Indicates if the signal is enable or disable.
+        tags : List[str]
+            Tags of the signal to provide more context.
 
         Raises
         ------
         ExecutionError
-            Informs that the node was not flagged in the _flags.
+            Informs that the elem_id was not found in the _pipeline.nodes.
+        ExecutionError
+            Informs that the type was not found in the valid_types.
         """
 
-        try:
-            self._check_invalid_flag(flag)
-            node = self._pipeline.nodes[node_id]
+        self._check_inexistent_elem_id(elem_id)
+        self._check_invalid_type(type)
+        signal = Signal(id, elem_id, type, status, tags)
 
-            if node.id not in self._flags:
-                self._flags[node.id] = {}
-            self._flags[node.id][flag] = status
-        except Exception as error:
-            raise ExecutionError(
-                'node not flagged in the _flags', f'node_id == {node_id}'
-            ) from error
+        self._signals[signal.elem_id] = signal
 
-    def _check_invalid_flag(self, flag: str) -> None:
-        """Checks if the flag is invalid.
+    def _check_inexistent_elem_id(self, elem_id: str) -> None:
+        """Checks if the element ID does not exist.
 
         Parameters
         ----------
-        flag : {'skip'}
-            Flag that acts as a signal to take some action during execution. 
+        elem_id : str
+            ID of the element (node).
+
+        Raises
+        ------
+        ExecutionError
+            Informs that the elem_id was not found in the _pipeline.nodes.
+        """
+
+        if elem_id not in self._pipeline.nodes.keys():
+            raise ExecutionError(
+                'elem_id not found in the _pipeline.nodes', 
+                f'elem_id == {elem_id}'
+            )
+
+    def _check_invalid_type(self, type: str) -> None:
+        """Checks if the type is invalid.
+
+        Parameters
+        ----------
+        type : {'skip'}
+            Type of the signal that triggers an action.
 
             skip: skips the node execution.
 
         Raises
         ------
         ExecutionError
-            Informs that the flag was not found in the valid_flags.
+            Informs that the type was not found in the valid_types.
         """
 
-        valid_flags = ['skip']
+        valid_types = ['skip']
 
-        if flag not in valid_flags:
+        if type not in valid_types:
             raise ExecutionError(
-                'flag not found in the valid_flags', f'flag == {flag}'
+                'type not found in the valid_types', f'type == {type}'
             )
 
-    def execute_node(self, node_id: str) -> Dict[str, Any]:
+    def execute_node(self, id: str) -> Dict[str, Any]:
         """Executes a node.
 
         Parameters
         ----------
-        node_id : str
+        id : str
             ID of the node.
 
         Returns
@@ -168,8 +208,8 @@ class BaseExecutor(ABC):
         """
 
         try:
-            node = self._pipeline.nodes[node_id]
-            logger.info(f'node - id: {node.id}, tags: {node.tags}')
+            node = self._pipeline.nodes[id]
+            logger.info(f'node.id: {node.id}, node.tags: {node.tags}')
 
             func_inputs = build_func_inputs(node.inputs, self._catalog)
             returns = node.func(**func_inputs)
@@ -178,7 +218,7 @@ class BaseExecutor(ABC):
             return func_outputs
         except Exception as error:
             raise ExecutionError(
-                'node not executed by the executor', f'node_id == {node_id}'
+                'node not executed by the executor', f'id == {id}'
             ) from error
 
     def obtain_topo_order(self) -> List[list]:
@@ -228,9 +268,9 @@ class SequentialExecutor(BaseExecutor):
         Pipeline that stores the graph structure.
     _catalog : BaseCatalog
         Catalog that stores the items from the execution.
-    _flags : Dict[str, dict]
-        Flags linked to the nodes. The keys are the node IDs and values are 
-        the flags and their status.
+    _signals : Dict[str, BaseSignal]
+        Signals of the execution. The keys are the element IDs and the 
+        values are the signal objects where the IDs were obtained.
     """
 
     def execute_pipeline(self, topo_order: List[list]) -> None:
@@ -251,40 +291,14 @@ class SequentialExecutor(BaseExecutor):
 
         for group in topo_order:
             for node_id in group:
-                if not self._flags.get(node_id, {}).get('skip', False):
+                signal = self._signals.get(
+                    node_id, Signal('s0', node_id, 'default', False)
+                )
+
+                if signal.type == 'skip' and signal.status == True:
+                    continue
+                else:
                     func_outputs = self.execute_node(node_id)
 
                     for id, item in func_outputs.items():
                         self._catalog.add_item(id, item)
-
-
-def obtain_executor_class(type: str) -> Type[BaseExecutor]:
-    """Obtains an executor class.
-
-    Parameters
-    ----------
-    type : {'sequential'}
-        Type of the executor class.
-
-        sequential: executes a pipeline sequentially.
-
-    Returns
-    -------
-    executor_class : Type[BaseExecutor]
-        Executor class of a given type.
-
-    Raises
-    ------
-    ExecutionError
-        Informs that the type was not found in the executors.
-    """
-
-    try:
-        return getattr(
-            import_module('ipipeline.control.execution'), 
-            f'{type.capitalize()}Executor'
-        )
-    except AttributeError as error:
-        raise ExecutionError(
-            'type not found in the executors', f'type == {type}'
-        ) from error

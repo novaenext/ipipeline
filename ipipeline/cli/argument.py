@@ -159,7 +159,7 @@ name_arg = Argument(
 
 mod_name_arg = Argument(
     'mod_name', 
-    'name of the module.', 
+    'name of the module (absolute terms) where the function is declared.', 
     'store', 
     str
 )
@@ -167,7 +167,7 @@ mod_name_arg = Argument(
 
 func_name_arg = Argument(
     'func_name', 
-    'name of the function.', 
+    'name of the function that returns a pipeline.', 
     'store', 
     str
 )
@@ -175,7 +175,8 @@ func_name_arg = Argument(
 
 exe_type_arg = Argument(
     'exe_type', 
-    'type of the executor.\n\nsequential: executes a pipeline sequentially.', 
+    'type of the executor class.\n\n'
+    'sequential: executes a pipeline sequentially.', 
     'store', 
     str
 )

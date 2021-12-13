@@ -1,7 +1,10 @@
 """Classes and functions related to the instance procedures."""
 
 import re
+import sys
+from importlib import import_module
 from inspect import signature
+from pathlib import Path
 from typing import List
 
 from ipipeline.exception import InstanceError
@@ -104,10 +107,10 @@ class Identification:
             Instance representation.
         """
 
-        return build_instance_repr(self)
+        return build_repr(self)
 
 
-def build_instance_repr(instance: object) -> str:
+def build_repr(instance: object) -> str:
     """Builds the representation of an instance.
 
     The class name and the parameters in the initializer signature are 
@@ -120,11 +123,11 @@ def build_instance_repr(instance: object) -> str:
 
     Returns
     -------
-    instance_repr : str
-        Instance representation.
+    repr : str
+        Representation of an instance.
     """
 
-    instance_repr = f'{instance.__class__.__name__}('
+    repr = f'{instance.__class__.__name__}('
 
     for param in signature(instance.__init__).parameters.values():
         value = None
@@ -138,6 +141,37 @@ def build_instance_repr(instance: object) -> str:
 
                 break
 
-        instance_repr += f'{param.name}={value}, '
+        repr += f'{param.name}={value}, '
 
-    return f'{instance_repr})'.replace(', )', ')')
+    return f'{repr})'.replace(', )', ')')
+
+
+def obtain_instance(mod_name: str, inst_name: str) -> object:
+    """Obtains an instance declared in a module.
+
+    Parameters
+    ----------
+    mod_name : str
+        Name of the module in absolute terms (pkg.mod).
+    inst_name : str
+        Name of the instance declared in the module.
+
+    Returns
+    -------
+    instance : object
+        Instance of a class.
+
+    Raises
+    ------
+    InstanceError
+        Informs that the inst_name was not found in the module.
+    """
+
+    sys.path.append(str(Path(mod_name.split('.')[0]).resolve()))
+
+    try:
+        return getattr(import_module(mod_name), inst_name)
+    except (ModuleNotFoundError, AttributeError) as error:
+        raise InstanceError(
+            'inst_name not found in the module', f'inst_name == {inst_name}'
+        ) from error

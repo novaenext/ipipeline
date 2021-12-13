@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.exception import InstanceError
-from ipipeline.util.instance import Identification, build_instance_repr
+from ipipeline.util.instance import Identification, build_repr, obtain_instance
 
 
 class TestIdentification(TestCase):
@@ -26,11 +26,10 @@ class TestIdentification(TestCase):
 
     def test_repr(self) -> None:
         identifier = Identification('i1', tags=['t1', 't2'])
-        instance_repr = identifier.__repr__()
+        repr = identifier.__repr__()
 
         self.assertEqual(
-            instance_repr, 
-            'Identification(id=\'i1\', tags=[\'t1\', \'t2\'])'
+            repr, 'Identification(id=\'i1\', tags=[\'t1\', \'t2\'])'
         )
 
 
@@ -56,23 +55,44 @@ class MockClass4:
         pass
 
 
-class TestBuildInstanceRepr(TestCase):
+class TestBuildRepr(TestCase):
     def test_instance_with_params_with_attrs(self) -> None:
-        instance_repr = build_instance_repr(MockClass1(1))
+        repr = build_repr(MockClass1(1))
 
-        self.assertEqual(instance_repr, 'MockClass1(param1=1, param2=\'2\')')
+        self.assertEqual(repr, 'MockClass1(param1=1, param2=\'2\')')
 
     def test_instance_with_params_without_attrs(self) -> None:
-        instance_repr = build_instance_repr(MockClass2(1))
+        repr = build_repr(MockClass2(1))
 
-        self.assertEqual(instance_repr, 'MockClass2(param1=None, param2=None)')
+        self.assertEqual(repr, 'MockClass2(param1=None, param2=None)')
 
     def test_instance_without_params_with_attrs(self) -> None:
-        instance_repr = build_instance_repr(MockClass3())
+        repr = build_repr(MockClass3())
 
-        self.assertEqual(instance_repr, 'MockClass3()')
+        self.assertEqual(repr, 'MockClass3()')
 
     def test_instance_without_params_without_attrs(self) -> None:
-        instance_repr = build_instance_repr(MockClass4())
+        repr = build_repr(MockClass4())
 
-        self.assertEqual(instance_repr, 'MockClass4()')
+        self.assertEqual(repr, 'MockClass4()')
+
+
+class TestObtainInstance(TestCase):
+    def test_valid_names(self) -> None:
+        mock_class = obtain_instance('tests.util.test_instance', 'MockClass1')
+
+        self.assertEqual(mock_class.__name__, 'MockClass1')
+
+    def test_invalid_mod_name(self) -> None:
+        with self.assertRaisesRegex(
+            InstanceError, 
+            r'inst_name not found in the module: inst_name == MockClass1'
+        ):
+            _ = obtain_instance('tests.util.test_instances', 'MockClass1')
+
+    def test_invalid_inst_name(self) -> None:
+        with self.assertRaisesRegex(
+            InstanceError, 
+            r'inst_name not found in the module: inst_name == MockClass11'
+        ):
+            _ = obtain_instance('tests.util.test_instance', 'MockClass11')
