@@ -1,11 +1,11 @@
-"""Classes and functions related to the instance procedures."""
+"""Class and functions related to the instance procedures."""
 
 import re
 import sys
 from importlib import import_module
 from inspect import signature
 from pathlib import Path
-from typing import List
+from typing import Any, List
 
 from ipipeline.exception import InstanceError
 
@@ -13,8 +13,8 @@ from ipipeline.exception import InstanceError
 class Identification:
     """Stores the identification of an instance.
 
-    This class must be used as a base class to provide identification 
-    properties for instances of a class that derive from it.
+    This class must be used as a base class to provide identification for 
+    instances of a class that derive from it.
 
     Attributes
     ----------
@@ -24,14 +24,14 @@ class Identification:
         Tags of the instance to provide more context.
     """
 
-    def __init__(self, id: str, tags: List[str] = []) -> None:
+    def __init__(self, id: str, tags: List[str] = None) -> None:
         """Initializes the attributes.
 
         Parameters
         ----------
         id : str
             ID of the instance.
-        tags : List[str], default=[]
+        tags : List[str], default=None
             Tags of the instance to provide more context.
 
         Raises
@@ -41,7 +41,7 @@ class Identification:
         """
 
         self._id = self._check_valid_id(id)
-        self._tags = tags
+        self._tags = check_none_arg(tags, [])
 
     @property
     def id(self) -> str:
@@ -99,15 +99,37 @@ class Identification:
             )
 
     def __repr__(self) -> str:
-        """Obtains the instance representation.
+        """Obtains the representation of the instance.
 
         Returns
         -------
-        instance_repr : str
-            Instance representation.
+        repr : str
+            Representation of the instance.
         """
 
         return build_repr(self)
+
+
+def check_none_arg(arg: Any, default: Any) -> Any:
+    """Checks if the arg is None.
+
+    Parameters
+    ----------
+    arg : Any
+        Argument of a callable.
+    default : Any
+        Default value to assign to the arg if it is None.
+
+    Returns
+    -------
+    arg : Any
+        Argument of a callable with its original or default value.
+    """
+
+    if arg is None:
+        arg = default
+
+    return arg
 
 
 def build_repr(instance: object) -> str:
@@ -152,9 +174,9 @@ def obtain_instance(mod_name: str, inst_name: str) -> object:
     Parameters
     ----------
     mod_name : str
-        Name of the module in absolute terms (pkg.mod).
+        Name of the module (absolute terms) where the instance is declared.
     inst_name : str
-        Name of the instance declared in the module.
+        Name of the instance.
 
     Returns
     -------
