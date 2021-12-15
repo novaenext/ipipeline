@@ -2,7 +2,7 @@
 
 The file system functions act as a wrapper for the pathlib package, 
 exposing only the necessary parameters and performing some common 
-operations by default.
+operations.
 """
 
 from pathlib import Path
