@@ -1,47 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.exception import InstanceError
-from ipipeline.util.instance import (
-    Identification, check_none_arg, build_repr, obtain_instance
-)
-
-
-class TestIdentification(TestCase):
-    def test_init(self) -> None:
-        identification = Identification('i1', tags=['t1', 't2'])
-
-        self.assertEqual(identification.id, 'i1')
-        self.assertListEqual(identification.tags, ['t1', 't2'])
-
-    def test_defaults(self) -> None:
-        identification1 = Identification('i1')
-        identification2 = Identification('i2')
-
-        self.assertIsNot(identification1.tags, identification2.tags)
-
-    def test_check_valid_id(self) -> None:
-        identification = Identification('i1')
-        id = identification._check_valid_id('i1')
-
-        self.assertEqual(id, 'i1')
-
-    def test_check_invalid_id(self) -> None:
-        identification = Identification('i1')
-
-        with self.assertRaisesRegex(
-            InstanceError, 
-            r'id not validated according to the pattern \(letters, '
-            r'digits, underscores and/or dashes\): id == i\.1'
-        ):
-            _ = identification._check_valid_id('i.1')
-
-    def test_repr(self) -> None:
-        identification = Identification('i1', tags=['t1', 't2'])
-        repr = identification.__repr__()
-
-        self.assertEqual(
-            repr, 'Identification(id=\'i1\', tags=[\'t1\', \'t2\'])'
-        )
+from ipipeline.util.instance import check_none_arg, build_repr, obtain_instance
 
 
 class TestCheckNoneArg(TestCase):
