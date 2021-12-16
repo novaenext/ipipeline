@@ -1,35 +1,45 @@
-"""Classes related to the catalog procedures."""
+"""Class related to the catalog procedures."""
 
-from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
 from ipipeline.exception import CatalogError
-from ipipeline.util.instance import Identification
+from ipipeline.structure.info import Info
+from ipipeline.util.instance import check_none_arg
 
 
-class BaseCatalog(ABC, Identification):
-    """Provides an interface to the catalog classes.
+class Catalog(Info):
+    """Stores the items from an execution.
+
+    During the execution, each node is executed producing one or more 
+    items that are stored in the catalog so that other nodes can access 
+    them.
 
     Attributes
     ----------
     _id : str
         ID of the catalog.
     _items : Dict[str, Any]
-        Items obtained from the executions. The keys are the item IDs 
-        obtained from the outputs and the values are the items obtained 
-        from the returns.
+        Items obtained from the execution. The keys are the item IDs 
+        obtained from the node outputs and the values are the items 
+        obtained from the node returns.
     _tags : List[str]
         Tags of the catalog to provide more context.
     """
 
-    def __init__(self, id: str, tags: List[str] = []) -> None:
+    def __init__(
+        self, id: str, items: Dict[str, Any] = None, tags: List[str] = None
+    ) -> None:
         """Initializes the attributes.
 
         Parameters
         ----------
         id : str
             ID of the catalog.
-        tags : List[str], default=[]
+        items : Dict[str, Any], default=None
+            Items obtained from the execution. The keys are the item IDs 
+            obtained from the node outputs and the values are the items 
+            obtained from the node returns.
+        tags : List[str], default=None
             Tags of the catalog to provide more context.
 
         Raises
@@ -38,7 +48,7 @@ class BaseCatalog(ABC, Identification):
             Informs that the id was not validated according to the pattern.
         """
 
-        self._items = {}
+        self._items = check_none_arg(items, {})
 
         super().__init__(id, tags=tags)
 
@@ -49,94 +59,12 @@ class BaseCatalog(ABC, Identification):
         Returns
         -------
         items : Dict[str, Any]
-            Items obtained from the executions. The keys are the item IDs 
-            obtained from the outputs and the values are the items obtained 
-            from the returns.
+            Items obtained from the execution. The keys are the item IDs 
+            obtained from the node outputs and the values are the items 
+            obtained from the node returns.
         """
 
         return self._items
-
-    @abstractmethod
-    def add_item(self, id: str, item: Any) -> None:
-        """Provides an interface to add an item.
-
-        Parameters
-        ----------
-        id : str
-            ID of the item obtained from the outputs.
-        item : Any
-            Item obtained from the returns.
-        """
-
-        pass
-
-    @abstractmethod
-    def check_item(self, id: str) -> bool:
-        """Provides an interface to check if an item exists.
-
-        Parameters
-        ----------
-        id : str
-            ID of the item obtained from the outputs.
-
-        Returns
-        -------
-        checked : bool
-            Indicates if an item exists.
-        """
-
-        pass
-
-    @abstractmethod
-    def obtain_item(self, id: str) -> Any:
-        """Provides an interface to obtain an item.
-
-        Parameters
-        ----------
-        id : str
-            ID of the item obtained from the outputs.
-
-        Returns
-        -------
-        item : Any
-            Item obtained from the returns.
-        """
-
-        pass
-
-    @abstractmethod
-    def remove_item(self, id: str) -> None:
-        """Provides an interface to remove an item.
-
-        Parameters
-        ----------
-        id : str
-            ID of the item obtained from the outputs.
-        """
-
-        pass
-
-    @abstractmethod
-    def clean_items(self) -> None:
-        """Provides an interface to clean the items."""
-
-        pass
-
-
-class Catalog(BaseCatalog):
-    """Stores the items from an execution.
-
-    Attributes
-    ----------
-    _id : str
-        ID of the catalog.
-    _items : Dict[str, Any]
-        Items obtained from the executions. The keys are the item IDs 
-        obtained from the outputs and the values are the items obtained 
-        from the returns.
-    _tags : List[str]
-        Tags of the catalog to provide more context.
-    """
 
     def add_item(self, id: str, item: Any) -> None:
         """Adds an item.
@@ -147,9 +75,9 @@ class Catalog(BaseCatalog):
         Parameters
         ----------
         id : str
-            ID of the item obtained from the outputs.
+            ID of the item obtained from the node outputs.
         item : Any
-            Item obtained from the returns.
+            Item obtained from the node returns.
         """
 
         self._items[id] = item
@@ -160,12 +88,12 @@ class Catalog(BaseCatalog):
         Parameters
         ----------
         id : str
-            ID of the item obtained from the outputs.
+            ID of the item obtained from the node outputs.
 
         Returns
         -------
         checked : bool
-            Indicates if an item exists.
+            Indicates if an item exists or not.
         """
 
         return id in self._items.keys()
@@ -176,12 +104,12 @@ class Catalog(BaseCatalog):
         Parameters
         ----------
         id : str
-            ID of the item obtained from the outputs.
+            ID of the item obtained from the node outputs.
 
         Returns
         -------
         item : Any
-            Item obtained from the returns.
+            Item obtained from the node returns.
 
         Raises
         ------
@@ -202,7 +130,7 @@ class Catalog(BaseCatalog):
         Parameters
         ----------
         id : str
-            ID of the item obtained from the outputs.
+            ID of the item obtained from the node outputs.
 
         Raises
         ------
