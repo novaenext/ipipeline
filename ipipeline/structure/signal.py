@@ -1,20 +1,23 @@
-from abc import ABC
+"""Class related to the signal procedures."""
+
 from typing import List
 
-from ipipeline.util.instance import Identification
+from ipipeline.structure.info import Info
 
 
-class BaseSignal(ABC, Identification):
-    """Provides an interface to the signal classes.
+class Signal(Info):
+    """Stores the instructions of a node.
+
+    The instructions signal that a certain action must be triggered.
 
     Attributes
     ----------
     _id : str
         ID of the signal.
-    _elem_id : str
-        ID of the element.
+    _node_id : str
+        ID of the node.
     _type : str
-        Type of the signal that triggers an action.
+        Type of the signal used to trigger an action.
     _status : bool
         Indicates if the signal is enable or disable.
     _tags : List[str]
@@ -24,10 +27,10 @@ class BaseSignal(ABC, Identification):
     def __init__(
         self, 
         id: str, 
-        elem_id: str, 
+        node_id: str, 
         type: str, 
-        status: bool, 
-        tags: List[str] = []
+        status: bool = True, 
+        tags: List[str] = None
     ) -> None:
         """Initializes the attributes.
 
@@ -35,38 +38,38 @@ class BaseSignal(ABC, Identification):
         ----------
         id : str
             ID of the signal.
-        elem_id : str
-            ID of the element.
+        node_id : str
+            ID of the node.
         type : str
-            Type of the signal that triggers an action.
-        status : bool
+            Type of the signal used to trigger an action.
+        status : bool, default=True
             Indicates if the signal is enable or disable.
-        tags : List[str]
+        tags : List[str], default=None
             Tags of the signal to provide more context.
 
         Raises
         ------
-        InstanceError
+        InfoError
             Informs that the id was not validated according to the pattern.
         """
 
-        self._elem_id = elem_id
+        self._node_id = node_id
         self._type = type
         self._status = status
 
         super().__init__(id, tags=tags)
 
     @property
-    def elem_id(self) -> str:
-        """Obtains the _elem_id attribute.
+    def node_id(self) -> str:
+        """Obtains the _node_id attribute.
 
         Returns
         -------
-        elem_id : str
-            ID of the element.
+        node_id : str
+            ID of the node.
         """
 
-        return self._elem_id
+        return self._node_id
 
     @property
     def type(self) -> str:
@@ -75,7 +78,7 @@ class BaseSignal(ABC, Identification):
         Returns
         -------
         type : str
-            Type of the signal that triggers an action.
+            Type of the signal used to trigger an action.
         """
 
         return self._type
@@ -87,27 +90,7 @@ class BaseSignal(ABC, Identification):
         Returns
         -------
         status : bool
-            Indicates if the signal is enable (True) or disable (False).
+            Indicates if the signal is enable or disable.
         """
 
         return self._status
-
-
-class Signal(BaseSignal):
-    """Stores instructions of an element.
-
-    Attributes
-    ----------
-    _id : str
-        ID of the signal.
-    _elem_id : str
-        ID of the element.
-    _type : str
-        Type of the signal that triggers an action.
-    _status : bool
-        Indicates if the signal is enable or disable.
-    _tags : List[str]
-        Tags of the signal to provide more context.
-    """
-
-    pass
