@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from ipipeline.structure.node import BaseNode, Node
+from ipipeline.structure.node import Node
 
 
-class TestBaseNode(TestCase):
+class TestNode(TestCase):
     def test_init(self) -> None:
-        base_node = BaseNode(
+        node = Node(
             'n1', 
             mock_func, 
             inputs={'param1': 7}, 
@@ -13,18 +13,18 @@ class TestBaseNode(TestCase):
             tags=['data']
         )
 
-        self.assertEqual(base_node.id, 'n1')
-        self.assertEqual(base_node.func, mock_func)
-        self.assertDictEqual(base_node.inputs, {'param1': 7})
-        self.assertListEqual(base_node.outputs, ['return1'])
-        self.assertListEqual(base_node.tags, ['data'])
+        self.assertEqual(node.id, 'n1')
+        self.assertEqual(node.func, mock_func)
+        self.assertDictEqual(node.inputs, {'param1': 7})
+        self.assertListEqual(node.outputs, ['return1'])
+        self.assertListEqual(node.tags, ['data'])
 
+    def test_defaults(self) -> None:
+        node1 = Node('n1', mock_func) 
+        node2 = Node('n2', mock_func) 
 
-class TestNode(TestCase):
-    def test_deriv(self) -> None:
-        node = Node('n1', None)
-
-        self.assertIsInstance(node, BaseNode)
+        self.assertIsNot(node1.inputs, node2.inputs)
+        self.assertIsNot(node1.outputs, node2.outputs)
 
 
 def mock_func(param1: int) -> int:
