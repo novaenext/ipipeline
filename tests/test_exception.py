@@ -5,6 +5,7 @@ from ipipeline.exception import (
     BuildingError, 
     CatalogError, 
     ExecutionError, 
+    InfoError, 
     InstanceError, 
     PipelineError, 
     SortingError, 
@@ -43,6 +44,13 @@ class TestCatalogError(TestCase):
 class TestExecutionError(TestCase):
     def test_deriv(self) -> None:
         error = ExecutionError('', '')
+
+        self.assertIsInstance(error, BaseError)
+
+
+class TestInfoError(TestCase):
+    def test_deriv(self) -> None:
+        error = InfoError('', '')
 
         self.assertIsInstance(error, BaseError)
 
