@@ -1,40 +1,22 @@
 from unittest import TestCase
 
 from ipipeline.exception import CatalogError
-from ipipeline.structure.catalog import BaseCatalog, Catalog
-
-
-class MockBaseCatalog(BaseCatalog):
-    def add_item(self) -> None:
-        pass
-
-    def check_item(self) -> None:
-        pass
-   
-    def obtain_item(self) -> None:
-        pass
-
-    def remove_item(self) -> None:
-        pass
-
-    def clean_items(self) -> None:
-        pass
-
-
-class TestBaseCatalog(TestCase):
-    def test_init(self) -> None:
-        base_catalog = MockBaseCatalog('c1', tags=['data'])
-
-        self.assertEqual(base_catalog.id, 'c1')
-        self.assertDictEqual(base_catalog.items, {})
-        self.assertListEqual(base_catalog.tags, ['data'])
+from ipipeline.structure.catalog import Catalog
 
 
 class TestCatalog(TestCase):
-    def test_deriv(self) -> None:
-        catalog = Catalog('c1')
+    def test_init(self) -> None:
+        catalog = Catalog('c1', tags=['data'])
 
-        self.assertIsInstance(catalog, BaseCatalog)
+        self.assertEqual(catalog.id, 'c1')
+        self.assertDictEqual(catalog.items, {})
+        self.assertListEqual(catalog.tags, ['data'])
+
+    def test_defaults(self) -> None:
+        catalog1 = Catalog('c1')
+        catalog2 = Catalog('c2')
+
+        self.assertIsNot(catalog1.items, catalog2.items)
 
     def test_add_inexistent_item(self) -> None:
         catalog = Catalog('c1')
@@ -43,15 +25,13 @@ class TestCatalog(TestCase):
         self.assertDictEqual(catalog.items, {'i1': 7})
 
     def test_add_existent_item(self) -> None:
-        catalog = Catalog('c1')
-        catalog._items = {'i1': 0, 'i2': 0}
+        catalog = Catalog('c1', items={'i1': 0, 'i2': 0})
         catalog.add_item('i1', 7)
 
         self.assertDictEqual(catalog.items, {'i1': 7, 'i2': 0})
 
     def test_check_existent_item(self) -> None:
-        catalog = Catalog('c1')
-        catalog._items = {'i1': 0, 'i2': 0}
+        catalog = Catalog('c1', items={'i1': 7, 'i2': 0})
         checked = catalog.check_item('i1')
 
         self.assertTrue(checked)
@@ -63,8 +43,7 @@ class TestCatalog(TestCase):
         self.assertFalse(checked)
 
     def test_obtain_existent_item(self) -> None:
-        catalog = Catalog('c1')
-        catalog._items = {'i1': 7}
+        catalog = Catalog('c1', items={'i1': 7, 'i2': 0})
         item = catalog.obtain_item('i1')
 
         self.assertEqual(item, 7)
@@ -78,8 +57,7 @@ class TestCatalog(TestCase):
             _ = catalog.obtain_item('i1')
 
     def test_remove_existent_item(self) -> None:
-        catalog = Catalog('c1')
-        catalog._items = {'i1': 0, 'i2': 0}
+        catalog = Catalog('c1', items={'i1': 7, 'i2': 0})
         catalog.remove_item('i1')
 
         self.assertDictEqual(catalog.items, {'i2': 0})
@@ -93,8 +71,7 @@ class TestCatalog(TestCase):
             catalog.remove_item('i1')
 
     def test_clean_existent_items(self) -> None:
-        catalog = Catalog('c1')
-        catalog._items = {'i1': 0, 'i2': 0}
+        catalog = Catalog('c1', items={'i1': 7, 'i2': 0})
         catalog.clean_items()
 
         self.assertDictEqual(catalog.items, {})
