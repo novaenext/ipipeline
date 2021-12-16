@@ -1,113 +1,12 @@
-"""Class and functions related to the instance procedures."""
+"""Functions related to the instance procedures."""
 
-import re
 import sys
 from importlib import import_module
 from inspect import signature
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 from ipipeline.exception import InstanceError
-
-
-class Identification:
-    """Stores the identification of an instance.
-
-    This class must be used as a base class to provide identification for 
-    instances of a class that derive from it.
-
-    Attributes
-    ----------
-    _id : str
-        ID of the instance.
-    _tags : List[str]
-        Tags of the instance to provide more context.
-    """
-
-    def __init__(self, id: str, tags: List[str] = None) -> None:
-        """Initializes the attributes.
-
-        Parameters
-        ----------
-        id : str
-            ID of the instance.
-        tags : List[str], default=None
-            Tags of the instance to provide more context.
-
-        Raises
-        ------
-        InstanceError
-            Informs that the id was not validated according to the pattern.
-        """
-
-        self._id = self._check_valid_id(id)
-        self._tags = check_none_arg(tags, [])
-
-    @property
-    def id(self) -> str:
-        """Obtains the _id attribute.
-
-        Returns
-        -------
-        id : str
-            ID of the instance.
-        """
-
-        return self._id
-
-    @property
-    def tags(self) -> List[str]:
-        """Obtains the _tags attribute.
-
-        Returns
-        -------
-        tags : List[str]
-            Tags of the instance to provide more context.
-        """
-
-        return self._tags
-
-    def _check_valid_id(self, id: str) -> str:
-        """Checks if the ID is valid.
-
-        A valid ID consists of a combination of letters, digits, underscores 
-        and/or dashes.
-
-        Parameters
-        ----------
-        id : str
-            ID of the instance.
-
-        Returns
-        -------
-        id : str
-            ID of the instance.
-
-        Raises
-        ------
-        InstanceError
-            Informs that the id was not validated according to the pattern.
-        """
-
-        if re.fullmatch(r'[\w-]+', id):
-            return id
-        else:
-            raise InstanceError(
-                'id not validated according to the pattern '
-                '(letters, digits, underscores and/or dashes)', 
-                f'id == {id}'
-            )
-
-    def __repr__(self) -> str:
-        """Obtains the representation of the instance.
-
-        Returns
-        -------
-        repr : str
-            Representation of the instance.
-        """
-
-        return build_repr(self)
 
 
 def check_none_arg(arg: Any, default: Any) -> Any:
@@ -174,9 +73,9 @@ def obtain_instance(mod_name: str, inst_name: str) -> object:
     Parameters
     ----------
     mod_name : str
-        Name of the module (absolute terms) where the instance is declared.
+        Name of the module in absolute terms (package.module).
     inst_name : str
-        Name of the instance.
+        Name of the instance declared in the module.
 
     Returns
     -------
