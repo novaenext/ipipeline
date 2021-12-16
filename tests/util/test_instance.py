@@ -13,6 +13,12 @@ class TestIdentification(TestCase):
         self.assertEqual(identification.id, 'i1')
         self.assertListEqual(identification.tags, ['t1', 't2'])
 
+    def test_defaults(self) -> None:
+        identification1 = Identification('i1')
+        identification2 = Identification('i2')
+
+        self.assertIsNot(identification1.tags, identification2.tags)
+
     def test_check_valid_id(self) -> None:
         identification = Identification('i1')
         id = identification._check_valid_id('i1')
