@@ -10,9 +10,8 @@ from ipipeline.util.instance import check_none_arg
 class Catalog(Info):
     """Stores the items from an execution.
 
-    During the execution, each node is executed producing one or more 
-    items that are stored in the catalog so that other nodes can access 
-    them.
+    Items are generated through the execution of the nodes and are stored 
+    in the catalog to provide access between nodes.
 
     Attributes
     ----------
@@ -44,7 +43,7 @@ class Catalog(Info):
 
         Raises
         ------
-        InstanceError
+        InfoError
             Informs that the id was not validated according to the pattern.
         """
 

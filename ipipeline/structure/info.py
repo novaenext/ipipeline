@@ -10,8 +10,8 @@ from ipipeline.util.instance import build_repr, check_none_arg
 class Info:
     """Stores the information of an instance.
 
-    This class must be used as a base class to provide information for 
-    instances of a class that derive from it.
+    The information is used for identification purposes during the life 
+    cycle of the instance.
 
     Attributes
     ----------

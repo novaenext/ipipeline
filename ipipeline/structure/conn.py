@@ -8,8 +8,8 @@ from ipipeline.structure.info import Info
 class Conn(Info):
     """Stores a reference between two nodes.
 
-    The connection is used to define dependencies between nodes, therefore 
-    the destination node is dependent on the source node.
+    The reference defines the dependency between the nodes, therefore the 
+    destination node depends on the source node.
 
     Attributes
     ----------
@@ -50,7 +50,7 @@ class Conn(Info):
 
         Raises
         ------
-        InstanceError
+        InfoError
             Informs that the id was not validated according to the pattern.
         """
 
