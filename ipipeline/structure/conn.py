@@ -1,24 +1,26 @@
-"""Classes related to the connection procedures."""
+"""Class related to the connection procedures."""
 
-from abc import ABC
 from typing import Any, List
 
-from ipipeline.util.instance import Identification
+from ipipeline.structure.info import Info
 
 
-class BaseConn(ABC, Identification):
-    """Provides an interface to the connection classes.
+class Conn(Info):
+    """Stores a reference between two nodes.
+
+    The connection is used to define dependencies between nodes, therefore 
+    the destination node is dependent on the source node.
 
     Attributes
     ----------
     _id : str
         ID of the connection.
     _src_id : str
-        ID of the source element.
+        ID of the source node.
     _dst_id : str
-        ID of the destination element.
-    _value : Any
-        Value of the connection that indicates its strength.
+        ID of the destination node.
+    _power : Any
+        Power of the connection that indicates its strength.
     _tags : List[str]
         Tags of the connection to provide more context.
     """
@@ -28,8 +30,8 @@ class BaseConn(ABC, Identification):
         id: str, 
         src_id: str, 
         dst_id: str, 
-        value: Any = None, 
-        tags: List[str] = []
+        power: Any = None, 
+        tags: List[str] = None
     ) -> None:
         """Initializes the attributes.
 
@@ -38,12 +40,12 @@ class BaseConn(ABC, Identification):
         id : str
             ID of the connection.
         src_id : str
-            ID of the source element.
+            ID of the source node.
         dst_id : str
-            ID of the destination element.
-        value : Any, default=None
-            Value of the connection that indicates its strength.
-        tags : List[str], default=[]
+            ID of the destination node.
+        power : Any
+            Power of the connection that indicates its strength.
+        tags : List[str]
             Tags of the connection to provide more context.
 
         Raises
@@ -54,7 +56,7 @@ class BaseConn(ABC, Identification):
 
         self._src_id = src_id
         self._dst_id = dst_id
-        self._value = value
+        self._power = power
 
         super().__init__(id, tags=tags)
 
@@ -65,7 +67,7 @@ class BaseConn(ABC, Identification):
         Returns
         -------
         src_id : str
-            ID of the source element.
+            ID of the source node.
         """
 
         return self._src_id
@@ -77,39 +79,19 @@ class BaseConn(ABC, Identification):
         Returns
         -------
         dst_id : str
-            ID of the destination element.
+            ID of the destination node.
         """
 
         return self._dst_id
 
     @property
-    def value(self) -> Any:
-        """Obtains the _value attribute.
+    def power(self) -> Any:
+        """Obtains the _power attribute.
 
         Returns
         -------
-        value : Any
-            Value of the connection that indicates its strength.
+        power : Any
+            Power of the connection that indicates its strength.
         """
 
-        return self._value
-
-
-class Conn(BaseConn):
-    """Stores a reference between two elements.
-
-    Attributes
-    ----------
-    _id : str
-        ID of the connection.
-    _src_id : str
-        ID of the source element.
-    _dst_id : str
-        ID of the destination element.
-    _value : Any
-        Value of the connection that indicates its strength.
-    _tags : List[str]
-        Tags of the connection to provide more context.
-    """
-
-    pass
+        return self._power
