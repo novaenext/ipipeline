@@ -1,20 +1,23 @@
-"""Classes related to the node procedures."""
+"""Class related to the node procedures."""
 
-from abc import ABC
 from typing import Any, Callable, Dict, List
 
-from ipipeline.util.instance import Identification
+from ipipeline.structure.info import Info
+from ipipeline.util.instance import check_none_arg
 
 
-class BaseNode(ABC, Identification):
-    """Provides an interface to the node classes.
+class Node(Info):
+    """Stores a function and its specifications.
+
+    The specifications are used to build the inputs and outputs to execute 
+    the function that is bound to the node.
 
     Attributes
     ----------
     _id : str
         ID of the node.
     _func : Callable
-        Function that performs a specific action.
+        Function that represents an execution unit.
     _inputs : Dict[str, Any]
         Inputs of the function. The keys are the function parameters and 
         the values are any default values and/or items obtained from the 
@@ -24,9 +27,9 @@ class BaseNode(ABC, Identification):
         'c.[<item_id>, ..., <item_id>]': obtains a list of items.
     _outputs : List[str]
         Outputs of the function. The outputs must match the returns in 
-        terms of length. If one output is expected, the returns can be of 
+        terms of length. If one output is expected, the return can be of 
         any type, however, in cases with more than one output, the returns 
-        must be some type of sequence.
+        must be a sequence.
     _tags : List[str]
         Tags of the node to provide more context.
     """
@@ -35,9 +38,9 @@ class BaseNode(ABC, Identification):
         self, 
         id: str, 
         func: Callable, 
-        inputs: Dict[str, Any] = {}, 
-        outputs: List[str] = [], 
-        tags: List[str] = []
+        inputs: Dict[str, Any] = None, 
+        outputs: List[str] = None, 
+        tags: List[str] = None
     ) -> None:
         """Initializes the attributes.
 
@@ -46,31 +49,31 @@ class BaseNode(ABC, Identification):
         id : str
             ID of the node.
         func : Callable
-            Function that performs a specific action.
-        inputs : Dict[str, Any], default={}
+            Function that represents an execution unit.
+        inputs : Dict[str, Any], default=None
             Inputs of the function. The keys are the function parameters and 
             the values are any default values and/or items obtained from the 
             catalog through a specific syntax.
 
             'c.<item_id>': obtains a single item.
             'c.[<item_id>, ..., <item_id>]': obtains a list of items.
-        outputs : List[str], default=[]
+        outputs : List[str], default=None
             Outputs of the function. The outputs must match the returns in 
-            terms of length. If one output is expected, the returns can be of 
+            terms of length. If one output is expected, the return can be of 
             any type, however, in cases with more than one output, the returns 
-            must be some type of sequence.
-        tags : List[str], default=[]
+            must be a sequence.
+        tags : List[str], default=None
             Tags of the node to provide more context.
 
         Raises
         ------
-        InstanceError
+        InfoError
             Informs that the id was not validated according to the pattern.
         """
 
         self._func = func
-        self._inputs = inputs
-        self._outputs = outputs
+        self._inputs = check_none_arg(inputs, {})
+        self._outputs = check_none_arg(outputs, [])
 
         super().__init__(id, tags=tags)
 
@@ -81,7 +84,7 @@ class BaseNode(ABC, Identification):
         Returns
         -------
         func : Callable
-            Function that performs a specific action.
+            Function that represents an execution unit.
         """
 
         return self._func
@@ -111,37 +114,9 @@ class BaseNode(ABC, Identification):
         -------
         outputs : List[str]
             Outputs of the function. The outputs must match the returns in 
-            terms of length. If one output is expected, the returns can be of 
+            terms of length. If one output is expected, the return can be of 
             any type, however, in cases with more than one output, the returns 
-            must be some type of sequence.
+            must be a sequence.
         """
 
         return self._outputs
-
-
-class Node(BaseNode):
-    """Stores a function and its inputs and outputs.
-
-    Attributes
-    ----------
-    _id : str
-        ID of the node.
-    _func : Callable
-        Function that performs a specific action.
-    _inputs : Dict[str, Any]
-        Inputs of the function. The keys are the function parameters and 
-        the values are any default values and/or items obtained from the 
-        catalog through a specific syntax.
-
-        'c.<item_id>': obtains a single item.
-        'c.[<item_id>, ..., <item_id>]': obtains a list of items.
-    _outputs : List[str]
-        Outputs of the function. The outputs must match the returns in 
-        terms of length. If one output is expected, the returns can be of 
-        any type, however, in cases with more than one output, the returns 
-        must be some type of sequence.
-    _tags : List[str]
-        Tags of the node to provide more context.
-    """
-
-    pass
