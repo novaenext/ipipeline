@@ -4,7 +4,7 @@ import re
 from typing import List
 
 from ipipeline.exception import InfoError
-from ipipeline.util.instance import build_repr, check_none_arg
+from ipipeline.util.instance import build_inst_repr, check_none_arg
 
 
 class Info:
@@ -104,4 +104,4 @@ class Info:
             Representation of the instance.
         """
 
-        return build_repr(self)
+        return build_inst_repr(self)
