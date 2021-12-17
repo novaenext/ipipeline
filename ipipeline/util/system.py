@@ -1,8 +1,7 @@
 """Functions related to the system procedures.
 
-The file system functions act as a wrapper for the pathlib package, 
-exposing only the necessary parameters and performing some common 
-operations.
+These functions act as a wrapper for the pathlib package, exposing 
+only the necessary parameters and performing some common operations.
 """
 
 from pathlib import Path
