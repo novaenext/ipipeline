@@ -3,17 +3,17 @@
 import sys
 from typing import List
 
-from ipipeline.cli.command import root_cmd, project_cmd, execution_cmd
+from ipipeline.cli.command import cmds
 from ipipeline.cli.parsing import create_parser
 
 
 def execute_cli(args: List[str]) -> None:
-    """Executes the CLI.
+    """Executes a CLI.
 
     Parameters
     ----------
     args : List[str]
-        Arguments from the CLI.
+        Arguments of the CLI.
 
     Raises
     ------
@@ -29,7 +29,9 @@ def execute_cli(args: List[str]) -> None:
         if len(args) == 0:
             args.append('--help')
 
-        parser = create_parser(root_cmd, project_cmd, execution_cmd)
+        parser = create_parser(
+            cmds['root'], [cmds['project'], cmds['execution']]
+        )
         parsed_args = vars(parser.parse_args(args=args))
         parsed_args.pop('execute_action')(**parsed_args)
 
