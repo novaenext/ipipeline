@@ -1,27 +1,26 @@
 """Functions related to the parsing procedures.
 
 These functions act as a wrapper for the argparse package, exposing 
-only the necessary parameters and performing some common operations 
-by default.
+only the necessary parameters and performing some common operations.
 """
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 from typing import List
 
-from ipipeline.cli.argument import BaseArgument
-from ipipeline.cli.command import BaseCommand
+from ipipeline.cli.argument import Argument
+from ipipeline.cli.command import Command
 
 
 def create_parser(
-    root_cmd: BaseCommand, *sub_cmds: List[BaseCommand]
+    root_cmd: Command, sub_cmds: List[Command]
 ) -> ArgumentParser:
     """Creates a parser for the CLI.
 
     Parameters
     ----------
-    root_cmd : BaseCommand
+    root_cmd : Command
         Root command that defines the initial interface.
-    sub_cmds : List[BaseCommand]
+    sub_cmds : List[Command]
         Sub-commands available in the initial interface.
 
     Returns
@@ -68,16 +67,14 @@ def create_parser(
     return parser
 
 
-def _add_pos_args(
-    parser: ArgumentParser, pos_args: List[BaseArgument]
-) -> None:
+def _add_pos_args(parser: ArgumentParser, pos_args: List[Argument]) -> None:
     """Adds the positional arguments in a parser.
 
     Parameters
     ----------
     parser : ArgumentParser
         Parser of a command.
-    pos_args : List[BaseArgument]
+    pos_args : List[Argument]
         Positional arguments of the parser.
     """
 
@@ -91,16 +88,14 @@ def _add_pos_args(
         )
 
 
-def _add_opt_args(
-    parser: ArgumentParser, opt_args: List[BaseArgument]
-) -> None:
+def _add_opt_args(parser: ArgumentParser, opt_args: List[Argument]) -> None:
     """Adds the optional arguments in a parser.
 
     Parameters
     ----------
     parser : ArgumentParser
         Parser of a command.
-    opt_args : List[BaseArgument]
+    opt_args : List[Argument]
         Optional arguments of the parser.
     """
 
