@@ -1,28 +1,16 @@
-"""Classes and variables related to the command procedures.
+"""Class and dictionary related to the command procedures."""
 
-The commands are designed to work with the argparse package, 
-therefore, the possible values for some of the parameters must be 
-consulted in its documentation.
-"""
-
-from abc import ABC
 from typing import Callable, List
 
 from ipipeline.cli.action import create_project, execute_pipeline
-from ipipeline.cli.argument import (
-    BaseArgument, 
-    path_arg, 
-    name_arg, 
-    mod_name_arg, 
-    func_name_arg, 
-    exe_type_arg, 
-    help_arg, 
-    version_arg
-)
+from ipipeline.cli.argument import Argument, args
 
 
-class BaseCommand(ABC):
-    """Provides an interface to the command classes.
+class Command:
+    """Stores the specifications of a command.
+
+    The instances of this class are added as a parser. The values for the 
+    parameters must be consulted in the argparse package documentation. 
 
     Attributes
     ----------
@@ -31,10 +19,10 @@ class BaseCommand(ABC):
     _descr : str
         Description of the command.
     _action : Callable
-        Action to be applied to the command.
-    _pos_args : List[BaseArgument]
+        Action applied to the command.
+    _pos_args : List[Argument]
         Positional arguments of the command.
-    _opt_args : List[BaseArgument]
+    _opt_args : List[Argument]
         Optional arguments of the command.
     _key_args : dict
         Keyword arguments of the add_parser method.
@@ -45,10 +33,28 @@ class BaseCommand(ABC):
         name: str, 
         descr: str, 
         action: Callable, 
-        pos_args: List[BaseArgument], 
-        opt_args: List[BaseArgument], 
+        pos_args: List[Argument], 
+        opt_args: List[Argument], 
         **key_args: dict
     ) -> None:
+        """Initializes the attributes.
+
+        Parameters
+        ----------
+        name : str
+            Name of the command.
+        descr : str
+            Description of the command.
+        action : Callable
+            Action applied to the command.
+        pos_args : List[Argument]
+            Positional arguments of the command.
+        opt_args : List[Argument]
+            Optional arguments of the command.
+        key_args : dict
+            Keyword arguments of the add_parser method.
+        """
+
         self._name = name
         self._descr = descr
         self._action = action
@@ -87,30 +93,30 @@ class BaseCommand(ABC):
         Returns
         -------
         action : Callable
-            Action to be applied to the command.
+            Action applied to the command.
         """
 
         return self._action
 
     @property
-    def pos_args(self) -> List[BaseArgument]:
+    def pos_args(self) -> List[Argument]:
         """Obtains the _pos_args attribute.
 
         Returns
         -------
-        pos_args : List[BaseArgument]
+        pos_args : List[Argument]
             Positional arguments of the command.
         """
 
         return self._pos_args
 
     @property
-    def opt_args(self) -> List[BaseArgument]:
+    def opt_args(self) -> List[Argument]:
         """Obtains the _opt_args attribute.
 
         Returns
         -------
-        opt_args : List[BaseArgument]
+        opt_args : List[Argument]
             Optional arguments of the command.
         """
 
@@ -129,54 +135,28 @@ class BaseCommand(ABC):
         return self._key_args
 
 
-class Command(BaseCommand):
-    """Stores the specification of a command.
-
-    The instances of this class are added as a parser.
-
-    Attributes
-    ----------
-    _name : str
-        Name of the command.
-    _descr : str
-        Description of the command.
-    _action : Callable
-        Action to be applied to the command.
-    _pos_args : List[BaseArgument]
-        Positional arguments of the command.
-    _opt_args : List[BaseArgument]
-        Optional arguments of the command.
-    _key_args : dict
-        Keyword arguments of the add_parser method.
-    """
-
-    pass
-
-
-root_cmd = Command(
-    'ipipeline', 
-    'cli of the ipipeline package.', 
-    None, 
-    [], 
-    [help_arg, version_arg]
-)
-
-
-project_cmd = Command(
-    'project', 
-    'creates a project in the file system. the project provides a standard '
-    'structure for organizing the tasks that interact with the package.', 
-    create_project, 
-    [path_arg, name_arg], 
-    [help_arg]
-)
-
-
-execution_cmd = Command(
-    'execution', 
-    'executes a pipeline according to an executor. the pipeline is obtained '
-    'from the return of a function declared in a module.', 
-    execute_pipeline, 
-    [mod_name_arg, func_name_arg, exe_type_arg], 
-    [help_arg]
-)
+cmds = {
+    'root': Command(
+        'ipipeline', 
+        'cli of the ipipeline package.', 
+        None, 
+        [], 
+        [args['help'], args['version']]
+    ), 
+    'project': Command(
+        'project', 
+        'creates a project in the file system. the project provides a '
+        'standard structure for organizing the tasks that interact with the '
+        'package.', 
+        create_project, 
+        [args['path'], args['name']], 
+        [args['help']]
+    ), 
+    'execution': Command(
+        'execution', 
+        'executes a pipeline according to an executor.', 
+        execute_pipeline, 
+        [args['mod_name'], args['func_name'], args['exe_type']], 
+        [args['help']]
+    )
+}
