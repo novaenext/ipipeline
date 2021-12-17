@@ -20,11 +20,11 @@ class Node(Info):
         Function that represents an execution unit.
     _inputs : Dict[str, Any]
         Inputs of the function. The keys are the function parameters and 
-        the values are any default values and/or items obtained from the 
-        catalog through a specific syntax.
+        the values are any default values and/or placeholders for the 
+        catalog items.
 
         'c.<item_id>': obtains a single item.
-        'c.[<item_id>, ..., <item_id>]': obtains a list of items.
+        'c.[<item_id>, ..., <item_id>]': obtains multiple items.
     _outputs : List[str]
         Outputs of the function. The outputs must match the returns in 
         terms of length. If one output is expected, the return can be of 
@@ -52,11 +52,11 @@ class Node(Info):
             Function that represents an execution unit.
         inputs : Dict[str, Any], default=None
             Inputs of the function. The keys are the function parameters and 
-            the values are any default values and/or items obtained from the 
-            catalog through a specific syntax.
+            the values are any default values and/or placeholders for the 
+            catalog items.
 
             'c.<item_id>': obtains a single item.
-            'c.[<item_id>, ..., <item_id>]': obtains a list of items.
+            'c.[<item_id>, ..., <item_id>]': obtains multiple items.
         outputs : List[str], default=None
             Outputs of the function. The outputs must match the returns in 
             terms of length. If one output is expected, the return can be of 
@@ -97,11 +97,11 @@ class Node(Info):
         -------
         inputs : Dict[str, Any]
             Inputs of the function. The keys are the function parameters and 
-            the values are any default values and/or items obtained from the 
-            catalog through a specific syntax.
+            the values are any default values and/or placeholders for the 
+            catalog items.
 
             'c.<item_id>': obtains a single item.
-            'c.[<item_id>, ..., <item_id>]': obtains a list of items.
+            'c.[<item_id>, ..., <item_id>]': obtains multiple items.
         """
 
         return self._inputs
