@@ -1,18 +1,16 @@
-"""Classes and variables related to the argument procedures.
+"""Class and dictionary related to the argument procedures."""
 
-The arguments are designed to work with the argparse package, 
-therefore, the possible values for some of the parameters must be 
-consulted in its documentation.
-"""
-
-from abc import ABC
 from typing import Callable
 
 from ipipeline import __version__
 
 
-class BaseArgument(ABC):
-    """Provides an interface to the argument classes.
+class Argument:
+    """Stores the specifications of an argument.
+
+    The instances of this class are added as an argument to a parser. The 
+    values for the parameters must be consulted in the argparse package 
+    documentation. 
 
     Attributes
     ----------
@@ -21,9 +19,9 @@ class BaseArgument(ABC):
     _descr : str
         Description of the argument.
     _action : str
-        Action to be applied to the argument.
+        Action applied to the argument.
     _type : Callable
-        The type to which the argument must be converted.
+        Type to cast the argument.
     _key_args : dict
         Keyword arguments of the add_argument method.
     """
@@ -45,9 +43,9 @@ class BaseArgument(ABC):
         descr : str
             Description of the argument.
         action : str
-            Action to be applied to the argument.
+            Action applied to the argument.
         type : Callable
-            The type to which the argument must be converted.
+            Type to cast the argument.
         key_args : dict
             Keyword arguments of the add_argument method.
         """
@@ -89,7 +87,7 @@ class BaseArgument(ABC):
         Returns
         -------
         action : str
-            Action to be applied to the argument.
+            Action applied to the argument.
         """
 
         return self._action
@@ -101,7 +99,7 @@ class BaseArgument(ABC):
         Returns
         -------
         type : Callable
-            The type to which the argument must be converted.
+            Type to cast the argument.
         """
 
         return self._type
@@ -119,81 +117,49 @@ class BaseArgument(ABC):
         return self._key_args
 
 
-class Argument(BaseArgument):
-    """Stores the specification of an argument.
-
-    The instances of this class are added as an argument to a parser.
-
-    Attributes
-    ----------
-    _name : str
-        Name of the argument.
-    _descr : str
-        Description of the argument.
-    _action : str
-        Action to be applied to the argument.
-    _type : Callable
-        The type to which the argument must be converted.
-    _key_args : dict
-        Keyword arguments of the add_argument method.
-    """
-
-    pass
-
-
-path_arg = Argument(
-    'path', 
-    'path of the project.', 
-    'store', 
-    str
-)
-
-
-name_arg = Argument(
-    'name', 
-    'name of the project.', 
-    'store', 
-    str
-)
-
-
-mod_name_arg = Argument(
-    'mod_name', 
-    'name of the module (absolute terms) where the function is declared.', 
-    'store', 
-    str
-)
-
-
-func_name_arg = Argument(
-    'func_name', 
-    'name of the function that returns a pipeline.', 
-    'store', 
-    str
-)
-
-
-exe_type_arg = Argument(
-    'exe_type', 
-    'type of the executor class.\n\n'
-    'sequential: executes a pipeline sequentially.', 
-    'store', 
-    str
-)
-
-
-help_arg = Argument(
-    'help', 
-    'shows the available arguments.', 
-    'help', 
-    None
-)
-
-
-version_arg = Argument(
-    'version', 
-    'shows the version of the package.', 
-    'version', 
-    None, 
-    version=__version__
-)
+args = {
+    'path': Argument(
+        'path', 
+        'path of the project.', 
+        'store', 
+        str
+    ), 
+    'name': Argument(
+        'name', 
+        'name of the project.', 
+        'store', 
+        str
+    ), 
+    'mod_name': Argument(
+        'mod_name', 
+        'name of the module in absolute terms (package.module).', 
+        'store', 
+        str
+    ), 
+    'func_name': Argument(
+        'func_name', 
+        'name of the function that returns a pipeline.', 
+        'store', 
+        str
+    ), 
+    'exe_type': Argument(
+        'exe_type', 
+        'type of the executor.\n\n'
+        'sequential: executes a pipeline sequentially.', 
+        'store', 
+        str
+    ), 
+    'help': Argument(
+        'help', 
+        'shows the available arguments.', 
+        'help', 
+        None
+    ), 
+    'version': Argument(
+        'version', 
+        'shows the version of the package.', 
+        'version', 
+        None, 
+        version=__version__
+    )
+}
