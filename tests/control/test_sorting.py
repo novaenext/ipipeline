@@ -4,7 +4,7 @@ from ipipeline.control.sorting import (
     sort_graph_topo, 
     _obtain_in_conns_qty, 
     _find_ind_node_ids, 
-    _check_diff_nodes_qty
+    _check_circular_dependency
 )
 from ipipeline.exception import SortingError
 
@@ -70,7 +70,7 @@ class TestObtainInConnsQty(TestCase):
     def test_dag_without_src_node_ids(self) -> None:
         with self.assertRaisesRegex(
             SortingError, 
-            r'dst_node_id not specified as src_node_id: dst_node_id == n4'
+            r'dst_node_id not specified as a src_node_id: dst_node_id == n4'
         ):
             _ = _obtain_in_conns_qty(
                 {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4']}
@@ -89,14 +89,14 @@ class TestFindIndNodeIds(TestCase):
         self.assertListEqual(ind_node_ids, [])
 
 
-class TestCheckDiffNodesQty(TestCase):
+class TestCheckCircularDependency(TestCase):
     def test_diff_nodes_qty(self) -> None:
         with self.assertRaisesRegex(
             SortingError, r'circular dependency found in the graph: 7 != 4'
         ):
-            _check_diff_nodes_qty(7, 4)
+            _check_circular_dependency(7, 4)
 
     def test_equal_nodes_qty(self) -> None:
-        _check_diff_nodes_qty(7, 7)
+        _check_circular_dependency(7, 7)
 
         self.assertTrue(True)
