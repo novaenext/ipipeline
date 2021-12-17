@@ -3,11 +3,11 @@
 from typing import Any, Dict, List
 
 from ipipeline.exception import BuildingError
-from ipipeline.structure.catalog import BaseCatalog
+from ipipeline.structure.catalog import Catalog
 
 
 def build_func_inputs(
-    inputs: Dict[str, Any], catalog: BaseCatalog
+    inputs: Dict[str, Any], catalog: Catalog
 ) -> Dict[str, Any]:
     """Builds the inputs of a function.
 
@@ -15,20 +15,20 @@ def build_func_inputs(
     ----------
     inputs : Dict[str, Any]
         Inputs of the function. The keys are the function parameters and 
-        the values are any default values and/or items obtained from the 
-        catalog through a specific syntax.
+        the values are any default values and/or placeholders for the 
+        catalog items.
 
         'c.<item_id>': obtains a single item.
-        'c.[<item_id>, ..., <item_id>]': obtains a list of items.
-    catalog : BaseCatalog
-        Catalog that stores the items from the execution.
+        'c.[<item_id>, ..., <item_id>]': obtains multiple items.
+    catalog : Catalog
+        Catalog that stores the items from an execution.
 
     Returns
     -------
     func_inputs : Dict[str, Any]
-        Inputs of the function built according to the default values 
-        and/or the items obtained from the catalog. The keys are the 
-        function parameters and the values are the function arguments.
+        Inputs of the function. The keys are the function parameters and 
+        the values are any default values and/or items obtained from the 
+        catalog.
 
     Raises
     ------
@@ -64,18 +64,17 @@ def build_func_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
     ----------
     outputs : List[str]
         Outputs of the function. The outputs must match the returns in 
-        terms of length. If one output is expected, the returns can be of 
+        terms of length. If one output is expected, the return can be of 
         any type, however, in cases with more than one output, the returns 
-        must be some type of sequence.
+        must be a sequence.
     returns : Any
         Returns of the function obtained from its execution.
 
     Returns
     -------
     func_outputs : Dict[str, Any]
-        Outputs of the function built according to the combination of the 
-        outputs and returns. The keys are the outputs and the values are 
-        the returns.
+        Outputs of the function. The keys are the outputs and the values are 
+        the returns obtained from the execution.
 
     Raises
     ------
