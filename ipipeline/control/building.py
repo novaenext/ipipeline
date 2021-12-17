@@ -73,8 +73,8 @@ def build_func_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
     Returns
     -------
     func_outputs : Dict[str, Any]
-        Outputs of the function. The keys are the outputs and the values are 
-        the returns obtained from the execution.
+        Outputs of the function. The keys are the outputs and the values 
+        are the returns obtained from the execution.
 
     Raises
     ------
