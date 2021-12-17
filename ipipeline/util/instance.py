@@ -31,7 +31,7 @@ def check_none_arg(arg: Any, default: Any) -> Any:
     return arg
 
 
-def build_repr(instance: object) -> str:
+def build_inst_repr(inst: object) -> str:
     """Builds the representation of an instance.
 
     The class name and the parameters in the initializer signature are 
@@ -48,14 +48,14 @@ def build_repr(instance: object) -> str:
         Representation of an instance.
     """
 
-    repr = f'{instance.__class__.__name__}('
+    repr = f'{inst.__class__.__name__}('
 
-    for param in signature(instance.__init__).parameters.values():
+    for param in signature(inst.__init__).parameters.values():
         value = None
 
         for attr in [f'_{param.name}', param.name]:
-            if attr in instance.__dict__:
-                value = getattr(instance, attr)
+            if attr in inst.__dict__:
+                value = getattr(inst, attr)
 
                 if isinstance(value, str):
                     value = f'\'{value}\''
@@ -67,7 +67,7 @@ def build_repr(instance: object) -> str:
     return f'{repr})'.replace(', )', ')')
 
 
-def obtain_instance(mod_name: str, inst_name: str) -> object:
+def obtain_mod_inst(mod_name: str, inst_name: str) -> object:
     """Obtains an instance declared in a module.
 
     Parameters
