@@ -7,9 +7,10 @@ from typing import Any, Dict, List
 from ipipeline.control.building import build_func_inputs, build_func_outputs
 from ipipeline.control.sorting import sort_graph_topo
 from ipipeline.exception import ExecutionError
-from ipipeline.structure.catalog import BaseCatalog, Catalog
-from ipipeline.structure.pipeline import BasePipeline
-from ipipeline.structure.signal import BaseSignal, Signal
+from ipipeline.structure.catalog import Catalog
+from ipipeline.structure.pipeline import Pipeline
+from ipipeline.structure.signal import Signal
+from ipipeline.util.instance import check_none_arg
 
 
 logger = logging.getLogger(name=__name__)
@@ -18,149 +19,174 @@ logger = logging.getLogger(name=__name__)
 class BaseExecutor(ABC):
     """Provides an interface to the executor classes.
 
+    The execution of the graph stored in the pipeline is according to its 
+    topological order. The returns from each executed node are stored in 
+    the catalog to provide access to subsequent nodes.
+
     Attributes
     ----------
-    _pipeline : BasePipeline
-        Pipeline that stores the graph structure.
-    _catalog : BaseCatalog
-        Catalog that stores the items from the execution.
-    _signals : Dict[str, BaseSignal]
-        Signals of the execution. The keys are the element (node) IDs and 
-        the values are the signal objects where the IDs were obtained.
+    _pipeline : Pipeline
+        Pipeline that stores a graph.
+    _catalog : Catalog
+        Catalog that stores the items from an execution.
+    _signals : Dict[str, Signal]
+        Signals of the execution. The keys are the node IDs and the values 
+        are the signals where the IDs are obtained.
     """
 
     def __init__(
-        self, pipeline: BasePipeline, catalog: BaseCatalog = None
+        self, 
+        pipeline: Pipeline = None, 
+        catalog: Catalog = None, 
+        signals: Dict[str, Signal] = None
     ) -> None:
         """Initializes the attributes.
 
         Parameters
         ----------
-        pipeline : BasePipeline
-            Pipeline that stores the graph structure.
-        catalog : BaseCatalog, default=None
-            Catalog that stores the items from the execution.
+        pipeline : Pipeline
+            Pipeline that stores a graph.
+        catalog : Catalog
+            Catalog that stores the items from an execution.
+        signals : Dict[str, Signal]
+            Signals of the execution. The keys are the node IDs and the values 
+            are the signals where the IDs are obtained.
         """
 
-        self._pipeline = pipeline
-        self._catalog = self._check_inexistent_catalog(catalog)
-        self._signals = {}
+        self.add_pipeline(pipeline)
+        self.add_catalog(catalog)
+        self._signals = check_none_arg(signals, {})
 
     @property
-    def pipeline(self) -> BasePipeline:
+    def pipeline(self) -> Pipeline:
         """Obtains the _pipeline attribute.
 
         Returns
         -------
-        pipeline : BasePipeline
-            Pipeline that stores the graph structure.
+        pipeline : Pipeline
+            Pipeline that stores a graph.
         """
 
         return self._pipeline
 
     @property
-    def catalog(self) -> BaseCatalog:
+    def catalog(self) -> Catalog:
         """Obtains the _catalog attribute.
 
         Returns
         -------
-        catalog : BaseCatalog
-            Catalog that stores the items from the execution.
+        catalog : Catalog
+            Catalog that stores the items from an execution.
         """
 
         return self._catalog
 
     @property
-    def signals(self) -> Dict[str, BaseSignal]:
+    def signals(self) -> Dict[str, Signal]:
         """Obtains the _signals attribute.
 
         Returns
         -------
-        signals : Dict[str, BaseSignal]
-            Signals of the execution. The keys are the element (node) IDs and 
-            the values are the signal objects where the IDs were obtained.
+        signals : Dict[str, Signal]
+            Signals of the execution. The keys are the node IDs and the values 
+            are the signals where the IDs are obtained.
         """
 
         return self._signals
 
-    def _check_inexistent_catalog(self, catalog: BaseCatalog) -> BaseCatalog:
-        """Checks if the catalog does not exist.
-
-        A default catalog is provided for convenience.
+    def add_pipeline(self, pipeline: Pipeline) -> None:
+        """Adds a pipeline in the executor.
 
         Parameters
         ----------
-        catalog : BaseCatalog
-            Catalog that stores the items from the execution.
+        pipeline : Pipeline
+            Pipeline that stores a graph.
 
-        Returns
-        -------
-        catalog : BaseCatalog
-            Catalog that stores the items from the execution.
+        Raises
+        ------
+        InfoError
+            Informs that the id was not validated according to the pattern.
         """
 
-        if not catalog:
-            catalog = Catalog(self._pipeline.id, tags=self._pipeline.tags)
+        self._pipeline = check_none_arg(
+            pipeline, Pipeline('p0', tags=['default'])
+        )
 
-        return catalog
+    def add_catalog(self, catalog: Catalog) -> None:
+        """Adds a catalog in the executor.
+
+        Parameters
+        ----------
+        catalog : Catalog
+            Catalog that stores the items from an execution.
+
+        Raises
+        ------
+        InfoError
+            Informs that the id was not validated according to the pattern.
+        """
+
+        self._catalog = check_none_arg(
+            catalog, Catalog('c0', tags=['default'])
+        )
 
     def add_signal(
         self, 
         id: str, 
-        elem_id: str, 
+        node_id: str, 
         type: str, 
-        status: bool, 
-        tags: List[str] = []
+        status: bool = True, 
+        tags: List[str] = None
     ) -> None:
-        """Adds a signal in the execution.
+        """Adds a signal to a node.
 
         Parameters
         ----------
         id : str
             ID of the signal.
-        elem_id : str
-            ID of the element (node).
-        type : {'skip'}
-            Type of the signal that triggers an action.
-
-            skip: skips the node execution.
-        status : bool
+        node_id : str
+            ID of the node.
+        type : str
+            Type of the signal used to trigger an action.
+        status : bool, default=True
             Indicates if the signal is enable or disable.
-        tags : List[str]
+        tags : List[str], default=None
             Tags of the signal to provide more context.
 
         Raises
         ------
         ExecutionError
-            Informs that the elem_id was not found in the _pipeline.nodes.
+            Informs that the node_id was not found in the _pipeline.nodes.
         ExecutionError
             Informs that the type was not found in the valid_types.
+        InfoError
+            Informs that the id was not validated according to the pattern.
         """
 
-        self._check_inexistent_elem_id(elem_id)
+        self._check_inexistent_node_id(node_id)
         self._check_invalid_type(type)
-        signal = Signal(id, elem_id, type, status, tags)
+        signal = Signal(id, node_id, type, status, tags)
 
-        self._signals[signal.elem_id] = signal
+        self._signals[signal.node_id] = signal
 
-    def _check_inexistent_elem_id(self, elem_id: str) -> None:
-        """Checks if the element ID does not exist.
+    def _check_inexistent_node_id(self, node_id: str) -> None:
+        """Checks if the node ID does not exist.
 
         Parameters
         ----------
-        elem_id : str
-            ID of the element (node).
+        node_id : str
+            ID of the node.
 
         Raises
         ------
         ExecutionError
-            Informs that the elem_id was not found in the _pipeline.nodes.
+            Informs that the node_id was not found in the _pipeline.nodes.
         """
 
-        if elem_id not in self._pipeline.nodes.keys():
+        if node_id not in self._pipeline.nodes.keys():
             raise ExecutionError(
-                'elem_id not found in the _pipeline.nodes', 
-                f'elem_id == {elem_id}'
+                'node_id not found in the _pipeline.nodes', 
+                f'node_id == {node_id}'
             )
 
     def _check_invalid_type(self, type: str) -> None:
@@ -197,9 +223,8 @@ class BaseExecutor(ABC):
         Returns
         -------
         func_outputs : Dict[str, Any]
-            Outputs of the function built according to the combination of the 
-            outputs and returns. The keys are the outputs and the values are 
-            the returns.
+            Outputs of the function. The keys are the outputs and the values 
+            are the returns obtained from the execution.
 
         Raises
         ------
@@ -228,13 +253,13 @@ class BaseExecutor(ABC):
         -------
         topo_order : List[list]
             Topological order of the graph. The inner lists represent groups 
-            of nodes where the groups must be executed in order and the nodes 
-            within them can be processed simultaneously.
+            of nodes that must be executed in order and the nodes within these 
+            groups can be executed simultaneously.
 
         Raises
         ------
         SortingError
-            Informs that the dst_node_id was not specified as src_node_id.
+            Informs that the dst_node_id was not specified as a src_node_id.
         SortingError
             Informs that a circular dependency was found in the graph.
         """
@@ -252,8 +277,8 @@ class BaseExecutor(ABC):
         ----------
         topo_order : List[list]
             Topological order of the graph. The inner lists represent groups 
-            of nodes where the groups must be executed in order and the nodes 
-            within them can be processed simultaneously.
+            of nodes that must be executed in order and the nodes within these 
+            groups can be executed simultaneously.
         """
 
         pass
@@ -262,15 +287,19 @@ class BaseExecutor(ABC):
 class SequentialExecutor(BaseExecutor):
     """Executes a pipeline sequentially.
 
+    The execution of the graph stored in the pipeline is according to its 
+    topological order. The returns from each executed node are stored in 
+    the catalog to provide access to subsequent nodes.
+
     Attributes
     ----------
-    _pipeline : BasePipeline
-        Pipeline that stores the graph structure.
-    _catalog : BaseCatalog
-        Catalog that stores the items from the execution.
-    _signals : Dict[str, BaseSignal]
-        Signals of the execution. The keys are the element IDs and the 
-        values are the signal objects where the IDs were obtained.
+    _pipeline : Pipeline
+        Pipeline that stores a graph.
+    _catalog : Catalog
+        Catalog that stores the items from an execution.
+    _signals : Dict[str, Signal]
+        Signals of the execution. The keys are the node IDs and the values 
+        are the signals where the IDs are obtained.
     """
 
     def execute_pipeline(self, topo_order: List[list]) -> None:
@@ -280,8 +309,8 @@ class SequentialExecutor(BaseExecutor):
         ----------
         topo_order : List[list]
             Topological order of the graph. The inner lists represent groups 
-            of nodes where the groups must be executed in order and the nodes 
-            within them can be processed simultaneously.
+            of nodes that must be executed in order and the nodes within these 
+            groups can be executed simultaneously.
 
         Raises
         ------
@@ -292,7 +321,7 @@ class SequentialExecutor(BaseExecutor):
         for group in topo_order:
             for node_id in group:
                 signal = self._signals.get(
-                    node_id, Signal('s0', node_id, 'default', False)
+                    node_id, Signal('s0', node_id, 'default')
                 )
 
                 if signal.type == 'skip' and signal.status == True:
@@ -300,5 +329,5 @@ class SequentialExecutor(BaseExecutor):
                 else:
                     func_outputs = self.execute_node(node_id)
 
-                    for id, item in func_outputs.items():
-                        self._catalog.add_item(id, item)
+                    for out_key, out_value in func_outputs.items():
+                        self._catalog.add_item(out_key, out_value)
