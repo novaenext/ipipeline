@@ -1,7 +1,9 @@
 from unittest import TestCase
 
 from ipipeline.exception import InstanceError
-from ipipeline.util.instance import check_none_arg, build_repr, obtain_instance
+from ipipeline.util.instance import (
+    check_none_arg, build_inst_repr, obtain_mod_inst
+)
 
 
 class TestCheckNoneArg(TestCase):
@@ -38,31 +40,31 @@ class MockClass4:
         pass
 
 
-class TestBuildRepr(TestCase):
+class TestBuildInstRepr(TestCase):
     def test_with_params_with_attrs(self) -> None:
-        repr = build_repr(MockClass1(1))
+        repr = build_inst_repr(MockClass1(1))
 
         self.assertEqual(repr, 'MockClass1(param1=1, param2=\'2\')')
 
     def test_with_params_without_attrs(self) -> None:
-        repr = build_repr(MockClass2(1))
+        repr = build_inst_repr(MockClass2(1))
 
         self.assertEqual(repr, 'MockClass2(param1=None, param2=None)')
 
     def test_without_params_with_attrs(self) -> None:
-        repr = build_repr(MockClass3())
+        repr = build_inst_repr(MockClass3())
 
         self.assertEqual(repr, 'MockClass3()')
 
     def test_without_params_without_attrs(self) -> None:
-        repr = build_repr(MockClass4())
+        repr = build_inst_repr(MockClass4())
 
         self.assertEqual(repr, 'MockClass4()')
 
 
-class TestObtainInstance(TestCase):
+class TestObtainModInst(TestCase):
     def test_valid_names(self) -> None:
-        instance = obtain_instance('tests.util.test_instance', 'MockClass1')
+        instance = obtain_mod_inst('tests.util.test_instance', 'MockClass1')
 
         self.assertEqual(instance.__name__, 'MockClass1')
 
@@ -71,11 +73,11 @@ class TestObtainInstance(TestCase):
             InstanceError, 
             r'inst_name not found in the module: inst_name == MockClass1'
         ):
-            _ = obtain_instance('tests.util.test_instances', 'MockClass1')
+            _ = obtain_mod_inst('tests.util.test_instances', 'MockClass1')
 
     def test_invalid_inst_name(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
             r'inst_name not found in the module: inst_name == MockClass11'
         ):
-            _ = obtain_instance('tests.util.test_instance', 'MockClass11')
+            _ = obtain_mod_inst('tests.util.test_instance', 'MockClass11')
