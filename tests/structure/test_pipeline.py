@@ -79,7 +79,7 @@ class TestPipeline(TestCase):
 
         self.assertTrue(True)
 
-    def test_add_inexistent_conns_with_existents_nodes(self) -> None:
+    def test_add_inexistent_conns(self) -> None:
         pipeline = Pipeline('p1', graph=self._graph, nodes=self._nodes)
         pipeline.add_conn('c1', 'n1', 'n2')
         pipeline.add_conn('c2', 'n1', 'n3')
@@ -97,6 +97,16 @@ class TestPipeline(TestCase):
         self.assertListEqual(
             list(pipeline.graph.values()), [['n2', 'n3'], ['n4'], [], []]
         )
+
+    def test_add_existent_conns(self) -> None:
+        pipeline = Pipeline('p1', graph=self._graph, nodes=self._nodes)
+        pipeline.add_conn('c1', 'n1', 'n2')
+        pipeline.add_conn('c2', 'n1', 'n3')
+
+        with self.assertRaisesRegex(
+            PipelineError, r'conn_id found in the _conns: conn_id == c1'
+        ):
+            pipeline.add_conn('c1', 'n2', 'n4')
 
     def test_add_inexistent_conns_with_inexistent_src_node(self) -> None:
         pipeline = Pipeline('p1', graph=self._graph, nodes=self._nodes)
@@ -119,16 +129,6 @@ class TestPipeline(TestCase):
             r'node_id not found in the _nodes: conn_id == c3 and node_id == n7'
         ):
             pipeline.add_conn('c3', 'n2', 'n7')
-
-    def test_add_existent_conns_with_existent_nodes(self) -> None:
-        pipeline = Pipeline('p1', graph=self._graph, nodes=self._nodes)
-        pipeline.add_conn('c1', 'n1', 'n2')
-        pipeline.add_conn('c2', 'n1', 'n3')
-
-        with self.assertRaisesRegex(
-            PipelineError, r'conn_id found in the _conns: conn_id == c1'
-        ):
-            pipeline.add_conn('c1', 'n2', 'n4')
 
     def test_check_existent_conn_id(self) -> None:
         pipeline = Pipeline('p1', conns=self._conns)
