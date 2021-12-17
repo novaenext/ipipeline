@@ -12,7 +12,7 @@ from ipipeline.util.instance import check_none_arg
 class Pipeline(Info):
     """Stores a graph formed by nodes and their connections.
 
-    The graph must be acyclic in order to obtain the topological order 
+    The graph must be acyclic to be able to obtain its topological order 
     that is used to order the execution of the nodes.
 
     Attributes
@@ -28,7 +28,7 @@ class Pipeline(Info):
         the nodes where the IDs are obtained.
     _conns : Dict[str, Conn]
         Connections of the graph. The keys are the connection IDs and the 
-        values are the connection where the IDs are obtained.    
+        values are the connections where the IDs are obtained.
     _tags : List[str]
         Tags of the pipeline to provide more context.
     """
@@ -56,7 +56,7 @@ class Pipeline(Info):
             the nodes where the IDs are obtained.
         conns : Dict[str, Conn], default=None
             Connections of the graph. The keys are the connection IDs and the 
-            values are the connection where the IDs are obtained.        
+            values are the connections where the IDs are obtained.
         tags : List[str], default=None
             Tags of the pipeline to provide more context.
 
@@ -107,7 +107,7 @@ class Pipeline(Info):
         -------
         conns : Dict[str, Conn]
             Connections of the graph. The keys are the connection IDs and the 
-            values are the connection where the IDs are obtained.
+            values are the connections where the IDs are obtained.
         """
 
         return self._conns
@@ -130,11 +130,11 @@ class Pipeline(Info):
             Function that represents an execution unit.
         inputs : Dict[str, Any], default=None
             Inputs of the function. The keys are the function parameters and 
-            the values are any default values and/or items obtained from the 
-            catalog through a specific syntax.
+            the values are any default values and/or placeholders for the 
+            catalog items.
 
             'c.<item_id>': obtains a single item.
-            'c.[<item_id>, ..., <item_id>]': obtains a list of items.
+            'c.[<item_id>, ..., <item_id>]': obtains multiple items.
         outputs : List[str], default=None
             Outputs of the function. The outputs must match the returns in 
             terms of length. If one output is expected, the return can be of 
@@ -147,6 +147,8 @@ class Pipeline(Info):
         ------
         PipelineError
             Informs that the node_id was found in the _nodes.
+        InfoError
+            Informs that the id was not validated according to the pattern.
         """
 
         self._check_existent_node_id(id)
@@ -203,6 +205,8 @@ class Pipeline(Info):
             Informs that the conn_id was found in the _conns.
         PipelineError
             Informs that the node_id was not found in the _nodes.
+        InfoError
+            Informs that the id was not validated according to the pattern.
         """
 
         self._check_existent_conn_id(id)
