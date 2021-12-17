@@ -1,22 +1,15 @@
 from unittest import TestCase
 
-from ipipeline.cli.command import BaseCommand, Command
-
-
-class TestBaseCommand(TestCase):
-    def test_init(self) -> None:
-        base_cmd = BaseCommand('c1', 'cmd descr', None, [], [], param1=7)
-
-        self.assertEqual(base_cmd.name, 'c1')
-        self.assertEqual(base_cmd.descr, 'cmd descr')
-        self.assertEqual(base_cmd.action, None)
-        self.assertListEqual(base_cmd.pos_args, [])
-        self.assertListEqual(base_cmd.opt_args, [])
-        self.assertDictEqual(base_cmd.key_args, {'param1': 7})
+from ipipeline.cli.command import Command
 
 
 class TestCommand(TestCase):
-    def test_deriv(self) -> None:
-        cmd = Command('c1', 'cmd descr', None, [], [])
+    def test_init(self) -> None:
+        cmd = Command('c1', 'cmd descr', None, [], [], param1=7)
 
-        self.assertIsInstance(cmd, BaseCommand)
+        self.assertEqual(cmd.name, 'c1')
+        self.assertEqual(cmd.descr, 'cmd descr')
+        self.assertEqual(cmd.action, None)
+        self.assertListEqual(cmd.pos_args, [])
+        self.assertListEqual(cmd.opt_args, [])
+        self.assertDictEqual(cmd.key_args, {'param1': 7})
