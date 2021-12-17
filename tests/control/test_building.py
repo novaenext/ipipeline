@@ -9,42 +9,41 @@ from ipipeline.structure.catalog import Catalog
 
 class TestBuildFuncInputs(TestCase):
     def setUp(self) -> None:
-        self._catalog = Catalog('c1')
-        self._catalog._items = {'i1': 7, 'i2': 0}
+        self._catalog = Catalog('c1', items={'i1': 7, 'i2': 0})
 
-    def test_single_inputs(self) -> None:
+    def test_single_placeholders(self) -> None:
         func_inputs = build_func_inputs(
             {'in1': 'c.i1', 'in2': 'c.i2'}, self._catalog
         )
 
         self.assertDictEqual(func_inputs, {'in1': 7, 'in2': 0})
 
-    def test_multiple_inputs(self) -> None:
+    def test_multiple_placeholders(self) -> None:
         func_inputs = build_func_inputs(
-            {'in1': 'c.[i1, i2]'}, self._catalog
+            {'in1': 'c.[i1, i2]', 'in2': 'c.[i1]'}, self._catalog
         )
 
-        self.assertDictEqual(func_inputs, {'in1': [7, 0]})
+        self.assertDictEqual(func_inputs, {'in1': [7, 0], 'in2': [7]})
 
-    def test_default_inputs(self) -> None:
+    def test_invalid_placeholders(self) -> None:
+        with self.assertRaisesRegex(
+            CatalogError, r'id not found in the _items: id == i3'
+        ):
+            _ = build_func_inputs(
+                {'in1': 'c.i3', 'in2': 'c.[]'}, self._catalog
+            )
+
+    def test_default_values(self) -> None:
         func_inputs = build_func_inputs(
             {'in1': 10, 'in2': 'python'}, self._catalog
         )
 
         self.assertDictEqual(func_inputs, {'in1': 10, 'in2': 'python'})
 
-    def test_empty_inputs(self) -> None:
+    def test_empty_values(self) -> None:
         func_inputs = build_func_inputs({}, self._catalog)
 
         self.assertDictEqual(func_inputs, {})
-
-    def test_inexistent_inputs(self) -> None:
-        with self.assertRaisesRegex(
-            CatalogError, r'id not found in the _items: id == i3'
-        ):
-            _ = build_func_inputs(
-                {'in1': 'c.i3', 'in2': 'c.i4'}, self._catalog
-            )
 
 
 class TestBuildFuncOutputs(TestCase):
@@ -63,14 +62,14 @@ class TestBuildFuncOutputs(TestCase):
 
         self.assertDictEqual(func_outputs, {})
 
-    def test_diff_outputs1(self) -> None:
+    def test_invalid_outputs1(self) -> None:
         with self.assertRaisesRegex(
             BuildingError, 
             r'outputs_qty is not equal to the returns_qty: 2 != 1'
         ):
             _ = build_func_outputs(['out1', 'out2'], 7)
 
-    def test_diff_outputs2(self) -> None:
+    def test_invalid_outputs2(self) -> None:
         with self.assertRaisesRegex(
             BuildingError, 
             r'outputs_qty is not equal to the returns_qty: 2 != 3'
