@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.execution.executors import BaseExecutor, SequentialExecutor
-from ipipeline.exceptions import ExecutionError
+from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 
@@ -115,7 +115,7 @@ class TestBaseExecutor(TestCase):
         base_executor.add_signal('s1', 'n1', 'skip', True)
 
         with self.assertRaisesRegex(
-            ExecutionError, 
+            ExecutorError, 
             r'node_id not found in the _pipeline.nodes: node_id == n22'
         ):
             base_executor.add_signal('s2', 'n22', 'skips', True)
@@ -125,7 +125,7 @@ class TestBaseExecutor(TestCase):
         base_executor.add_signal('s1', 'n1', 'skip', True)
 
         with self.assertRaisesRegex(
-            ExecutionError, r'type not found in the valid_types: type == skips'
+            ExecutorError, r'type not found in the valid_types: type == skips'
         ):
             base_executor.add_signal('s2', 'n2', 'skips', True)
 
@@ -133,7 +133,7 @@ class TestBaseExecutor(TestCase):
         base_executor = MockBaseExecutor(self._pipeline)
 
         with self.assertRaisesRegex(
-            ExecutionError, 
+            ExecutorError, 
             r'node_id not found in the _pipeline.nodes: node_id == n11'
         ):
             base_executor._check_inexistent_node_id('n11')
@@ -148,7 +148,7 @@ class TestBaseExecutor(TestCase):
         base_executor = MockBaseExecutor()
 
         with self.assertRaisesRegex(
-            ExecutionError, r'type not found in the valid_types: type == skips'
+            ExecutorError, r'type not found in the valid_types: type == skips'
         ):
             base_executor._check_invalid_type('skips')
 
@@ -168,7 +168,7 @@ class TestBaseExecutor(TestCase):
         base_executor = MockBaseExecutor(self._pipeline)
 
         with self.assertRaisesRegex(
-            ExecutionError, r'node not executed by the executor: id == n11'
+            ExecutorError, r'node not executed by the executor: id == n11'
         ):
             _ = base_executor.execute_node('n11')
 
