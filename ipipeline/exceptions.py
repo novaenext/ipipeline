@@ -69,8 +69,8 @@ class CatalogError(BaseError):
     pass
 
 
-class ExecutionError(BaseError):
-    """Informs the occurrence of an error related to the execution module.
+class ExecutorError(BaseError):
+    """Informs the occurrence of an error related to the executors module.
 
     Attributes
     ----------
