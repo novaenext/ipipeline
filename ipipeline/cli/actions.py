@@ -71,7 +71,7 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
         Informs that the dst_node_id was not specified as a src_node_id.
     SortingError
         Informs that a circular dependency was found in the graph.
-    ExecutionError
+    ExecutorError
         Informs that the node was not executed by the executor.
     """
 

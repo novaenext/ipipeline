@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 from ipipeline.execution.building import build_task_inputs, build_task_outputs
 from ipipeline.execution.sorting import sort_graph_topo
-from ipipeline.exceptions import ExecutionError
+from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 from ipipeline.structure.signal import Signal
@@ -155,9 +155,9 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        ExecutionError
+        ExecutorError
             Informs that the node_id was not found in the _pipeline.nodes.
-        ExecutionError
+        ExecutorError
             Informs that the type was not found in the valid_types.
         InfoError
             Informs that the id was not validated according to the pattern.
@@ -179,12 +179,12 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        ExecutionError
+        ExecutorError
             Informs that the node_id was not found in the _pipeline.nodes.
         """
 
         if node_id not in self._pipeline.nodes.keys():
-            raise ExecutionError(
+            raise ExecutorError(
                 'node_id not found in the _pipeline.nodes', 
                 f'node_id == {node_id}'
             )
@@ -201,14 +201,14 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        ExecutionError
+        ExecutorError
             Informs that the type was not found in the valid_types.
         """
 
         valid_types = ['skip']
 
         if type not in valid_types:
-            raise ExecutionError(
+            raise ExecutorError(
                 'type not found in the valid_types', f'type == {type}'
             )
 
@@ -228,7 +228,7 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        ExecutionError
+        ExecutorError
             Informs that the node was not executed by the executor.
         """
 
@@ -242,7 +242,7 @@ class BaseExecutor(ABC):
 
             return task_outputs
         except Exception as error:
-            raise ExecutionError(
+            raise ExecutorError(
                 'node not executed by the executor', f'id == {id}'
             ) from error
 
@@ -314,7 +314,7 @@ class SequentialExecutor(BaseExecutor):
 
         Raises
         ------
-        ExecutionError
+        ExecutorError
             Informs that the node was not executed by the executor.
         """
 
