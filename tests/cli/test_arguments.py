@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.cli.argument import Argument
+from ipipeline.cli.arguments import Argument
 
 
 class TestArgument(TestCase):

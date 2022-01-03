@@ -1,8 +1,8 @@
 from argparse import ArgumentParser
 from unittest import TestCase
 
-from ipipeline.cli.argument import args
-from ipipeline.cli.command import cmds
+from ipipeline.cli.arguments import args
+from ipipeline.cli.commands import cmds
 from ipipeline.cli.parsing import create_parser, _add_pos_args, _add_opt_args
 
 

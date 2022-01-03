@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.exception import InfoError
+from ipipeline.exceptions import InfoError
 from ipipeline.structure.info import Info
 
 

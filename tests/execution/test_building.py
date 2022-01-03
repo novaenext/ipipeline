@@ -1,9 +1,9 @@
 from unittest import TestCase
 
-from ipipeline.control.building import (
+from ipipeline.execution.building import (
     build_func_inputs, build_func_outputs, _check_diff_outputs_qty
 )
-from ipipeline.exception import BuildingError, CatalogError
+from ipipeline.exceptions import BuildingError, CatalogError
 from ipipeline.structure.catalog import Catalog
 
 

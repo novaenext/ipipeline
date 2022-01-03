@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.exception import CatalogError
+from ipipeline.exceptions import CatalogError
 from ipipeline.structure.catalog import Catalog
 
 

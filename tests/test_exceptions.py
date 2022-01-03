@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.exception import (
+from ipipeline.exceptions import (
     BaseError, 
     BuildingError, 
     CatalogError, 

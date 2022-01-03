@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.exception import PipelineError
+from ipipeline.exceptions import PipelineError
 from ipipeline.structure.pipeline import Pipeline
 
 

@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from ipipeline.control.execution import BaseExecutor, SequentialExecutor
-from ipipeline.exception import ExecutionError
+from ipipeline.execution.executors import BaseExecutor, SequentialExecutor
+from ipipeline.exceptions import ExecutionError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 

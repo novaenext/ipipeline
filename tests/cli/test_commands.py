@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.cli.command import Command
+from ipipeline.cli.commands import Command
 
 
 class TestCommand(TestCase):

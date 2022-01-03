@@ -1,12 +1,12 @@
 from unittest import TestCase
 
-from ipipeline.control.sorting import (
+from ipipeline.execution.sorting import (
     sort_graph_topo, 
     _obtain_in_conns_qty, 
     _find_ind_node_ids, 
     _check_circular_dependency
 )
-from ipipeline.exception import SortingError
+from ipipeline.exceptions import SortingError
 
 
 class TestSortGraphTopo(TestCase):

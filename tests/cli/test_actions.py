@@ -2,8 +2,8 @@ from pathlib import Path
 from shutil import rmtree
 from unittest import TestCase
 
-from ipipeline.cli.action import create_project, execute_pipeline
-from ipipeline.exception import InstanceError, SystemError
+from ipipeline.cli.actions import create_project, execute_pipeline
+from ipipeline.exceptions import InstanceError, SystemError
 from ipipeline.structure import Pipeline
 
 
@@ -29,10 +29,10 @@ class TestCreateProject(TestCase):
             'tests'
         ]
         pkg_items = [
-            'config', 
-            'exception.py', 
-            'group', 
-            'task', 
+            'configs', 
+            'exceptions.py', 
+            'pipelines', 
+            'tasks', 
             '__init__.py', 
             '__main__.py'
         ]
@@ -55,7 +55,7 @@ class TestCreateProject(TestCase):
 class TestExecutePipeline(TestCase):
     def test_valid_execution(self) -> None:
         execute_pipeline(
-            'tests.cli.test_action', 'mock_build_pipeline', 'sequential'
+            'tests.cli.test_actions', 'mock_build_pipeline', 'sequential'
         )
 
         self.assertTrue(True)
@@ -67,7 +67,7 @@ class TestExecutePipeline(TestCase):
             r'mock_build_pipelines'
         ):
             execute_pipeline(
-                'tests.cli.test_action', 'mock_build_pipelines', 'sequential'
+                'tests.cli.test_actions', 'mock_build_pipelines', 'sequential'
             )
 
 
