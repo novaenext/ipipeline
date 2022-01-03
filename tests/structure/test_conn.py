@@ -8,8 +8,8 @@ class TestConn(TestCase):
         conn = Conn('c1', 'n1', 'n2', tags=['data'])
 
         self.assertEqual(conn.id, 'c1')
-        self.assertEqual(conn.src_id, 'n1')
-        self.assertEqual(conn.dst_id, 'n2')
+        self.assertEqual(conn.src_node_id, 'n1')
+        self.assertEqual(conn.dst_node_id, 'n2')
         self.assertEqual(conn.power, None)
         self.assertListEqual(conn.tags, ['data'])
 
