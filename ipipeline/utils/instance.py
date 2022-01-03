@@ -6,7 +6,7 @@ from inspect import signature
 from pathlib import Path
 from typing import Any
 
-from ipipeline.exception import InstanceError
+from ipipeline.exceptions import InstanceError
 
 
 def check_none_arg(arg: Any, default: Any) -> Any:

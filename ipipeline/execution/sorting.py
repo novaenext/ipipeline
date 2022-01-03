@@ -2,7 +2,7 @@
 
 from typing import Dict, List
 
-from ipipeline.exception import SortingError
+from ipipeline.exceptions import SortingError
 
 
 def sort_graph_topo(graph: Dict[str, list]) -> List[list]:

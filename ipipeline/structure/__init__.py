@@ -1,7 +1,6 @@
 """Package initialization procedures.
 
-The structure package provides components that store data of the user 
-tasks.
+The structure package provides components to store the tasks.
 """
 
 from ipipeline.structure.catalog import Catalog

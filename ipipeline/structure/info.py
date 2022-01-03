@@ -3,8 +3,8 @@
 import re
 from typing import List
 
-from ipipeline.exception import InfoError
-from ipipeline.util.instance import build_inst_repr, check_none_arg
+from ipipeline.exceptions import InfoError
+from ipipeline.utils.instance import build_inst_repr, check_none_arg
 
 
 class Info:

@@ -2,9 +2,9 @@
 
 from typing import Any, Dict, List
 
-from ipipeline.exception import CatalogError
+from ipipeline.exceptions import CatalogError
 from ipipeline.structure.info import Info
-from ipipeline.util.instance import check_none_arg
+from ipipeline.utils.instance import check_none_arg
 
 
 class Catalog(Info):

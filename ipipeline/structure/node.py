@@ -3,7 +3,7 @@
 from typing import Any, Callable, Dict, List
 
 from ipipeline.structure.info import Info
-from ipipeline.util.instance import check_none_arg
+from ipipeline.utils.instance import check_none_arg
 
 
 class Node(Info):

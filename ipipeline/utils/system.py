@@ -6,7 +6,7 @@ only the necessary parameters and performing some common operations.
 
 from pathlib import Path
 
-from ipipeline.exception import SystemError
+from ipipeline.exceptions import SystemError
 
 
 def create_directory(

@@ -3,7 +3,7 @@
 import sys
 from typing import List
 
-from ipipeline.cli.command import cmds
+from ipipeline.cli.commands import cmds
 from ipipeline.cli.parsing import create_parser
 
 

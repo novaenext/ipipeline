@@ -2,8 +2,8 @@
 
 from typing import Callable, List
 
-from ipipeline.cli.action import create_project, execute_pipeline
-from ipipeline.cli.argument import Argument, args
+from ipipeline.cli.actions import create_project, execute_pipeline
+from ipipeline.cli.arguments import Argument, args
 
 
 class Command:

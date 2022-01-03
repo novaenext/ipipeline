@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List
 
-from ipipeline.exception import BuildingError
+from ipipeline.exceptions import BuildingError
 from ipipeline.structure.catalog import Catalog
 
 

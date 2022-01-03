@@ -7,8 +7,8 @@ only the necessary parameters and performing some common operations.
 from argparse import ArgumentParser, RawTextHelpFormatter
 from typing import List
 
-from ipipeline.cli.argument import Argument
-from ipipeline.cli.command import Command
+from ipipeline.cli.arguments import Argument
+from ipipeline.cli.commands import Command
 
 
 def create_parser(

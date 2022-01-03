@@ -4,13 +4,13 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from ipipeline.control.building import build_func_inputs, build_func_outputs
-from ipipeline.control.sorting import sort_graph_topo
-from ipipeline.exception import ExecutionError
+from ipipeline.execution.building import build_func_inputs, build_func_outputs
+from ipipeline.execution.sorting import sort_graph_topo
+from ipipeline.exceptions import ExecutionError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 from ipipeline.structure.signal import Signal
-from ipipeline.util.instance import check_none_arg
+from ipipeline.utils.instance import check_none_arg
 
 
 logger = logging.getLogger(name=__name__)

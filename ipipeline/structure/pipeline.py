@@ -2,11 +2,11 @@
 
 from typing import Any, Callable, Dict, List
 
-from ipipeline.exception import PipelineError
+from ipipeline.exceptions import PipelineError
 from ipipeline.structure.conn import Conn
 from ipipeline.structure.info import Info
 from ipipeline.structure.node import Node
-from ipipeline.util.instance import check_none_arg
+from ipipeline.utils.instance import check_none_arg
 
 
 class Pipeline(Info):

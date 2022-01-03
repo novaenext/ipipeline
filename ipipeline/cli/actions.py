@@ -1,7 +1,7 @@
-"""Functions related to the action procedures."""
+"""Functions related to the action procedure."""
 
-from ipipeline.util.instance import obtain_mod_inst
-from ipipeline.util.system import create_directory, create_file
+from ipipeline.utils.instance import obtain_mod_inst
+from ipipeline.utils.system import create_directory, create_file
 
 
 def create_project(path: str, name: str) -> None:
@@ -42,10 +42,10 @@ def create_project(path: str, name: str) -> None:
     ]:
         create_file(f'{proj_path}/{proj_file}')
 
-    for pkg_dir in ['config', 'group', 'task']:
+    for pkg_dir in ['configs', 'pipelines', 'tasks']:
         create_directory(f'{pkg_path}/{pkg_dir}')
 
-    for pkg_file in ['exception.py', '__init__.py', '__main__.py']:
+    for pkg_file in ['exceptions.py', '__init__.py', '__main__.py']:
         create_file(f'{pkg_path}/{pkg_file}')
 
 
@@ -77,7 +77,7 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
 
     pipeline = obtain_mod_inst(mod_name, func_name)()
     executor = obtain_mod_inst(
-        'ipipeline.control.execution', f'{exe_type.capitalize()}Executor'
+        'ipipeline.execution.executors', f'{exe_type.capitalize()}Executor'
     )()
     executor.add_pipeline(pipeline)
     topo_order = executor.obtain_topo_order()
