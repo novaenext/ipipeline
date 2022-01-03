@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from ipipeline.execution.building import build_func_inputs, build_func_outputs
+from ipipeline.execution.building import build_task_inputs, build_task_outputs
 from ipipeline.execution.sorting import sort_graph_topo
 from ipipeline.exceptions import ExecutionError
 from ipipeline.structure.catalog import Catalog
@@ -50,7 +50,7 @@ class BaseExecutor(ABC):
             Catalog that stores the items from an execution.
         signals : Dict[str, Signal]
             Signals of the execution. The keys are the node IDs and the values 
-            are the signals where the IDs are obtained.
+            are the signal instances.
         """
 
         self.add_pipeline(pipeline)
@@ -89,7 +89,7 @@ class BaseExecutor(ABC):
         -------
         signals : Dict[str, Signal]
             Signals of the execution. The keys are the node IDs and the values 
-            are the signals where the IDs are obtained.
+            are the signal instances.
         """
 
         return self._signals
@@ -222,8 +222,8 @@ class BaseExecutor(ABC):
 
         Returns
         -------
-        func_outputs : Dict[str, Any]
-            Outputs of the function. The keys are the outputs and the values 
+        task_outputs : Dict[str, Any]
+            Outputs of the task. The keys are the outputs and the values 
             are the returns obtained from the execution.
 
         Raises
@@ -236,11 +236,11 @@ class BaseExecutor(ABC):
             node = self._pipeline.nodes[id]
             logger.info(f'node.id: {node.id}, node.tags: {node.tags}')
 
-            func_inputs = build_func_inputs(node.inputs, self._catalog)
-            returns = node.func(**func_inputs)
-            func_outputs = build_func_outputs(node.outputs, returns)
+            task_inputs = build_task_inputs(node.inputs, self._catalog)
+            returns = node.task(**task_inputs)
+            task_outputs = build_task_outputs(node.outputs, returns)
 
-            return func_outputs
+            return task_outputs
         except Exception as error:
             raise ExecutionError(
                 'node not executed by the executor', f'id == {id}'
@@ -327,7 +327,7 @@ class SequentialExecutor(BaseExecutor):
                 if signal.type == 'skip' and signal.status == True:
                     continue
                 else:
-                    func_outputs = self.execute_node(node_id)
+                    task_outputs = self.execute_node(node_id)
 
-                    for out_key, out_value in func_outputs.items():
+                    for out_key, out_value in task_outputs.items():
                         self._catalog.add_item(out_key, out_value)
