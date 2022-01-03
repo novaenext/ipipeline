@@ -25,10 +25,10 @@ class Pipeline(Info):
         destination nodes.
     _nodes : Dict[str, Node]
         Nodes of the graph. The keys are the node IDs and the values are 
-        the nodes where the IDs are obtained.
+        the node instances.
     _conns : Dict[str, Conn]
         Connections of the graph. The keys are the connection IDs and the 
-        values are the connections where the IDs are obtained.
+        values are the connection instances.
     _tags : List[str]
         Tags of the pipeline to provide more context.
     """
@@ -53,10 +53,10 @@ class Pipeline(Info):
             destination nodes.
         nodes : Dict[str, Node], default=None
             Nodes of the graph. The keys are the node IDs and the values are 
-            the nodes where the IDs are obtained.
+            the node instances.
         conns : Dict[str, Conn], default=None
             Connections of the graph. The keys are the connection IDs and the 
-            values are the connections where the IDs are obtained.
+            values are the connection instances.
         tags : List[str], default=None
             Tags of the pipeline to provide more context.
 
@@ -94,7 +94,7 @@ class Pipeline(Info):
         -------
         nodes : Dict[str, Node]
             Nodes of the graph. The keys are the node IDs and the values are 
-            the nodes where the IDs are obtained.
+            the node instances.
         """
 
         return self._nodes
@@ -107,7 +107,7 @@ class Pipeline(Info):
         -------
         conns : Dict[str, Conn]
             Connections of the graph. The keys are the connection IDs and the 
-            values are the connections where the IDs are obtained.
+            values are the connection instances.
         """
 
         return self._conns
@@ -115,7 +115,7 @@ class Pipeline(Info):
     def add_node(
         self, 
         id: str, 
-        func: Callable, 
+        task: Callable, 
         inputs: Dict[str, Any] = None, 
         outputs: List[str] = None, 
         tags: List[str] = None
@@ -126,17 +126,17 @@ class Pipeline(Info):
         ----------
         id : str
             ID of the node.
-        func : Callable
-            Function that represents an execution unit.
+        task : Callable
+            Task that represents an execution unit.
         inputs : Dict[str, Any], default=None
-            Inputs of the function. The keys are the function parameters and 
+            Inputs of the task. The keys are the function parameters and 
             the values are any default values and/or placeholders for the 
             catalog items.
 
             'c.<item_id>': obtains a single item.
             'c.[<item_id>, ..., <item_id>]': obtains multiple items.
         outputs : List[str], default=None
-            Outputs of the function. The outputs must match the returns in 
+            Outputs of the task. The outputs must match the returns in 
             terms of length. If one output is expected, the return can be of 
             any type, however, in cases with more than one output, the returns 
             must be a sequence.
@@ -152,7 +152,7 @@ class Pipeline(Info):
         """
 
         self._check_existent_node_id(id)
-        node = Node(id, func, inputs, outputs, tags)
+        node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
 
         self._graph[node.id] = []
         self._nodes[node.id] = node
@@ -179,8 +179,8 @@ class Pipeline(Info):
     def add_conn(
         self, 
         id: str, 
-        src_id: str, 
-        dst_id: str, 
+        src_node_id: str, 
+        dst_node_id: str, 
         power: Any = None, 
         tags: List[str] = None
     ) -> None:
@@ -190,9 +190,9 @@ class Pipeline(Info):
         ----------
         id : str
             ID of the connection.
-        src_id : str
+        src_node_id : str
             ID of the source node.
-        dst_id : str
+        dst_node_id : str
             ID of the destination node.
         power : Any
             Power of the connection that indicates its strength.
@@ -210,11 +210,11 @@ class Pipeline(Info):
         """
 
         self._check_existent_conn_id(id)
-        self._check_inexistent_node_id(id, src_id)
-        self._check_inexistent_node_id(id, dst_id)
-        conn = Conn(id, src_id, dst_id, power, tags)
+        self._check_inexistent_node_id(id, src_node_id)
+        self._check_inexistent_node_id(id, dst_node_id)
+        conn = Conn(id, src_node_id, dst_node_id, power=power, tags=tags)
 
-        self._graph[conn.src_id].append(conn.dst_id)
+        self._graph[conn.src_node_id].append(conn.dst_node_id)
         self._conns[conn.id] = conn
 
     def _check_existent_conn_id(self, conn_id: str) -> None:
