@@ -210,8 +210,8 @@ class Pipeline(Info):
         """
 
         self._check_existent_conn_id(id)
-        self._check_inexistent_node_id(id, src_node_id)
-        self._check_inexistent_node_id(id, dst_node_id)
+        self._check_inexistent_node_id(src_node_id)
+        self._check_inexistent_node_id(dst_node_id)
         conn = Conn(id, src_node_id, dst_node_id, power=power, tags=tags)
 
         self._graph[conn.src_node_id].append(conn.dst_node_id)
@@ -236,13 +236,11 @@ class Pipeline(Info):
                 'conn_id found in the _conns', f'conn_id == {conn_id}'
             )
 
-    def _check_inexistent_node_id(self, conn_id: str, node_id: str) -> None:
+    def _check_inexistent_node_id(self, node_id: str) -> None:
         """Checks if the node ID does not exist.
 
         Parameters
         ----------
-        conn_id : str
-            ID of the connection.
         node_id : str
             ID of the node.
 
@@ -254,6 +252,5 @@ class Pipeline(Info):
 
         if node_id not in self._nodes.keys():
             raise PipelineError(
-                'node_id not found in the _nodes', 
-                f'conn_id == {conn_id} and node_id == {node_id}'
+                'node_id not found in the _nodes', f'node_id == {node_id}'
             )
