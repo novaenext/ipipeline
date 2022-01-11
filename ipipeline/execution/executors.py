@@ -155,39 +155,19 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        ExecutorError
-            Informs that the node_id was not found in the _pipeline.nodes.
+        PipelineError
+            Informs that the node_id was not found in the _nodes.
         ExecutorError
             Informs that the type was not found in the valid_types.
         InfoError
             Informs that the id was not validated according to the pattern.
         """
 
-        self._check_inexistent_node_id(node_id)
+        self._pipeline._check_inexistent_node_id(node_id)
         self._check_invalid_type(type)
         signal = Signal(id, node_id, type, status, tags)
 
         self._signals[signal.node_id] = signal
-
-    def _check_inexistent_node_id(self, node_id: str) -> None:
-        """Checks if the node ID does not exist.
-
-        Parameters
-        ----------
-        node_id : str
-            ID of the node.
-
-        Raises
-        ------
-        ExecutorError
-            Informs that the node_id was not found in the _pipeline.nodes.
-        """
-
-        if node_id not in self._pipeline.nodes.keys():
-            raise ExecutorError(
-                'node_id not found in the _pipeline.nodes', 
-                f'node_id == {node_id}'
-            )
 
     def _check_invalid_type(self, type: str) -> None:
         """Checks if the type is invalid.
