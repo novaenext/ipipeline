@@ -18,13 +18,13 @@ class TestInfo(TestCase):
         self.assertIsNot(info1.tags, info2.tags)
 
     def test_check_valid_id(self) -> None:
-        info = Info('i1')
+        info = Info('i1', tags=None)
         id = info._check_valid_id('i1')
 
         self.assertEqual(id, 'i1')
 
     def test_check_invalid_id(self) -> None:
-        info = Info('i1')
+        info = Info('i1', tags=None)
 
         with self.assertRaisesRegex(
             InfoError, 

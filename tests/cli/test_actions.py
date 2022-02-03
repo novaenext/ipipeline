@@ -53,14 +53,14 @@ class TestCreateProject(TestCase):
 
 
 class TestExecutePipeline(TestCase):
-    def test_valid_execution(self) -> None:
+    def test_existent_pipeline(self) -> None:
         execute_pipeline(
             'tests.cli.test_actions', 'mock_build_pipeline', 'sequential'
         )
 
         self.assertTrue(True)
 
-    def test_invalid_execution(self) -> None:
+    def test_inexistent_pipeline(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
             r'inst_name not found in the module: inst_name == '

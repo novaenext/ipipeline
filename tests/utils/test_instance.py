@@ -7,12 +7,12 @@ from ipipeline.utils.instance import (
 
 
 class TestCheckNoneArg(TestCase):
-    def test_arg_with_none(self) -> None:
+    def test_none_arg(self) -> None:
         arg = check_none_arg(None, 'a1')
 
         self.assertEqual(arg, 'a1')
 
-    def test_arg_without_none(self) -> None:
+    def test_str_arg(self) -> None:
         arg = check_none_arg('a1', 'a2')
 
         self.assertEqual(arg, 'a1')
@@ -41,22 +41,22 @@ class MockClass4:
 
 
 class TestBuildInstRepr(TestCase):
-    def test_with_params_with_attrs(self) -> None:
+    def test_inst_with_params_with_attrs(self) -> None:
         repr = build_inst_repr(MockClass1(1))
 
         self.assertEqual(repr, 'MockClass1(param1=1, param2=\'2\')')
 
-    def test_with_params_without_attrs(self) -> None:
+    def test_inst_with_params_without_attrs(self) -> None:
         repr = build_inst_repr(MockClass2(1))
 
         self.assertEqual(repr, 'MockClass2(param1=None, param2=None)')
 
-    def test_without_params_with_attrs(self) -> None:
+    def test_inst_without_params_with_attrs(self) -> None:
         repr = build_inst_repr(MockClass3())
 
         self.assertEqual(repr, 'MockClass3()')
 
-    def test_without_params_without_attrs(self) -> None:
+    def test_inst_without_params_without_attrs(self) -> None:
         repr = build_inst_repr(MockClass4())
 
         self.assertEqual(repr, 'MockClass4()')

@@ -10,18 +10,18 @@ class TestNode(TestCase):
             mock_task, 
             inputs={'param1': 7}, 
             outputs=['return1'], 
-            tags=['data']
+            tags=['t1']
         )
 
         self.assertEqual(node.id, 'n1')
         self.assertEqual(node.task, mock_task)
         self.assertDictEqual(node.inputs, {'param1': 7})
         self.assertListEqual(node.outputs, ['return1'])
-        self.assertListEqual(node.tags, ['data'])
+        self.assertListEqual(node.tags, ['t1'])
 
     def test_defaults(self) -> None:
-        node1 = Node('n1', mock_task) 
-        node2 = Node('n2', mock_task) 
+        node1 = Node('n1', mock_task)
+        node2 = Node('n2', mock_task)
 
         self.assertIsNot(node1.inputs, node2.inputs)
         self.assertIsNot(node1.outputs, node2.outputs)
