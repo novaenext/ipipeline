@@ -144,7 +144,7 @@ class Catalog(Info):
                 'id not found in the _items', f'id == {id}'
             ) from error
 
-    def clean_items(self) -> None:
-        """Cleans the items."""
+    def remove_items(self) -> None:
+        """Remove the items."""
 
         self._items.clear()
