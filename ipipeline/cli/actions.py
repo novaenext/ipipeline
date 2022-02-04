@@ -1,7 +1,7 @@
-"""Functions related to the action procedures."""
+"""Functions related to the action procedure."""
 
-from ipipeline.util.instance import obtain_instance
-from ipipeline.util.system import create_directory, create_file
+from ipipeline.utils.instance import obtain_mod_inst
+from ipipeline.utils.system import create_directory, create_file
 
 
 def create_project(path: str, name: str) -> None:
@@ -27,7 +27,7 @@ def create_project(path: str, name: str) -> None:
 
     proj_path = f'{path}/{name}'
     pkg_path = f'{proj_path}/{name}'
-    create_directory(proj_path, missing=True, suppressed=True)
+    create_directory(proj_path, missing=True)
 
     for proj_dir in ['io', 'requirements', 'tests', name]:
         create_directory(f'{proj_path}/{proj_dir}')
@@ -42,10 +42,10 @@ def create_project(path: str, name: str) -> None:
     ]:
         create_file(f'{proj_path}/{proj_file}')
 
-    for pkg_dir in ['config', 'group', 'task']:
+    for pkg_dir in ['configs', 'pipelines', 'tasks']:
         create_directory(f'{pkg_path}/{pkg_dir}')
 
-    for pkg_file in ['exception.py', '__init__.py', '__main__.py']:
+    for pkg_file in ['exceptions.py', '__init__.py', '__main__.py']:
         create_file(f'{pkg_path}/{pkg_file}')
 
 
@@ -55,11 +55,11 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
     Parameters
     ----------
     mod_name : str
-        Name of the module (absolute terms) where the function is declared.
+        Name of the module in absolute terms (package.module).
     func_name : str
         Name of the function that returns a pipeline.
     exe_type : {'sequential'}
-        Type of the executor class.
+        Type of the executor.
 
         sequential: executes a pipeline sequentially.
 
@@ -68,16 +68,17 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
     InstanceError
         Informs that the inst_name was not found in the module.
     SortingError
-        Informs that the dst_node_id was not specified as src_node_id.
+        Informs that the dst_node_id was not specified as a src_node_id.
     SortingError
         Informs that a circular dependency was found in the graph.
-    ExecutionError
+    ExecutorError
         Informs that the node was not executed by the executor.
     """
 
-    pipeline = obtain_instance(mod_name, func_name)()
-    executor = obtain_instance(
-        'ipipeline.control.execution', f'{exe_type.capitalize()}Executor'
-    )(pipeline)
+    pipeline = obtain_mod_inst(mod_name, func_name)()
+    executor = obtain_mod_inst(
+        'ipipeline.execution.executors', f'{exe_type.capitalize()}Executor'
+    )()
+    executor.add_pipeline(pipeline)
     topo_order = executor.obtain_topo_order()
     executor.execute_pipeline(topo_order)

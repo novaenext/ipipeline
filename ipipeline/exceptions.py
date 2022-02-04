@@ -1,8 +1,7 @@
 """Classes related to the exception procedures.
 
 The exceptions are bound to a module rather than a specific error. To 
-inform about the specification of an error the description and detail 
-parameters must be used.
+inform about the specifications of an error the parameters must be used.
 """
 
 class BaseError(Exception):
@@ -70,8 +69,22 @@ class CatalogError(BaseError):
     pass
 
 
-class ExecutionError(BaseError):
-    """Informs the occurrence of an error related to the execution module.
+class ExecutorError(BaseError):
+    """Informs the occurrence of an error related to the executors module.
+
+    Attributes
+    ----------
+    _descr : str
+        Description of the error.
+    _detail : str
+        Detail of the error represented as a valid expression.
+    """
+
+    pass
+
+
+class InfoError(BaseError):
+    """Informs the occurrence of an error related to the info module.
 
     Attributes
     ----------

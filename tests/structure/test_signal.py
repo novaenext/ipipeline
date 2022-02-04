@@ -1,27 +1,20 @@
 from unittest import TestCase
 
-from ipipeline.structure.signal import BaseSignal, Signal
-
-
-class TestBaseSignal(TestCase):
-    def test_init(self) -> None:
-        base_signal = BaseSignal(
-            's1', 
-            'e1', 
-            'skip', 
-            True, 
-            tags=['data']
-        )
-
-        self.assertEqual(base_signal.id, 's1')
-        self.assertEqual(base_signal.elem_id, 'e1')
-        self.assertEqual(base_signal.type, 'skip')
-        self.assertEqual(base_signal.status, True)
-        self.assertListEqual(base_signal.tags, ['data'])
+from ipipeline.structure.signal import Signal
 
 
 class TestSignal(TestCase):
-    def test_deriv(self) -> None:
-        signal = Signal('s1', 'e1', 'skip', True)
+    def test_init(self) -> None:
+        signal = Signal('s1', 'n1', 'skip', status=True, tags=['t1'])
 
-        self.assertIsInstance(signal, BaseSignal)
+        self.assertEqual(signal.id, 's1')
+        self.assertEqual(signal.node_id, 'n1')
+        self.assertEqual(signal.type, 'skip')
+        self.assertEqual(signal.status, True)
+        self.assertListEqual(signal.tags, ['t1'])
+
+    def test_defaults(self) -> None:
+        signal1 = Signal('s1', 'n1', 'skip')
+        signal2 = Signal('s2', 'n2', 'skip')
+
+        self.assertIs(signal1.status, signal2.status)

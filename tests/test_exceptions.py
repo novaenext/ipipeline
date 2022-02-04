@@ -1,10 +1,11 @@
 from unittest import TestCase
 
-from ipipeline.exception import (
+from ipipeline.exceptions import (
     BaseError, 
     BuildingError, 
     CatalogError, 
-    ExecutionError, 
+    ExecutorError, 
+    InfoError, 
     InstanceError, 
     PipelineError, 
     SortingError, 
@@ -40,9 +41,16 @@ class TestCatalogError(TestCase):
         self.assertIsInstance(error, BaseError)
 
 
-class TestExecutionError(TestCase):
+class TestExecutorError(TestCase):
     def test_deriv(self) -> None:
-        error = ExecutionError('', '')
+        error = ExecutorError('', '')
+
+        self.assertIsInstance(error, BaseError)
+
+
+class TestInfoError(TestCase):
+    def test_deriv(self) -> None:
+        error = InfoError('', '')
 
         self.assertIsInstance(error, BaseError)
 

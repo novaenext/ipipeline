@@ -1,45 +1,65 @@
 from unittest import TestCase
 
-from ipipeline.exception import PipelineError
-from ipipeline.structure.pipeline import BasePipeline, Pipeline
-
-
-class MockBasePipeline(BasePipeline):
-    def add_node(self) -> None:
-        pass
-
-    def add_conn(self) -> None:
-        pass
-
-
-class TestBasePipeline(TestCase):
-    def test_init(self) -> None:
-        base_pipeline = MockBasePipeline('p1', tags=['data'])
-
-        self.assertEqual(base_pipeline.id, 'p1')
-        self.assertDictEqual(base_pipeline.nodes, {})
-        self.assertDictEqual(base_pipeline.conns, {})
-        self.assertDictEqual(base_pipeline.graph, {})
-        self.assertListEqual(base_pipeline.tags, ['data'])
+from ipipeline.exceptions import PipelineError
+from ipipeline.structure.pipeline import Pipeline
 
 
 class TestPipeline(TestCase):
     def setUp(self) -> None:
-        self._nodes = {'n1': None, 'n2': None, 'n3': None, 'n4': None}
         self._graph = {'n1': [], 'n2': [], 'n3': [], 'n4': []}
+        self._nodes = {'n1': None, 'n2': None, 'n3': None, 'n4': None}
+        self._conns = {'c1': None, 'c2': None, 'c3': None}
 
-    def test_deriv(self) -> None:
-        pipeline = Pipeline('p1')
+    def test_init(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            graph=self._graph, 
+            nodes=self._nodes, 
+            conns=self._conns, 
+            tags=['t1']
+        )
 
-        self.assertIsInstance(pipeline, BasePipeline)
+        self.assertEqual(
+            pipeline.id, 'p1'
+        )
+        self.assertDictEqual(
+            pipeline.graph, {'n1': [], 'n2': [], 'n3': [], 'n4': []}
+        )
+        self.assertDictEqual(
+            pipeline.nodes, {'n1': None, 'n2': None, 'n3': None, 'n4': None}
+        )
+        self.assertDictEqual(
+            pipeline.conns, {'c1': None, 'c2': None, 'c3': None}
+        )
+        self.assertListEqual(
+            pipeline.tags, ['t1']
+        )
+
+    def test_defaults(self) -> None:
+        pipeline1 = Pipeline('p1')
+        pipeline2 = Pipeline('p2')
+
+        self.assertIsNot(pipeline1.graph, pipeline2.graph)
+        self.assertIsNot(pipeline1.nodes, pipeline2.nodes)
+        self.assertIsNot(pipeline1.conns, pipeline2.conns)
 
     def test_add_inexistent_nodes(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline.add_node(
-            'n1', mock_sum, inputs={'param1': 7, 'param2': 3}, outputs=['sum']
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=None, conns=None, tags=None
         )
         pipeline.add_node(
-            'n2', mock_sub, inputs={'param1': 7, 'param2': 3}, outputs=['sub']
+            'n1', 
+            mock_sum, 
+            inputs={'param1': 7, 'param2': 3}, 
+            outputs=['sum'], 
+            tags=None
+        )
+        pipeline.add_node(
+            'n2', 
+            mock_sub, 
+            inputs={'param1': 7, 'param2': 3}, 
+            outputs=['sub'], 
+            tags=None
         )
 
         self.assertListEqual(
@@ -56,9 +76,15 @@ class TestPipeline(TestCase):
         )
 
     def test_add_existent_nodes(self) -> None:
-        pipeline = Pipeline('p1')
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=None, conns=None, tags=None
+        )
         pipeline.add_node(
-            'n1', mock_sum, inputs={'param1': 7, 'param2': 3}, outputs=['sum']
+            'n1', 
+            mock_sum, 
+            inputs={'param1': 7, 'param2': 3}, 
+            outputs=['sum'], 
+            tags=None
         )
 
         with self.assertRaisesRegex(
@@ -68,31 +94,39 @@ class TestPipeline(TestCase):
                 'n1', 
                 mock_sub, 
                 inputs={'param1': 7, 'param2': 3}, 
-                outputs=['sub']
+                outputs=['sub'], 
+                tags=None
             )
 
-    def test_check_existent_node_id(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._nodes = {'n1': None}
+    def test_check_existent_node_id_aff(self) -> None:
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=self._nodes, conns=None, tags=None
+        )
 
         with self.assertRaisesRegex(
             PipelineError, r'node_id found in the _nodes: node_id == n1'
         ):
             pipeline._check_existent_node_id('n1')
 
-    def test_check_inexistent_node_id(self) -> None:
-        pipeline = Pipeline('p1')
+    def test_check_inexistent_node_id_aff(self) -> None:
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=None, conns=None, tags=None
+        )
         pipeline._check_existent_node_id('n1')
 
         self.assertTrue(True)
 
-    def test_add_inexistent_conns(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
-        pipeline.add_conn('c1', 'n1', 'n2')
-        pipeline.add_conn('c2', 'n1', 'n3')
-        pipeline.add_conn('c3', 'n2', 'n4')
+    def test_add_inexistent_conns_with_existent_nodes(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            graph=self._graph, 
+            nodes=self._nodes, 
+            conns=None, 
+            tags=None
+        )
+        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
+        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
+        pipeline.add_conn('c3', 'n2', 'n4', power=None, tags=None)
 
         self.assertListEqual(
             list(pipeline.conns.keys()), ['c1', 'c2', 'c3']
@@ -107,43 +141,58 @@ class TestPipeline(TestCase):
             list(pipeline.graph.values()), [['n2', 'n3'], ['n4'], [], []]
         )
 
-    def test_add_existent_conns(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
-        pipeline.add_conn('c1', 'n1', 'n2')
-        pipeline.add_conn('c2', 'n1', 'n3')
+    def test_add_existent_conns_with_existent_nodes(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            graph=self._graph, 
+            nodes=self._nodes, 
+            conns=None, 
+            tags=None
+        )
+        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
+        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
 
         with self.assertRaisesRegex(
             PipelineError, r'conn_id found in the _conns: conn_id == c1'
         ):
-            pipeline.add_conn('c1', 'n2', 'n4')
+            pipeline.add_conn('c1', 'n2', 'n4', power=None, tags=None)
 
-    def test_add_inexistent_src_node(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
-
-        with self.assertRaisesRegex(
-            PipelineError, 
-            r'node_id not found in the _nodes: conn_id == c1 and node_id == n7'
-        ):
-            pipeline.add_conn('c1', 'n7', 'n2')
-
-    def test_add_inexistent_dst_node(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._nodes = self._nodes
-        pipeline._graph = self._graph
+    def test_add_inexistent_conns_with_inexistent_src_node(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            graph=self._graph, 
+            nodes=self._nodes, 
+            conns=None, 
+            tags=None
+        )
+        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
+        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
 
         with self.assertRaisesRegex(
-            PipelineError, 
-            r'node_id not found in the _nodes: conn_id == c1 and node_id == n9'
+            PipelineError, r'node_id not found in the _nodes: node_id == n7'
         ):
-            pipeline.add_conn('c1', 'n1', 'n9')
+            pipeline.add_conn('c3', 'n7', 'n4', power=None, tags=None)
+
+    def test_add_inexistent_conns_with_inexistent_dst_node(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            graph=self._graph, 
+            nodes=self._nodes, 
+            conns=None, 
+            tags=None
+        )
+        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
+        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
+
+        with self.assertRaisesRegex(
+            PipelineError, r'node_id not found in the _nodes: node_id == n7'
+        ):
+            pipeline.add_conn('c3', 'n2', 'n7', power=None, tags=None)
 
     def test_check_existent_conn_id(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._conns = {'c1': None}
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=None, conns=self._conns, tags=None
+        )
 
         with self.assertRaisesRegex(
             PipelineError, r'conn_id found in the _conns: conn_id == c1'
@@ -151,26 +200,28 @@ class TestPipeline(TestCase):
             pipeline._check_existent_conn_id('c1')
 
     def test_check_inexistent_conn_id(self) -> None:
-        pipeline = Pipeline('p1')
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=None, conns=None, tags=None
+        )
         pipeline._check_existent_conn_id('c1')
 
         self.assertTrue(True)
 
-    def test_check_inexistent_node_id_with_conn_id(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._conns = {'c1': None}
+    def test_check_inexistent_node_id_neg(self) -> None:
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=None, conns=None, tags=None
+        )
 
         with self.assertRaisesRegex(
-            PipelineError, 
-            r'node_id not found in the _nodes: conn_id == c1 and node_id == n1'
+            PipelineError, r'node_id not found in the _nodes: node_id == n1'
         ):
-            pipeline._check_inexistent_node_id('c1', 'n1')
+            pipeline._check_inexistent_node_id('n1')
 
-    def test_check_existent_node_id_with_conn_id(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline._nodes = {'n1': None}
-        pipeline._conns = {'c1': None}
-        pipeline._check_inexistent_node_id('c1', 'n1')
+    def test_check_existent_node_id_neg(self) -> None:
+        pipeline = Pipeline(
+            'p1', graph=None, nodes=self._nodes, conns=None, tags=None
+        )
+        pipeline._check_inexistent_node_id('n1')
 
         self.assertTrue(True)
 
