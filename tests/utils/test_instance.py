@@ -1,8 +1,9 @@
+import sys
 from unittest import TestCase
 from typing import List
 
 from ipipeline.exceptions import InstanceError
-from ipipeline.utils.instance import build_repr, obtain_mod_inst
+from ipipeline.utils.instance import build_repr, get_inst
 
 
 class MockClass1:
@@ -71,22 +72,24 @@ class TestBuildRepr(TestCase):
         self.assertEqual(repr, 'MockClass4()')
 
 
-class TestObtainModInst(TestCase):
-    def test_valid_names(self) -> None:
-        instance = obtain_mod_inst('tests.utils.test_instance', 'MockClass1')
+class TestGetInst(TestCase):
+    def test_get_inst__mod_name_eq_mod__inst_name_eq_inst(self) -> None:
+        inst = get_inst('tests.utils.test_instance', 'MockClass1')
 
-        self.assertEqual(instance.__name__, 'MockClass1')
+        self.assertEqual(inst.__name__, 'MockClass1')
+        self.assertIn('ipipeline/tests', sys.path[-1])
 
-    def test_invalid_mod_name(self) -> None:
+    def test_get_inst__mod_name_ne_mod__inst_name_eq_inst(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'inst_name not found in the module: inst_name == MockClass1'
+            r'mod_name not found in the package: '
+            r'mod_name == tests.utils.test_instance'
         ):
-            _ = obtain_mod_inst('tests.utils.test_instances', 'MockClass1')
+            _ = get_inst('tests.utils.test_instances', 'MockClass1')
 
-    def test_invalid_inst_name(self) -> None:
+    def test_get_inst__mod_name_eq_mod__inst_name_ne_inst(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'inst_name not found in the module: inst_name == MockClass11'
+            r'inst_name not found in the module: inst_name == MockClass0'
         ):
-            _ = obtain_mod_inst('tests.utils.test_instance', 'MockClass11')
+            _ = get_inst('tests.utils.test_instance', 'MockClass0')
