@@ -8,15 +8,15 @@ from pathlib import Path
 from ipipeline.exceptions import InstanceError
 
 
-def build_inst_repr(inst: object) -> str:
+def build_repr(inst: object) -> str:
     """Builds the representation of an instance.
 
-    The class name and the parameters in the initializer signature are 
-    used to create the representation.
+    The class name and the initializer parameters are used to create the 
+    representation.
 
     Parameters
     ----------
-    instance : object
+    inst : object
         Instance of a class.
 
     Returns
@@ -41,7 +41,9 @@ def build_inst_repr(inst: object) -> str:
 
         repr += f'{param.name}={value}, '
 
-    return f'{repr})'.replace(', )', ')')
+    repr = f'{repr})'.replace(', )', ')')
+
+    return repr
 
 
 def obtain_mod_inst(mod_name: str, inst_name: str) -> object:
