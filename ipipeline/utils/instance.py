@@ -4,31 +4,8 @@ import sys
 from importlib import import_module
 from inspect import signature
 from pathlib import Path
-from typing import Any
 
 from ipipeline.exceptions import InstanceError
-
-
-def check_none_arg(arg: Any, default: Any) -> Any:
-    """Checks if the arg is None.
-
-    Parameters
-    ----------
-    arg : Any
-        Argument of a callable.
-    default : Any
-        Default value to assign to the arg if it is None.
-
-    Returns
-    -------
-    arg : Any
-        Argument of a callable with its original or default value.
-    """
-
-    if arg is None:
-        arg = default
-
-    return arg
 
 
 def build_inst_repr(inst: object) -> str:
