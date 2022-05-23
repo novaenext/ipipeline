@@ -46,7 +46,7 @@ def build_repr(inst: object) -> str:
     return repr
 
 
-def obtain_mod_inst(mod_name: str, inst_name: str) -> object:
+def get_inst(mod_name: str, inst_name: str) -> object:
     """Gets an instance from a module.
 
     Parameters
