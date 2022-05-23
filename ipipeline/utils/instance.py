@@ -47,22 +47,24 @@ def build_repr(inst: object) -> str:
 
 
 def obtain_mod_inst(mod_name: str, inst_name: str) -> object:
-    """Obtains an instance declared in a module.
+    """Gets an instance from a module.
 
     Parameters
     ----------
     mod_name : str
-        Name of the module in absolute terms (package.module).
+        Name of the module in absolute terms.
     inst_name : str
-        Name of the instance declared in the module.
+        Name of the instance located in the module.
 
     Returns
     -------
-    instance : object
+    inst : object
         Instance of a class.
 
     Raises
     ------
+    InstanceError
+        Informs that the mod_name was not found in the package.
     InstanceError
         Informs that the inst_name was not found in the module.
     """
@@ -70,8 +72,14 @@ def obtain_mod_inst(mod_name: str, inst_name: str) -> object:
     sys.path.append(str(Path(mod_name.split('.')[0]).resolve()))
 
     try:
-        return getattr(import_module(mod_name), inst_name)
-    except (ModuleNotFoundError, AttributeError) as error:
+        inst = getattr(import_module(mod_name), inst_name)
+
+        return inst
+    except ModuleNotFoundError as error:
+        raise InstanceError(
+            'mod_name not found in the package', f'mod_name == {mod_name}'
+        ) from error
+    except AttributeError as error:
         raise InstanceError(
             'inst_name not found in the module', f'inst_name == {inst_name}'
         ) from error
