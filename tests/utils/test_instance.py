@@ -1,21 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.exceptions import InstanceError
-from ipipeline.utils.instance import (
-    check_none_arg, build_inst_repr, obtain_mod_inst
-)
-
-
-class TestCheckNoneArg(TestCase):
-    def test_none_arg(self) -> None:
-        arg = check_none_arg(None, 'a1')
-
-        self.assertEqual(arg, 'a1')
-
-    def test_str_arg(self) -> None:
-        arg = check_none_arg('a1', 'a2')
-
-        self.assertEqual(arg, 'a1')
+from ipipeline.utils.instance import build_inst_repr, obtain_mod_inst
 
 
 class MockClass1:
