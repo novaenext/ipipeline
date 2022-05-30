@@ -3,23 +3,23 @@
 from typing import Any
 
 
-def check_none(data: Any, default: Any) -> Any:
-    """Checks if the data is None.
+def check_none(item: Any, default: Any) -> Any:
+    """Checks if an item is None.
 
     Parameters
     ----------
-    data : Any
-        Data.
+    item : Any
+        Item.
     default : Any
-        Default value to assign to the data in case it is None.
+        Default to assign in case the item is None.
 
     Returns
     -------
-    data : Any
-        Data with its original or default value.
+    item : Any
+        Item.
     """
 
-    if data is None:
-        data = default
+    if item is None:
+        item = default
 
-    return data
+    return item
