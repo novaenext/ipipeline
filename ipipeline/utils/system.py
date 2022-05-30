@@ -9,7 +9,7 @@ from pathlib import Path
 from ipipeline.exceptions import SystemError
 
 
-def create_directory(
+def build_directory(
     path: str, missing: bool = False, suppressed: bool = False
 ) -> None:
     """Creates a directory in the file system.
@@ -40,7 +40,7 @@ def create_directory(
         ) from error
 
 
-def create_file(path: str, suppressed: bool = False) -> None:
+def build_file(path: str, suppressed: bool = False) -> None:
     """Creates a file in the file system.
 
     The path format is handled according to the underlying operating system.
