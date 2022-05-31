@@ -1,16 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.exceptions import (
-    BaseError, 
-    BuildingError, 
-    CatalogError, 
-    ExecutorError, 
-    InfoError, 
-    InstanceError, 
-    PipelineError, 
-    SortingError, 
-    SystemError
-)
+from ipipeline.exceptions import BaseError
 
 
 class TestBaseError(TestCase):
@@ -37,59 +27,3 @@ class TestBaseError(TestCase):
         msg = error.__str__()
 
         self.assertEqual(msg, 'error text: cause1 == item1, cause2 == item2')
-
-
-class TestBuildingError(TestCase):
-    def test_deriv(self) -> None:
-        error = BuildingError('', '')
-
-        self.assertIsInstance(error, BaseError)
-
-
-class TestCatalogError(TestCase):
-    def test_deriv(self) -> None:
-        error = CatalogError('', '')
-
-        self.assertIsInstance(error, BaseError)
-
-
-class TestExecutorError(TestCase):
-    def test_deriv(self) -> None:
-        error = ExecutorError('', '')
-
-        self.assertIsInstance(error, BaseError)
-
-
-class TestInfoError(TestCase):
-    def test_deriv(self) -> None:
-        error = InfoError('', '')
-
-        self.assertIsInstance(error, BaseError)
-
-
-class TestInstanceError(TestCase):
-    def test_deriv(self) -> None:
-        error = InstanceError('', '')
-
-        self.assertIsInstance(error, BaseError)
-
-
-class TestPipelineError(TestCase):
-    def test_deriv(self) -> None:
-        error = PipelineError('', '')
-
-        self.assertIsInstance(error, BaseError)
-
-
-class TestSortingError(TestCase):
-    def test_deriv(self) -> None:
-        error = SortingError('', '')
-
-        self.assertIsInstance(error, BaseError)
-
-
-class TestSystemError(TestCase):
-    def test_deriv(self) -> None:
-        error = SystemError('', '')
-
-        self.assertIsInstance(error, BaseError)
