@@ -4,7 +4,8 @@ import re
 from typing import List
 
 from ipipeline.exceptions import InfoError
-from ipipeline.utils.instance import build_inst_repr, check_none_arg
+from ipipeline.utils.checking import check_none
+from ipipeline.utils.instance import build_repr
 
 
 class Info:
@@ -38,7 +39,7 @@ class Info:
         """
 
         self._id = self._check_valid_id(id)
-        self._tags = check_none_arg(tags, [])
+        self._tags = check_none(tags, [])
 
     @property
     def id(self) -> str:
@@ -92,7 +93,7 @@ class Info:
             raise InfoError(
                 'id not validated according to the pattern '
                 '(letters, digits, underscores and/or dashes)', 
-                f'id == {id}'
+                [f'id == {id}']
             )
 
     def __repr__(self) -> str:
@@ -104,4 +105,4 @@ class Info:
             Representation of the instance.
         """
 
-        return build_inst_repr(self)
+        return build_repr(self)

@@ -8,5 +8,6 @@ ipipeline.egg-info/
 
 # files
 .env
+.coverage
 tmp.py
 notes.md

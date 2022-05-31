@@ -1,38 +1,42 @@
+import sys
 from unittest import TestCase
+from typing import List
 
 from ipipeline.exceptions import InstanceError
-from ipipeline.utils.instance import (
-    check_none_arg, build_inst_repr, obtain_mod_inst
-)
-
-
-class TestCheckNoneArg(TestCase):
-    def test_none_arg(self) -> None:
-        arg = check_none_arg(None, 'a1')
-
-        self.assertEqual(arg, 'a1')
-
-    def test_str_arg(self) -> None:
-        arg = check_none_arg('a1', 'a2')
-
-        self.assertEqual(arg, 'a1')
+from ipipeline.utils.instance import build_repr, get_inst
 
 
 class MockClass1:
-    def __init__(self, param1: int, param2: str = '2') -> None:
+    def __init__(
+        self, 
+        param1: int, 
+        param2: str, 
+        param3: List[int] = [3], 
+        param4: List[str] = ['4']
+    ) -> None:
         self._param1 = param1
-        self.param2 = param2
+        self._param2 = param2
+        self.param3 = param3
+        self.param4 = param4
 
 
 class MockClass2:
-    def __init__(self, param1: int, param2: str = '2') -> None:
+    def __init__(
+        self, 
+        param1: int, 
+        param2: str, 
+        param3: List[int] = [3], 
+        param4: List[str] = ['4']
+    ) -> None:
         pass
 
 
 class MockClass3:
     def __init__(self) -> None:
         self._param1 = 1
-        self.param2 = '2'
+        self._param2 = '2'
+        self.param3 = [3]
+        self.param4 = ['4']
 
 
 class MockClass4:
@@ -40,44 +44,52 @@ class MockClass4:
         pass
 
 
-class TestBuildInstRepr(TestCase):
-    def test_inst_with_params_with_attrs(self) -> None:
-        repr = build_inst_repr(MockClass1(1))
+class TestBuildRepr(TestCase):
+    def test_build_repr__inst_eq_mock_wi_params_wi_attrs(self) -> None:
+        repr = build_repr(MockClass1(1, '2'))
 
-        self.assertEqual(repr, 'MockClass1(param1=1, param2=\'2\')')
+        self.assertEqual(
+            repr, 
+            'MockClass1(param1=1, param2=\'2\', param3=[3], param4=[\'4\'])'
+        )
 
-    def test_inst_with_params_without_attrs(self) -> None:
-        repr = build_inst_repr(MockClass2(1))
+    def test_build_repr__inst_eq_mock_wi_params_wo_attrs(self) -> None:
+        repr = build_repr(MockClass2(1, '2'))
 
-        self.assertEqual(repr, 'MockClass2(param1=None, param2=None)')
+        self.assertEqual(
+            repr, 
+            'MockClass2(param1=None, param2=None, param3=None, param4=None)'
+        )
 
-    def test_inst_without_params_with_attrs(self) -> None:
-        repr = build_inst_repr(MockClass3())
+    def test_build_repr__inst_eq_mock_wo_params_wi_attrs(self) -> None:
+        repr = build_repr(MockClass3())
 
         self.assertEqual(repr, 'MockClass3()')
 
-    def test_inst_without_params_without_attrs(self) -> None:
-        repr = build_inst_repr(MockClass4())
+    def test_build_repr__inst_eq_mock_wo_params_wo_attrs(self) -> None:
+        repr = build_repr(MockClass4())
 
         self.assertEqual(repr, 'MockClass4()')
 
 
-class TestObtainModInst(TestCase):
-    def test_valid_names(self) -> None:
-        instance = obtain_mod_inst('tests.utils.test_instance', 'MockClass1')
+class TestGetInst(TestCase):
+    def test_get_inst__mod_name_eq_mod__inst_name_eq_inst(self) -> None:
+        inst = get_inst('tests.utils.test_instance', 'MockClass1')
 
-        self.assertEqual(instance.__name__, 'MockClass1')
+        self.assertEqual(inst.__name__, 'MockClass1')
+        self.assertIn('ipipeline/tests', sys.path[-1])
 
-    def test_invalid_mod_name(self) -> None:
+    def test_get_inst__mod_name_ne_mod__inst_name_eq_inst(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'inst_name not found in the module: inst_name == MockClass1'
+            r'mod_name not found in the package: '
+            r'mod_name == tests.utils.test_instance'
         ):
-            _ = obtain_mod_inst('tests.utils.test_instances', 'MockClass1')
+            _ = get_inst('tests.utils.test_instances', 'MockClass1')
 
-    def test_invalid_inst_name(self) -> None:
+    def test_get_inst__mod_name_eq_mod__inst_name_ne_inst(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'inst_name not found in the module: inst_name == MockClass11'
+            r'inst_name not found in the module: inst_name == MockClass0'
         ):
-            _ = obtain_mod_inst('tests.utils.test_instance', 'MockClass11')
+            _ = get_inst('tests.utils.test_instance', 'MockClass0')

@@ -6,7 +6,7 @@ from ipipeline.exceptions import PipelineError
 from ipipeline.structure.conn import Conn
 from ipipeline.structure.info import Info
 from ipipeline.structure.node import Node
-from ipipeline.utils.instance import check_none_arg
+from ipipeline.utils.checking import check_none
 
 
 class Pipeline(Info):
@@ -66,9 +66,9 @@ class Pipeline(Info):
             Informs that the id was not validated according to the pattern.
         """
 
-        self._graph = check_none_arg(graph, {})
-        self._nodes = check_none_arg(nodes, {})
-        self._conns = check_none_arg(conns, {})
+        self._graph = check_none(graph, {})
+        self._nodes = check_none(nodes, {})
+        self._conns = check_none(conns, {})
 
         super().__init__(id, tags=tags)
 
@@ -173,7 +173,7 @@ class Pipeline(Info):
 
         if node_id in self._nodes.keys():
             raise PipelineError(
-                'node_id found in the _nodes', f'node_id == {node_id}'
+                'node_id found in the _nodes', [f'node_id == {node_id}']
             )
 
     def add_conn(
@@ -233,7 +233,7 @@ class Pipeline(Info):
 
         if conn_id in self._conns.keys():
             raise PipelineError(
-                'conn_id found in the _conns', f'conn_id == {conn_id}'
+                'conn_id found in the _conns', [f'conn_id == {conn_id}']
             )
 
     def _check_inexistent_node_id(self, node_id: str) -> None:
@@ -252,5 +252,5 @@ class Pipeline(Info):
 
         if node_id not in self._nodes.keys():
             raise PipelineError(
-                'node_id not found in the _nodes', f'node_id == {node_id}'
+                'node_id not found in the _nodes', [f'node_id == {node_id}']
             )

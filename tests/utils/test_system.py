@@ -2,46 +2,60 @@ from pathlib import Path
 from unittest import TestCase
 
 from ipipeline.exceptions import SystemError
-from ipipeline.utils.system import create_directory, create_file
+from ipipeline.utils.system import build_directory, build_file
 
 
-class TestCreateDirectory(TestCase):
+class TestBuildDirectory(TestCase):
     def setUp(self) -> None:
         self._path = Path(__file__).resolve().parents[0] / 'mock_dir'
 
     def tearDown(self) -> None:
-        self._path.rmdir()
+        if self._path.exists():
+            self._path.rmdir()
 
-    def test_inexistent_directory(self) -> None:
-        create_directory(str(self._path), missing=False, suppressed=False)
+    def test_build_directory__path_eq_dir_wi_comps(self) -> None:
+        build_directory(str(self._path))
+
+        with self.assertRaisesRegex(
+            SystemError, r'path found in the file system: path == *'
+        ):
+            build_directory(str(self._path), exist_ok=False)
+
+    def test_build_directory__path_ne_dir_wi_comps(self) -> None:
+        build_directory(str(self._path))
 
         self.assertTrue(self._path.exists())
 
-    def test_existent_directory(self) -> None:
-        create_directory(str(self._path), missing=False, suppressed=False)
-
+    def test_build_directory__path_ne_dir_wo_comps(self) -> None:
         with self.assertRaisesRegex(
-            SystemError, r'directory not created in the file system: path == *'
+            SystemError, r'path not found in the file system: path == *'
         ):
-            create_directory(str(self._path), missing=False, suppressed=False)
+            build_directory(str(self._path / 'mock_dir'))
 
 
-class TestCreateFile(TestCase):
+class TestBuildFile(TestCase):
     def setUp(self) -> None:
         self._path = Path(__file__).resolve().parents[0] / 'mock_file'
 
     def tearDown(self) -> None:
-        self._path.unlink()
+        if self._path.exists():
+            self._path.unlink()
 
-    def test_inexistent_file(self) -> None:
-        create_file(str(self._path), suppressed=False)
+    def test_build_file__path_eq_file_wi_comps(self) -> None:
+        build_file(str(self._path))
+
+        with self.assertRaisesRegex(
+            SystemError, r'path found in the file system: path == *'
+        ):
+            build_file(str(self._path), exist_ok=False)
+
+    def test_build_file__path_ne_file_wi_comps(self) -> None:
+        build_file(str(self._path))
 
         self.assertTrue(self._path.exists())
 
-    def test_existent_file(self) -> None:
-        create_file(str(self._path), suppressed=False)
-
+    def test_build_file__path_ne_file_wo_comps(self) -> None:
         with self.assertRaisesRegex(
-            SystemError, r'file not created in the file system: path == *'
+            SystemError, r'path not found in the file system: path == *'
         ):
-            create_file(str(self._path), suppressed=False)
+            build_file(str(self._path / 'mock_file'))

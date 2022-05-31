@@ -4,42 +4,19 @@ import sys
 from importlib import import_module
 from inspect import signature
 from pathlib import Path
-from typing import Any
 
 from ipipeline.exceptions import InstanceError
 
 
-def check_none_arg(arg: Any, default: Any) -> Any:
-    """Checks if the arg is None.
-
-    Parameters
-    ----------
-    arg : Any
-        Argument of a callable.
-    default : Any
-        Default value to assign to the arg if it is None.
-
-    Returns
-    -------
-    arg : Any
-        Argument of a callable with its original or default value.
-    """
-
-    if arg is None:
-        arg = default
-
-    return arg
-
-
-def build_inst_repr(inst: object) -> str:
+def build_repr(inst: object) -> str:
     """Builds the representation of an instance.
 
-    The class name and the parameters in the initializer signature are 
-    used to create the representation.
+    The class name and the initializer parameters are used to create the 
+    representation.
 
     Parameters
     ----------
-    instance : object
+    inst : object
         Instance of a class.
 
     Returns
@@ -64,26 +41,30 @@ def build_inst_repr(inst: object) -> str:
 
         repr += f'{param.name}={value}, '
 
-    return f'{repr})'.replace(', )', ')')
+    repr = f'{repr})'.replace(', )', ')')
+
+    return repr
 
 
-def obtain_mod_inst(mod_name: str, inst_name: str) -> object:
-    """Obtains an instance declared in a module.
+def get_inst(mod_name: str, inst_name: str) -> object:
+    """Gets an instance from a module.
 
     Parameters
     ----------
     mod_name : str
-        Name of the module in absolute terms (package.module).
+        Name of the module in absolute terms.
     inst_name : str
-        Name of the instance declared in the module.
+        Name of the instance located in the module.
 
     Returns
     -------
-    instance : object
+    inst : object
         Instance of a class.
 
     Raises
     ------
+    InstanceError
+        Informs that the mod_name was not found in the package.
     InstanceError
         Informs that the inst_name was not found in the module.
     """
@@ -91,8 +72,14 @@ def obtain_mod_inst(mod_name: str, inst_name: str) -> object:
     sys.path.append(str(Path(mod_name.split('.')[0]).resolve()))
 
     try:
-        return getattr(import_module(mod_name), inst_name)
-    except (ModuleNotFoundError, AttributeError) as error:
+        inst = getattr(import_module(mod_name), inst_name)
+
+        return inst
+    except ModuleNotFoundError as error:
         raise InstanceError(
-            'inst_name not found in the module', f'inst_name == {inst_name}'
+            'mod_name not found in the package', [f'mod_name == {mod_name}']
+        ) from error
+    except AttributeError as error:
+        raise InstanceError(
+            'inst_name not found in the module', [f'inst_name == {inst_name}']
         ) from error

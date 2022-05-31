@@ -10,7 +10,7 @@ from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 from ipipeline.structure.signal import Signal
-from ipipeline.utils.instance import check_none_arg
+from ipipeline.utils.checking import check_none
 
 
 logger = logging.getLogger(name=__name__)
@@ -55,7 +55,7 @@ class BaseExecutor(ABC):
 
         self.add_pipeline(pipeline)
         self.add_catalog(catalog)
-        self._signals = check_none_arg(signals, {})
+        self._signals = check_none(signals, {})
 
     @property
     def pipeline(self) -> Pipeline:
@@ -108,7 +108,7 @@ class BaseExecutor(ABC):
             Informs that the id was not validated according to the pattern.
         """
 
-        self._pipeline = check_none_arg(
+        self._pipeline = check_none(
             pipeline, Pipeline('p0', tags=['default'])
         )
 
@@ -126,7 +126,7 @@ class BaseExecutor(ABC):
             Informs that the id was not validated according to the pattern.
         """
 
-        self._catalog = check_none_arg(
+        self._catalog = check_none(
             catalog, Catalog('c0', tags=['default'])
         )
 
@@ -189,7 +189,7 @@ class BaseExecutor(ABC):
 
         if type not in valid_types:
             raise ExecutorError(
-                'type not found in the valid_types', f'type == {type}'
+                'type not found in the valid_types', [f'type == {type}']
             )
 
     def execute_node(self, id: str) -> Dict[str, Any]:
@@ -223,7 +223,7 @@ class BaseExecutor(ABC):
             return task_outputs
         except Exception as error:
             raise ExecutorError(
-                'node not executed by the executor', f'id == {id}'
+                'node not executed by the executor', [f'id == {id}']
             ) from error
 
     def obtain_topo_order(self) -> List[list]:
