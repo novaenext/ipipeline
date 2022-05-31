@@ -77,9 +77,11 @@ def get_inst(mod_name: str, inst_name: str) -> object:
         return inst
     except ModuleNotFoundError as error:
         raise InstanceError(
-            'mod_name not found in the package', [f'mod_name == {mod_name}']
+            'mod_name was not found in the package', 
+            [f'mod_name == {mod_name}']
         ) from error
     except AttributeError as error:
         raise InstanceError(
-            'inst_name not found in the module', [f'inst_name == {inst_name}']
+            'inst_name was not found in the module', 
+            [f'inst_name == {inst_name}']
         ) from error
