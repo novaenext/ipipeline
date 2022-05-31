@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from ipipeline.exceptions import CatalogError
 from ipipeline.structure.info import Info
-from ipipeline.utils.instance import check_none_arg
+from ipipeline.utils.checking import check_none
 
 
 class Catalog(Info):
@@ -47,7 +47,7 @@ class Catalog(Info):
             Informs that the id was not validated according to the pattern.
         """
 
-        self._items = check_none_arg(items, {})
+        self._items = check_none(items, {})
 
         super().__init__(id, tags=tags)
 

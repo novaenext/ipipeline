@@ -3,7 +3,7 @@
 from typing import Any, Callable, Dict, List
 
 from ipipeline.structure.info import Info
-from ipipeline.utils.instance import check_none_arg
+from ipipeline.utils.checking import check_none
 
 
 class Node(Info):
@@ -72,8 +72,8 @@ class Node(Info):
         """
 
         self._task = task
-        self._inputs = check_none_arg(inputs, {})
-        self._outputs = check_none_arg(outputs, [])
+        self._inputs = check_none(inputs, {})
+        self._outputs = check_none(outputs, [])
 
         super().__init__(id, tags=tags)
 
