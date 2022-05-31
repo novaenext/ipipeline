@@ -29,7 +29,7 @@ class Info:
         ----------
         id : str
             ID of the instance.
-        tags : List[str], default=None
+        tags : List[str], optional
             Tags of the instance to provide more context.
 
         Raises
