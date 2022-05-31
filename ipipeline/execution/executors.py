@@ -189,7 +189,7 @@ class BaseExecutor(ABC):
 
         if type not in valid_types:
             raise ExecutorError(
-                'type not found in the valid_types', f'type == {type}'
+                'type not found in the valid_types', [f'type == {type}']
             )
 
     def execute_node(self, id: str) -> Dict[str, Any]:
@@ -223,7 +223,7 @@ class BaseExecutor(ABC):
             return task_outputs
         except Exception as error:
             raise ExecutorError(
-                'node not executed by the executor', f'id == {id}'
+                'node not executed by the executor', [f'id == {id}']
             ) from error
 
     def obtain_topo_order(self) -> List[list]:
