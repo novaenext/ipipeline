@@ -45,7 +45,7 @@ class MockClass4:
 
 
 class TestBuildRepr(TestCase):
-    def test_build_repr__inst_wi_params_wi_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wi_params_wi_attrs(self) -> None:
         repr = build_repr(MockClass1(1, '2'))
 
         self.assertEqual(
@@ -53,7 +53,7 @@ class TestBuildRepr(TestCase):
             'MockClass1(param1=1, param2=\'2\', param3=[3], param4=[\'4\'])'
         )
 
-    def test_build_repr__inst_wi_params_wo_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wi_params_wo_attrs(self) -> None:
         repr = build_repr(MockClass2(1, '2'))
 
         self.assertEqual(
@@ -61,12 +61,12 @@ class TestBuildRepr(TestCase):
             'MockClass2(param1=None, param2=None, param3=None, param4=None)'
         )
 
-    def test_build_repr__inst_wo_params_wi_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wo_params_wi_attrs(self) -> None:
         repr = build_repr(MockClass3())
 
         self.assertEqual(repr, 'MockClass3()')
 
-    def test_build_repr__inst_wo_params_wo_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wo_params_wo_attrs(self) -> None:
         repr = build_repr(MockClass4())
 
         self.assertEqual(repr, 'MockClass4()')
