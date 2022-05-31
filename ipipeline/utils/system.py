@@ -42,28 +42,34 @@ def build_directory(path: str, **key_args: dict) -> None:
         ) from error
 
 
-def build_file(path: str, suppressed: bool = False) -> None:
-    """Creates a file in the file system.
+def build_file(path: str, **key_args: dict) -> None:
+    """Builds a file in the file system.
 
-    The path format is handled according to the underlying operating system.
+    The path is handled according to the underlying operating system.
 
     Parameters
     ----------
     path : str
         Path of the file.
-    suppressed : bool, default=False
-        Indicates if the error should be suppressed or not.
+    key_args : dict
+        Key arguments of the touch method.
 
     Raises
     ------
     SystemError
-        Informs that the file was not created in the file system.
+        Informs that the path was found in the file system.
+    SystemError
+        Informs that the path was not found in the file system.
     """
 
     try:
         path = Path(path).resolve()
-        path.touch(exist_ok=suppressed)
-    except (FileExistsError, FileNotFoundError) as error:
+        path.touch(**key_args)
+    except FileExistsError as error:
         raise SystemError(
-            'file not created in the file system', f'path == {path}'
+            'path found in the file system', f'path == {path}'
+        ) from error
+    except FileNotFoundError as error:
+        raise SystemError(
+            'path not found in the file system', f'path == {path}'
         ) from error
