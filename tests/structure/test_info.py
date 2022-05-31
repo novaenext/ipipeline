@@ -5,38 +5,36 @@ from ipipeline.structure.info import Info
 
 
 class TestInfo(TestCase):
-    def test_init(self) -> None:
+    def test_init__id_eq_str__tags_eq_list(self) -> None:
         info = Info('i1', tags=['t1', 't2'])
 
         self.assertEqual(info.id, 'i1')
         self.assertListEqual(info.tags, ['t1', 't2'])
 
-    def test_defaults(self) -> None:
-        info1 = Info('i1')
-        info2 = Info('i2')
+    def test_check_id__id_eq_pattern(self) -> None:
+        info = Info('i1')
+        id = info._check_id('i1_-.')
 
-        self.assertIsNot(info1.tags, info2.tags)
+        self.assertEqual(id, 'i1_-.')
 
-    def test_check_valid_id(self) -> None:
-        info = Info('i1', tags=None)
-        id = info._check_valid_id('i1')
-
-        self.assertEqual(id, 'i1')
-
-    def test_check_invalid_id(self) -> None:
-        info = Info('i1', tags=None)
+    def test_check_id__id_ne_pattern(self) -> None:
+        info = Info('i1')
 
         with self.assertRaisesRegex(
-            InfoError, 
-            r'id not validated according to the pattern \(letters, '
-            r'digits, underscores and/or dashes\): id == i\.1'
+            InfoError, r'id did not match the pattern: id == i1!'
         ):
-            _ = info._check_valid_id('i.1')
+            _ = info._check_id('i1!')
+
+    def test_check_id__id_eq_empty(self) -> None:
+        info = Info('i1')
+
+        with self.assertRaisesRegex(
+            InfoError, r'id did not match the pattern: id == '
+        ):
+            _ = info._check_id('')
 
     def test_repr(self) -> None:
         info = Info('i1', tags=['t1', 't2'])
         repr = info.__repr__()
 
-        self.assertEqual(
-            repr, 'Info(id=\'i1\', tags=[\'t1\', \'t2\'])'
-        )
+        self.assertEqual(repr, 'Info(id=\'i1\', tags=[\'t1\', \'t2\'])')
