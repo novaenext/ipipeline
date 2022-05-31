@@ -10,20 +10,27 @@ class TestBuildDirectory(TestCase):
         self._path = Path(__file__).resolve().parents[0] / 'mock_dir'
 
     def tearDown(self) -> None:
-        self._path.rmdir()
+        if self._path.exists():
+            self._path.rmdir()
 
-    def test_inexistent_directory(self) -> None:
-        build_directory(str(self._path), missing=False, suppressed=False)
+    def test_build_directory__path_eq_dir_wi_comps(self) -> None:
+        build_directory(str(self._path))
+
+        with self.assertRaisesRegex(
+            SystemError, r'path found in the file system: path == *'
+        ):
+            build_directory(str(self._path))
+
+    def test_build_directory__path_ne_dir_wi_comps(self) -> None:
+        build_directory(str(self._path))
 
         self.assertTrue(self._path.exists())
 
-    def test_existent_directory(self) -> None:
-        build_directory(str(self._path), missing=False, suppressed=False)
-
+    def test_build_directory__path_ne_dir_wo_comps(self) -> None:
         with self.assertRaisesRegex(
-            SystemError, r'directory not created in the file system: path == *'
+            SystemError, r'path not found in the file system: path == *'
         ):
-            build_directory(str(self._path), missing=False, suppressed=False)
+            build_directory(str(self._path / 'mock_dir'))
 
 
 class TestBuildFile(TestCase):
