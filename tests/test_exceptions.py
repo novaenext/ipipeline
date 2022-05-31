@@ -14,17 +14,29 @@ from ipipeline.exceptions import (
 
 
 class TestBaseError(TestCase):
-    def test_init(self) -> None:
-        error = BaseError('error descr', 'error == value')
+    def test_init__text_eq_str__causes_eq_list(self) -> None:
+        error = BaseError('error text', ['cause == item'])
 
-        self.assertEqual(error._descr, 'error descr')
-        self.assertEqual(error._detail, 'error == value')
+        self.assertEqual(error._text, 'error text')
+        self.assertListEqual(error._causes, ['cause == item'])
 
-    def test_str(self) -> None:
-        error = BaseError('error descr', 'error == value')
-        error_msg = error.__str__()
+    def test_str__text_eq_str__causes_eq_empty_cause(self) -> None:
+        error = BaseError('error text', [])
+        msg = error.__str__()
 
-        self.assertEqual(error_msg, 'error descr: error == value')
+        self.assertEqual(msg, 'error text: ')
+
+    def test_str__text_eq_str__causes_eq_single_cause(self) -> None:
+        error = BaseError('error text', ['cause == item'])
+        msg = error.__str__()
+
+        self.assertEqual(msg, 'error text: cause == item')
+
+    def test_str__text_eq_str__causes_eq_multiple_causes(self) -> None:
+        error = BaseError('error text', ['cause1 == item1', 'cause2 == item2'])
+        msg = error.__str__()
+
+        self.assertEqual(msg, 'error text: cause1 == item1, cause2 == item2')
 
 
 class TestBuildingError(TestCase):
