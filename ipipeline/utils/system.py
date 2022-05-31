@@ -34,11 +34,11 @@ def build_directory(path: str, **key_args: dict) -> None:
         path.mkdir(**key_args)
     except FileExistsError as error:
         raise SystemError(
-            'path found in the file system', f'path == {path}'
+            'path found in the file system', [f'path == {path}']
         ) from error
     except FileNotFoundError as error:
         raise SystemError(
-            'path not found in the file system', f'path == {path}'
+            'path not found in the file system', [f'path == {path}']
         ) from error
 
 
@@ -67,9 +67,9 @@ def build_file(path: str, **key_args: dict) -> None:
         path.touch(**key_args)
     except FileExistsError as error:
         raise SystemError(
-            'path found in the file system', f'path == {path}'
+            'path found in the file system', [f'path == {path}']
         ) from error
     except FileNotFoundError as error:
         raise SystemError(
-            'path not found in the file system', f'path == {path}'
+            'path not found in the file system', [f'path == {path}']
         ) from error
