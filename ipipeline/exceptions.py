@@ -4,41 +4,44 @@ The exceptions are bound to a module rather than a specific error. To
 inform about the specifications of an error the parameters must be used.
 """
 
+from typing import List
+
+
 class BaseError(Exception):
     """Informs the occurrence of an error related to the ipipeline package.
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
-    def __init__(self, descr: str, detail: str) -> None:
+    def __init__(self, text: str, causes: List[str]) -> None:
         """Initializes the attributes.
 
         Parameters
         ----------
-        descr : str
-            Description of the error.
-        detail : str
-            Detail of the error represented as a valid expression.
+        text : str
+            Text of the error.
+        causes : List[str]
+            Causes of the error.
         """
 
-        self._descr = descr
-        self._detail = detail
+        self._text = text
+        self._causes = causes
 
     def __str__(self) -> str:
-        """Obtains the error message.
+        """Builds the error message.
 
         Returns
         -------
-        error_msg : str
-            Error message.
+        msg : str
+            Message of the error.
         """
 
-        return f'{self._descr}: {self._detail}'
+        return f'{self._text}: {", ".join(self._causes)}'
 
 
 class BuildingError(BaseError):
@@ -46,10 +49,10 @@ class BuildingError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
@@ -60,10 +63,10 @@ class CatalogError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
@@ -74,10 +77,10 @@ class ExecutorError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
@@ -88,10 +91,10 @@ class InfoError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
@@ -102,10 +105,10 @@ class InstanceError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
@@ -116,10 +119,10 @@ class PipelineError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
@@ -130,10 +133,10 @@ class SortingError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
@@ -144,10 +147,10 @@ class SystemError(BaseError):
 
     Attributes
     ----------
-    _descr : str
-        Description of the error.
-    _detail : str
-        Detail of the error represented as a valid expression.
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
     """
 
     pass
