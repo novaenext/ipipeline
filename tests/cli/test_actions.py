@@ -47,7 +47,7 @@ class TestCreateProject(TestCase):
         create_project(str(self._path.parents[0]), 'mock_proj')
 
         with self.assertRaisesRegex(
-            SystemError, r'directory not created in the file system: path == *'
+            SystemError, r'path found in the file system: path == *'
         ):
             create_project(str(self._path.parents[0]), 'mock_proj')
 
