@@ -82,7 +82,7 @@ class TestGetInst(TestCase):
     def test_get_inst__mod_name_ne_mod__inst_name_eq_inst(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'mod_name not found in the package: '
+            r'mod_name was not found in the package: '
             r'mod_name == tests.utils.test_instance'
         ):
             _ = get_inst('tests.utils.test_instances', 'MockClass1')
@@ -90,6 +90,6 @@ class TestGetInst(TestCase):
     def test_get_inst__mod_name_eq_mod__inst_name_ne_inst(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'inst_name not found in the module: inst_name == MockClass0'
+            r'inst_name was not found in the module: inst_name == MockClass0'
         ):
             _ = get_inst('tests.utils.test_instance', 'MockClass0')

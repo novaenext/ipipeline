@@ -17,7 +17,7 @@ class TestBuildDirectory(TestCase):
         build_directory(str(self._path))
 
         with self.assertRaisesRegex(
-            SystemError, r'path found in the file system: path == *'
+            SystemError, r'path was found in the file system: path == *'
         ):
             build_directory(str(self._path), exist_ok=False)
 
@@ -28,7 +28,7 @@ class TestBuildDirectory(TestCase):
 
     def test_build_directory__path_ne_dir_wo_comps(self) -> None:
         with self.assertRaisesRegex(
-            SystemError, r'path not found in the file system: path == *'
+            SystemError, r'path was not found in the file system: path == *'
         ):
             build_directory(str(self._path / 'mock_dir'))
 
@@ -45,7 +45,7 @@ class TestBuildFile(TestCase):
         build_file(str(self._path))
 
         with self.assertRaisesRegex(
-            SystemError, r'path found in the file system: path == *'
+            SystemError, r'path was found in the file system: path == *'
         ):
             build_file(str(self._path), exist_ok=False)
 
@@ -56,6 +56,6 @@ class TestBuildFile(TestCase):
 
     def test_build_file__path_ne_file_wo_comps(self) -> None:
         with self.assertRaisesRegex(
-            SystemError, r'path not found in the file system: path == *'
+            SystemError, r'path was not found in the file system: path == *'
         ):
             build_file(str(self._path / 'mock_file'))
