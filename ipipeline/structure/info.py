@@ -93,12 +93,14 @@ class Info:
             raise InfoError('id did not match the pattern', [f'id == {id}'])
 
     def __repr__(self) -> str:
-        """Obtains the representation of the instance.
+        """Builds the representation of an instance.
 
         Returns
         -------
         repr : str
-            Representation of the instance.
+            Representation of an instance.
         """
 
-        return build_repr(self)
+        repr = build_repr(self)
+
+        return repr
