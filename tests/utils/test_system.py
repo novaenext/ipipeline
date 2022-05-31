@@ -19,7 +19,7 @@ class TestBuildDirectory(TestCase):
         with self.assertRaisesRegex(
             SystemError, r'path found in the file system: path == *'
         ):
-            build_directory(str(self._path))
+            build_directory(str(self._path), exist_ok=False)
 
     def test_build_directory__path_ne_dir_wi_comps(self) -> None:
         build_directory(str(self._path))
@@ -38,17 +38,24 @@ class TestBuildFile(TestCase):
         self._path = Path(__file__).resolve().parents[0] / 'mock_file'
 
     def tearDown(self) -> None:
-        self._path.unlink()
+        if self._path.exists():
+            self._path.unlink()
 
-    def test_inexistent_file(self) -> None:
-        build_file(str(self._path), suppressed=False)
+    def test_build_file__path_eq_file_wi_comps(self) -> None:
+        build_file(str(self._path))
+
+        with self.assertRaisesRegex(
+            SystemError, r'path found in the file system: path == *'
+        ):
+            build_file(str(self._path), exist_ok=False)
+
+    def test_build_file__path_ne_file_wi_comps(self) -> None:
+        build_file(str(self._path))
 
         self.assertTrue(self._path.exists())
 
-    def test_existent_file(self) -> None:
-        build_file(str(self._path), suppressed=False)
-
+    def test_build_file__path_ne_file_wo_comps(self) -> None:
         with self.assertRaisesRegex(
-            SystemError, r'file not created in the file system: path == *'
+            SystemError, r'path not found in the file system: path == *'
         ):
-            build_file(str(self._path), suppressed=False)
+            build_file(str(self._path / 'mock_file'))
