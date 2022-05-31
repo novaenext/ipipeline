@@ -37,5 +37,5 @@ def execute_cli(args: List[str]) -> None:
 
         sys.exit(0)
     except Exception as error:
-        print('error:', ': '.join(error.args), file=sys.stderr)
+        print('error:', str(error), file=sys.stderr)
         sys.exit(1)
