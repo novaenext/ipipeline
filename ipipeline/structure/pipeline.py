@@ -173,7 +173,7 @@ class Pipeline(Info):
 
         if node_id in self._nodes.keys():
             raise PipelineError(
-                'node_id found in the _nodes', f'node_id == {node_id}'
+                'node_id found in the _nodes', [f'node_id == {node_id}']
             )
 
     def add_conn(
@@ -233,7 +233,7 @@ class Pipeline(Info):
 
         if conn_id in self._conns.keys():
             raise PipelineError(
-                'conn_id found in the _conns', f'conn_id == {conn_id}'
+                'conn_id found in the _conns', [f'conn_id == {conn_id}']
             )
 
     def _check_inexistent_node_id(self, node_id: str) -> None:
@@ -252,5 +252,5 @@ class Pipeline(Info):
 
         if node_id not in self._nodes.keys():
             raise PipelineError(
-                'node_id not found in the _nodes', f'node_id == {node_id}'
+                'node_id not found in the _nodes', [f'node_id == {node_id}']
             )

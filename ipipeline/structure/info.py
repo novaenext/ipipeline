@@ -93,7 +93,7 @@ class Info:
             raise InfoError(
                 'id not validated according to the pattern '
                 '(letters, digits, underscores and/or dashes)', 
-                f'id == {id}'
+                [f'id == {id}']
             )
 
     def __repr__(self) -> str:

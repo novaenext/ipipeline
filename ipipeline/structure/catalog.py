@@ -120,7 +120,7 @@ class Catalog(Info):
             return self._items[id]
         except KeyError as error:
             raise CatalogError(
-                'id not found in the _items', f'id == {id}'
+                'id not found in the _items', [f'id == {id}']
             ) from error
 
     def remove_item(self, id: str) -> None:
@@ -141,7 +141,7 @@ class Catalog(Info):
             del self._items[id]
         except KeyError as error:
             raise CatalogError(
-                'id not found in the _items', f'id == {id}'
+                'id not found in the _items', [f'id == {id}']
             ) from error
 
     def remove_items(self) -> None:
