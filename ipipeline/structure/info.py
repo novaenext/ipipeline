@@ -35,15 +35,15 @@ class Info:
         Raises
         ------
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
         """
 
-        self._id = self._check_valid_id(id)
+        self._id = self._check_id(id)
         self._tags = check_none(tags, [])
 
     @property
     def id(self) -> str:
-        """Obtains the _id attribute.
+        """Gets the _id attribute.
 
         Returns
         -------
@@ -55,7 +55,7 @@ class Info:
 
     @property
     def tags(self) -> List[str]:
-        """Obtains the _tags attribute.
+        """Gets the _tags attribute.
 
         Returns
         -------
@@ -65,11 +65,11 @@ class Info:
 
         return self._tags
 
-    def _check_valid_id(self, id: str) -> str:
-        """Checks if the ID is valid.
+    def _check_id(self, id: str) -> str:
+        """Checks if the ID matches a pattern.
 
-        A valid ID consists of a combination of letters, digits, underscores 
-        and/or dashes.
+        The pattern consists of a combination of letters, digits, underscores, 
+        dashes, and/or points.
 
         Parameters
         ----------
@@ -84,17 +84,13 @@ class Info:
         Raises
         ------
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
         """
 
-        if re.fullmatch(r'[\w-]+', id):
+        if re.fullmatch(r'[\w.-]+', id) is not None:
             return id
         else:
-            raise InfoError(
-                'id not validated according to the pattern '
-                '(letters, digits, underscores and/or dashes)', 
-                [f'id == {id}']
-            )
+            raise InfoError('id did not match the pattern', [f'id == {id}'])
 
     def __repr__(self) -> str:
         """Obtains the representation of the instance.
