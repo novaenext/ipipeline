@@ -68,8 +68,8 @@ class TestPipeline(TestCase):
         self.assertTrue(checked)
 
     def test_check_node__id_ne_node_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
-        checked = pipeline.check_node('n3')
+        pipeline = Pipeline('p1')
+        checked = pipeline.check_node('n1')
 
         self.assertFalse(checked)
 
@@ -101,6 +101,18 @@ class TestPipeline(TestCase):
         self.assertListEqual(
             [node.id for node in pipeline.nodes.values()], ['n1']
         )
+
+    def test_check_link__id_eq_link_id(self) -> None:
+        pipeline = Pipeline('p1', links=self._mock_links)
+        checked = pipeline.check_link('l1')
+
+        self.assertTrue(checked)
+
+    def test_check_link__id_ne_link_id(self) -> None:
+        pipeline = Pipeline('p1')
+        checked = pipeline.check_link('l1')
+
+        self.assertFalse(checked)
 
     def test_check_existent_node_id_aff(self) -> None:
         pipeline = Pipeline(
