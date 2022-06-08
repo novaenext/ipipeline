@@ -214,25 +214,6 @@ class Pipeline(Info):
         self._graph[node.id] = []
         self._nodes[node.id] = node
 
-    def _check_existent_node_id(self, node_id: str) -> None:
-        """Checks if the node ID exists.
-
-        Parameters
-        ----------
-        node_id : str
-            ID of the node.
-
-        Raises
-        ------
-        PipelineError
-            Informs that the node_id was found in the _nodes.
-        """
-
-        if node_id in self._nodes.keys():
-            raise PipelineError(
-                'node_id found in the _nodes', [f'node_id == {node_id}']
-            )
-
     def check_link(self, id: str) -> bool:
         """Checks if a link exists.
 
@@ -304,41 +285,3 @@ class Pipeline(Info):
 
         self._graph[link.src_id].append(link.dst_id)
         self._links[link.id] = link
-
-    def _check_existent_link_id(self, link_id: str) -> None:
-        """Checks if the link ID exists.
-
-        Parameters
-        ----------
-        link_id : str
-            ID of the link.
-
-        Raises
-        ------
-        PipelineError
-            Informs that the link_id was found in the _links.
-        """
-
-        if link_id in self._links.keys():
-            raise PipelineError(
-                'link_id found in the _links', [f'link_id == {link_id}']
-            )
-
-    def _check_inexistent_node_id(self, node_id: str) -> None:
-        """Checks if the node ID does not exist.
-
-        Parameters
-        ----------
-        node_id : str
-            ID of the node.
-
-        Raises
-        ------
-        PipelineError
-            Informs that the node_id was not found in the _nodes.
-        """
-
-        if node_id not in self._nodes.keys():
-            raise PipelineError(
-                'node_id not found in the _nodes', [f'node_id == {node_id}']
-            )
