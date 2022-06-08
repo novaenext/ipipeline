@@ -72,6 +72,18 @@ class TestPipeline(TestCase):
         self.assertDictEqual(pipeline.links, {'l5': None})
         self.assertListEqual(pipeline.tags, ['t2'])
 
+    def test_check_node__id_eq_node_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+        checked = pipeline.check_node('n2')
+
+        self.assertTrue(checked)
+
+    def test_check_node__id_ne_node_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+        checked = pipeline.check_node('n8')
+
+        self.assertFalse(checked)
+
     def test_add_inexistent_nodes(self) -> None:
         pipeline = Pipeline(
             'p1', graph=None, nodes=None, links=None, tags=None
