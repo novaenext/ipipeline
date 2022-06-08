@@ -1,25 +1,25 @@
-"""Class related to the connection procedures."""
+"""Class related to the link procedures."""
 
 from typing import List
 
 from ipipeline.structure.info import Info
 
 
-class Conn(Info):
-    """Stores a connection between two nodes.
+class Link(Info):
+    """Stores a link between two nodes.
 
-    The connection defines the dependency between the nodes.
+    The link defines the dependency between the nodes.
 
     Attributes
     ----------
     _id : str
-        ID of the connection.
+        ID of the link.
     _src_id : str
         ID of the source node.
     _dst_id : str
         ID of the destination node.
     _tags : List[str]
-        Tags of the connection to provide more context.
+        Tags of the link to provide more context.
     """
 
     def __init__(
@@ -34,13 +34,13 @@ class Conn(Info):
         Parameters
         ----------
         id : str
-            ID of the connection.
+            ID of the link.
         src_id : str
             ID of the source node.
         dst_id : str
             ID of the destination node.
         tags : List[str], optional
-            Tags of the connection to provide more context.
+            Tags of the link to provide more context.
 
         Raises
         ------
