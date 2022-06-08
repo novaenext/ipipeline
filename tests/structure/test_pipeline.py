@@ -8,9 +8,9 @@ class TestPipeline(TestCase):
     def setUp(self) -> None:
         self._graph = {'n1': [], 'n2': [], 'n3': [], 'n4': []}
         self._nodes = {'n1': None, 'n2': None, 'n3': None, 'n4': None}
-        self._links = {'c1': None, 'c2': None, 'c3': None}
+        self._links = {'l1': None, 'l2': None, 'l3': None, 'l4': None}
 
-    def test_init(self) -> None:
+    def test_init__graph_eq_dict__nodes_eq_dict__links_eq_dict(self) -> None:
         pipeline = Pipeline(
             'p1', 
             graph=self._graph, 
@@ -19,9 +19,28 @@ class TestPipeline(TestCase):
             tags=['t1']
         )
 
-        self.assertEqual(
-            pipeline.id, 'p1'
+        self.assertEqual(pipeline._id, 'p1')
+        self.assertDictEqual(
+            pipeline._graph, {'n1': [], 'n2': [], 'n3': [], 'n4': []}
         )
+        self.assertDictEqual(
+            pipeline._nodes, {'n1': None, 'n2': None, 'n3': None, 'n4': None}
+        )
+        self.assertDictEqual(
+            pipeline._links, {'l1': None, 'l2': None, 'l3': None, 'l4': None}
+        )
+        self.assertListEqual(pipeline._tags, ['t1'])
+
+    def test_get__graph_eq_dict__nodes_eq_dict__links_eq_dict(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            graph=self._graph, 
+            nodes=self._nodes, 
+            links=self._links, 
+            tags=['t1']
+        )
+
+        self.assertEqual(pipeline.id, 'p1')
         self.assertDictEqual(
             pipeline.graph, {'n1': [], 'n2': [], 'n3': [], 'n4': []}
         )
@@ -29,19 +48,29 @@ class TestPipeline(TestCase):
             pipeline.nodes, {'n1': None, 'n2': None, 'n3': None, 'n4': None}
         )
         self.assertDictEqual(
-            pipeline.links, {'c1': None, 'c2': None, 'c3': None}
+            pipeline.links, {'l1': None, 'l2': None, 'l3': None, 'l4': None}
         )
-        self.assertListEqual(
-            pipeline.tags, ['t1']
+        self.assertListEqual(pipeline.tags, ['t1'])
+
+    def test_set__graph_eq_dict__nodes_eq_dict__links_eq_dict(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            graph=self._graph, 
+            nodes=self._nodes, 
+            links=self._links, 
+            tags=['t1']
         )
+        pipeline.id = 'p2'
+        pipeline.graph = {'n5': []}
+        pipeline.nodes = {'n5': None}
+        pipeline.links = {'l5': None}
+        pipeline.tags = ['t2']
 
-    def test_defaults(self) -> None:
-        pipeline1 = Pipeline('p1')
-        pipeline2 = Pipeline('p2')
-
-        self.assertIsNot(pipeline1.graph, pipeline2.graph)
-        self.assertIsNot(pipeline1.nodes, pipeline2.nodes)
-        self.assertIsNot(pipeline1.links, pipeline2.links)
+        self.assertEqual(pipeline.id, 'p2')
+        self.assertDictEqual(pipeline.graph, {'n5': []})
+        self.assertDictEqual(pipeline.nodes, {'n5': None})
+        self.assertDictEqual(pipeline.links, {'l5': None})
+        self.assertListEqual(pipeline.tags, ['t2'])
 
     def test_add_inexistent_nodes(self) -> None:
         pipeline = Pipeline(
@@ -124,15 +153,16 @@ class TestPipeline(TestCase):
             links=None, 
             tags=None
         )
-        pipeline.add_link('c1', 'n1', 'n2', tags=None)
-        pipeline.add_link('c2', 'n1', 'n3', tags=None)
-        pipeline.add_link('c3', 'n2', 'n4', tags=None)
+        pipeline.add_link('l1', 'n1', 'n2', tags=None)
+        pipeline.add_link('l2', 'n1', 'n3', tags=None)
+        pipeline.add_link('l3', 'n2', 'n4', tags=None)
 
         self.assertListEqual(
-            list(pipeline.links.keys()), ['c1', 'c2', 'c3']
+            list(pipeline.links.keys()), ['l1', 'l2', 'l3']
         )
         self.assertListEqual(
-            [link.id for link in pipeline.links.values()], ['c1', 'c2', 'c3']
+            [link.id for link in pipeline.links.values()], 
+            ['l1', 'l2', 'l3']
         )
         self.assertListEqual(
             list(pipeline.graph.keys()), ['n1', 'n2', 'n3', 'n4']
@@ -149,13 +179,13 @@ class TestPipeline(TestCase):
             links=None, 
             tags=None
         )
-        pipeline.add_link('c1', 'n1', 'n2', tags=None)
-        pipeline.add_link('c2', 'n1', 'n3', tags=None)
+        pipeline.add_link('l1', 'n1', 'n2', tags=None)
+        pipeline.add_link('l2', 'n1', 'n3', tags=None)
 
         with self.assertRaisesRegex(
-            PipelineError, r'link_id found in the _links: link_id == c1'
+            PipelineError, r'link_id found in the _links: link_id == l1'
         ):
-            pipeline.add_link('c1', 'n2', 'n4', tags=None)
+            pipeline.add_link('l1', 'n2', 'n4', tags=None)
 
     def test_add_inexistent_links_with_inexistent_src_node(self) -> None:
         pipeline = Pipeline(
@@ -165,13 +195,13 @@ class TestPipeline(TestCase):
             links=None, 
             tags=None
         )
-        pipeline.add_link('c1', 'n1', 'n2', tags=None)
-        pipeline.add_link('c2', 'n1', 'n3', tags=None)
+        pipeline.add_link('l1', 'n1', 'n2', tags=None)
+        pipeline.add_link('l2', 'n1', 'n3', tags=None)
 
         with self.assertRaisesRegex(
             PipelineError, r'node_id not found in the _nodes: node_id == n7'
         ):
-            pipeline.add_link('c3', 'n7', 'n4', tags=None)
+            pipeline.add_link('l3', 'n7', 'n4', tags=None)
 
     def test_add_inexistent_links_with_inexistent_dst_node(self) -> None:
         pipeline = Pipeline(
@@ -181,13 +211,13 @@ class TestPipeline(TestCase):
             links=None, 
             tags=None
         )
-        pipeline.add_link('c1', 'n1', 'n2', tags=None)
-        pipeline.add_link('c2', 'n1', 'n3', tags=None)
+        pipeline.add_link('l1', 'n1', 'n2', tags=None)
+        pipeline.add_link('l2', 'n1', 'n3', tags=None)
 
         with self.assertRaisesRegex(
             PipelineError, r'node_id not found in the _nodes: node_id == n7'
         ):
-            pipeline.add_link('c3', 'n2', 'n7', tags=None)
+            pipeline.add_link('l3', 'n2', 'n7', tags=None)
 
     def test_check_existent_link_id(self) -> None:
         pipeline = Pipeline(
@@ -195,15 +225,15 @@ class TestPipeline(TestCase):
         )
 
         with self.assertRaisesRegex(
-            PipelineError, r'link_id found in the _links: link_id == c1'
+            PipelineError, r'link_id found in the _links: link_id == l1'
         ):
-            pipeline._check_existent_link_id('c1')
+            pipeline._check_existent_link_id('l1')
 
     def test_check_inexistent_link_id(self) -> None:
         pipeline = Pipeline(
             'p1', graph=None, nodes=None, links=None, tags=None
         )
-        pipeline._check_existent_link_id('c1')
+        pipeline._check_existent_link_id('l1')
 
         self.assertTrue(True)
 
