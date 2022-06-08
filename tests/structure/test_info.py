@@ -8,8 +8,22 @@ class TestInfo(TestCase):
     def test_init__id_eq_str__tags_eq_list(self) -> None:
         info = Info('i1', tags=['t1', 't2'])
 
+        self.assertEqual(info._id, 'i1')
+        self.assertListEqual(info._tags, ['t1', 't2'])
+
+    def test_get__id_eq_str__tags_eq_list(self) -> None:
+        info = Info('i1', tags=['t1', 't2'])
+
         self.assertEqual(info.id, 'i1')
         self.assertListEqual(info.tags, ['t1', 't2'])
+
+    def test_set__id_eq_str__tags_eq_list(self) -> None:
+        info = Info('i1', tags=['t1', 't2'])
+        info.id = 'i2'
+        info.tags = ['t3', 't4']
+
+        self.assertEqual(info.id, 'i2')
+        self.assertListEqual(info.tags, ['t3', 't4'])
 
     def test_check_id__id_eq_pattern(self) -> None:
         info = Info('i1')
