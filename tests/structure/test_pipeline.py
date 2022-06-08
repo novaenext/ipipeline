@@ -118,24 +118,6 @@ class TestPipeline(TestCase):
 
         self.assertFalse(checked)
 
-    def test_check_existent_node_id_aff(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=self._mock_nodes, links=None, tags=None
-        )
-
-        with self.assertRaisesRegex(
-            PipelineError, r'node_id found in the _nodes: node_id == n1'
-        ):
-            pipeline._check_existent_node_id('n1')
-
-    def test_check_inexistent_node_id_aff(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, links=None, tags=None
-        )
-        pipeline._check_existent_node_id('n1')
-
-        self.assertTrue(True)
-
     def test_add_link__id_eq_id__src_id_eq_id__dst_id_eq_id(self) -> None:
         pipeline = Pipeline(
             'p1', 
@@ -187,47 +169,3 @@ class TestPipeline(TestCase):
             PipelineError, r'dst_id was not found in the _nodes: dst_id == n3'
         ):
             pipeline.add_link('l1', 'n2', 'n3')
-
-    def test_check_existent_link_id(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, links=self._mock_links, tags=None
-        )
-
-        with self.assertRaisesRegex(
-            PipelineError, r'link_id found in the _links: link_id == l1'
-        ):
-            pipeline._check_existent_link_id('l1')
-
-    def test_check_inexistent_link_id(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, links=None, tags=None
-        )
-        pipeline._check_existent_link_id('l1')
-
-        self.assertTrue(True)
-
-    def test_check_inexistent_node_id_neg(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, links=None, tags=None
-        )
-
-        with self.assertRaisesRegex(
-            PipelineError, r'node_id not found in the _nodes: node_id == n1'
-        ):
-            pipeline._check_inexistent_node_id('n1')
-
-    def test_check_existent_node_id_neg(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=self._mock_nodes, links=None, tags=None
-        )
-        pipeline._check_inexistent_node_id('n1')
-
-        self.assertTrue(True)
-
-
-def mock_sum(param1: int, param2: int) -> int:
-    return param1 + param2
-
-
-def mock_sub(param1: int, param2: int) -> int:
-    return param1 - param2
