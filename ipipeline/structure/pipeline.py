@@ -181,32 +181,33 @@ class Pipeline(Info):
         id : str
             ID of the node.
         task : Callable
-            Task that represents an execution unit.
+            Task of the node.
         inputs : Dict[str, Any], optional
-            Inputs of the task. The keys are the function parameters and 
-            the values are any default values and/or placeholders for the 
-            catalog items.
+            Inputs of the task. The keys are the callable parameters and the 
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
 
-            'c.<item_id>': obtains a single item.
-            'c.[<item_id>, ..., <item_id>]': obtains multiple items.
+            Placeholders:
+                'c.<item_id>': gets an item.
+                'c.[<item_id>, ..., <item_id>]': gets a list of items.
         outputs : List[str], optional
-            Outputs of the task. The outputs must match the returns in 
-            terms of length. If one output is expected, the return can be of 
-            any type, however, in cases with more than one output, the returns 
-            must be a sequence.
+            Outputs of the task. The outputs must match the returns in terms 
+            of size.
         tags : List[str], optional
             Tags of the node to provide more context.
 
         Raises
         ------
-        PipelineError
-            Informs that the node_id was found in the _nodes.
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
+        PipelineError
+            Informs that the id was found in the _nodes.
         """
 
-        self._check_existent_node_id(id)
         node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
+
+        if self.check_node(node.id):
+            raise PipelineError('id was found in the _nodes', [f'id == {id}'])
 
         self._graph[node.id] = []
         self._nodes[node.id] = node
