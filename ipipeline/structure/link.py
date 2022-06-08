@@ -8,7 +8,7 @@ from ipipeline.structure.info import Info
 class Link(Info):
     """Stores a link between two nodes.
 
-    The link defines the dependency between the nodes.
+    The link represents the dependency between the nodes.
 
     Attributes
     ----------
