@@ -111,7 +111,7 @@ class Info:
             Informs that the id did not match the pattern.
         """
 
-        if re.fullmatch(r'[\w.-]+', id) is not None:
+        if id is not None and re.fullmatch(r'[\w.-]+', id) is not None:
             return id
         else:
             raise InfoError('id did not match the pattern', [f'id == {id}'])
