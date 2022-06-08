@@ -3,14 +3,14 @@
 from typing import Any, Callable, Dict, List
 
 from ipipeline.exceptions import PipelineError
-from ipipeline.structure.conn import Conn
 from ipipeline.structure.info import Info
+from ipipeline.structure.link import Link
 from ipipeline.structure.node import Node
 from ipipeline.utils.checking import check_none
 
 
 class Pipeline(Info):
-    """Stores a graph formed by nodes and their connections.
+    """Stores a graph formed by nodes and their links.
 
     The graph must be acyclic to be able to obtain its topological order 
     that is used to order the execution of the nodes.
@@ -26,9 +26,9 @@ class Pipeline(Info):
     _nodes : Dict[str, Node]
         Nodes of the graph. The keys are the node IDs and the values are 
         the node instances.
-    _conns : Dict[str, Conn]
-        Connections of the graph. The keys are the connection IDs and the 
-        values are the connection instances.
+    _links : Dict[str, Link]
+        Links of the graph. The keys are the link IDs and the values are 
+        the link instances.
     _tags : List[str]
         Tags of the pipeline to provide more context.
     """
@@ -38,7 +38,7 @@ class Pipeline(Info):
         id: str, 
         graph: Dict[str, list] = None,
         nodes: Dict[str, Node] = None, 
-        conns: Dict[str, Conn] = None, 
+        links: Dict[str, Link] = None, 
         tags: List[str] = None
     ) -> None:
         """Initializes the attributes.
@@ -47,17 +47,17 @@ class Pipeline(Info):
         ----------
         id : str
             ID of the pipeline.
-        graph : Dict[str, list], default=None
+        graph : Dict[str, list], optional
             Graph of the pipeline. The keys are the IDs of the source nodes 
             and the values are the dependencies formed by the IDs of the 
             destination nodes.
-        nodes : Dict[str, Node], default=None
+        nodes : Dict[str, Node], optional
             Nodes of the graph. The keys are the node IDs and the values are 
             the node instances.
-        conns : Dict[str, Conn], default=None
-            Connections of the graph. The keys are the connection IDs and the 
-            values are the connection instances.
-        tags : List[str], default=None
+        links : Dict[str, Link], optional
+            Links of the graph. The keys are the link IDs and the values are 
+            the link instances.
+        tags : List[str], optional
             Tags of the pipeline to provide more context.
 
         Raises
@@ -66,11 +66,11 @@ class Pipeline(Info):
             Informs that the id was not validated according to the pattern.
         """
 
+        super().__init__(id, tags=tags)
+
         self._graph = check_none(graph, {})
         self._nodes = check_none(nodes, {})
-        self._conns = check_none(conns, {})
-
-        super().__init__(id, tags=tags)
+        self._links = check_none(links, {})
 
     @property
     def graph(self) -> Dict[str, list]:
@@ -100,17 +100,17 @@ class Pipeline(Info):
         return self._nodes
 
     @property
-    def conns(self) -> Dict[str, Conn]:
-        """Obtains the _conns attribute.
+    def links(self) -> Dict[str, Link]:
+        """Obtains the _links attribute.
 
         Returns
         -------
-        conns : Dict[str, Conn]
-            Connections of the graph. The keys are the connection IDs and the 
-            values are the connection instances.
+        links : Dict[str, Link], optional
+            Links of the graph. The keys are the link IDs and the values are 
+            the link instances.
         """
 
-        return self._conns
+        return self._links
 
     def add_node(
         self, 
@@ -128,19 +128,19 @@ class Pipeline(Info):
             ID of the node.
         task : Callable
             Task that represents an execution unit.
-        inputs : Dict[str, Any], default=None
+        inputs : Dict[str, Any], optional
             Inputs of the task. The keys are the function parameters and 
             the values are any default values and/or placeholders for the 
             catalog items.
 
             'c.<item_id>': obtains a single item.
             'c.[<item_id>, ..., <item_id>]': obtains multiple items.
-        outputs : List[str], default=None
+        outputs : List[str], optional
             Outputs of the task. The outputs must match the returns in 
             terms of length. If one output is expected, the return can be of 
             any type, however, in cases with more than one output, the returns 
             must be a sequence.
-        tags : List[str], default=None
+        tags : List[str], optional
             Tags of the node to provide more context.
 
         Raises
@@ -176,64 +176,61 @@ class Pipeline(Info):
                 'node_id found in the _nodes', [f'node_id == {node_id}']
             )
 
-    def add_conn(
+    def add_link(
         self, 
         id: str, 
-        src_node_id: str, 
-        dst_node_id: str, 
-        power: Any = None, 
+        src_id: str, 
+        dst_id: str, 
         tags: List[str] = None
     ) -> None:
-        """Adds a connection in the graph.
+        """Adds a link in the graph.
 
         Parameters
         ----------
         id : str
-            ID of the connection.
-        src_node_id : str
+            ID of the link.
+        src_id : str
             ID of the source node.
-        dst_node_id : str
+        dst_id : str
             ID of the destination node.
-        power : Any
-            Power of the connection that indicates its strength.
-        tags : List[str]
-            Tags of the connection to provide more context.
+        tags : List[str], optional
+            Tags of the link to provide more context.
 
         Raises
         ------
         PipelineError
-            Informs that the conn_id was found in the _conns.
+            Informs that the link_id was found in the _link.
         PipelineError
             Informs that the node_id was not found in the _nodes.
         InfoError
             Informs that the id was not validated according to the pattern.
         """
 
-        self._check_existent_conn_id(id)
-        self._check_inexistent_node_id(src_node_id)
-        self._check_inexistent_node_id(dst_node_id)
-        conn = Conn(id, src_node_id, dst_node_id, power=power, tags=tags)
+        self._check_existent_link_id(id)
+        self._check_inexistent_node_id(src_id)
+        self._check_inexistent_node_id(dst_id)
+        link = Link(id, src_id, dst_id, tags=tags)
 
-        self._graph[conn.src_node_id].append(conn.dst_node_id)
-        self._conns[conn.id] = conn
+        self._graph[link.src_id].append(link.dst_id)
+        self._links[link.id] = link
 
-    def _check_existent_conn_id(self, conn_id: str) -> None:
-        """Checks if the connection ID exists.
+    def _check_existent_link_id(self, link_id: str) -> None:
+        """Checks if the link ID exists.
 
         Parameters
         ----------
-        conn_id : str
-            ID of the connection.
+        link_id : str
+            ID of the link.
 
         Raises
         ------
         PipelineError
-            Informs that the conn_id was found in the _conns.
+            Informs that the link_id was found in the _links.
         """
 
-        if conn_id in self._conns.keys():
+        if link_id in self._links.keys():
             raise PipelineError(
-                'conn_id found in the _conns', [f'conn_id == {conn_id}']
+                'link_id found in the _links', [f'link_id == {link_id}']
             )
 
     def _check_inexistent_node_id(self, node_id: str) -> None:
