@@ -7,7 +7,9 @@ from ipipeline.utils.checking import check_none
 
 
 class Node(Info):
-    """Stores a task and its inputs and outputs.
+    """Stores a node with its settings.
+
+    The node defines an executable unit.
 
     Attributes
     ----------
@@ -84,6 +86,18 @@ class Node(Info):
 
         return self._task
 
+    @task.setter
+    def task(self, task: Callable) -> None:
+        """Sets the _task attribute.
+
+        Parameters
+        ----------
+        task : Callable
+            Task of the node.
+        """
+
+        self._task = task
+
     @property
     def inputs(self) -> Dict[str, Any]:
         """Gets the _inputs attribute.
@@ -102,6 +116,24 @@ class Node(Info):
 
         return self._inputs
 
+    @inputs.setter
+    def inputs(self, inputs: Dict[str, Any]) -> None:
+        """Sets the _inputs attribute.
+
+        Parameters
+        ----------
+        inputs : Dict[str, Any]
+            Inputs of the task. The keys are the callable parameters and the 
+            items are the data required for the parameters. The items can also 
+            be placeholders for the catalog items.
+
+            Placeholders:
+                'c.<item_id>': gets an item.
+                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        """
+
+        self._inputs = inputs
+
     @property
     def outputs(self) -> List[str]:
         """Gets the _outputs attribute.
@@ -114,3 +146,16 @@ class Node(Info):
         """
 
         return self._outputs
+
+    @outputs.setter
+    def outputs(self, outputs: List[str]) -> None:
+        """Sets the _outputs attribute.
+
+        Parameters
+        ----------
+        outputs : List[str]
+            Outputs of the task. The outputs must match the returns in terms 
+            of size.
+        """
+
+        self._outputs = outputs
