@@ -10,25 +10,24 @@ from ipipeline.utils.checking import check_none
 
 
 class Pipeline(Info):
-    """Stores a graph formed by nodes and their links.
+    """Stores a pipeline composed of nodes and links.
 
-    The graph must be acyclic to be able to obtain its topological order 
-    that is used to order the execution of the nodes.
+    The pipeline represents the graph that must be directed and acyclic in 
+    order to obtain the topological order.
 
     Attributes
     ----------
     _id : str
         ID of the pipeline.
     _graph : Dict[str, list]
-        Graph of the pipeline. The keys are the IDs of the source nodes 
-        and the values are the dependencies formed by the IDs of the 
-        destination nodes.
+        Graph of the pipeline. The keys are the source node IDs and the 
+        values are a list of destination node IDs.
     _nodes : Dict[str, Node]
         Nodes of the graph. The keys are the node IDs and the values are 
-        the node instances.
+        the nodes.
     _links : Dict[str, Link]
         Links of the graph. The keys are the link IDs and the values are 
-        the link instances.
+        the links.
     _tags : List[str]
         Tags of the pipeline to provide more context.
     """
@@ -48,22 +47,21 @@ class Pipeline(Info):
         id : str
             ID of the pipeline.
         graph : Dict[str, list], optional
-            Graph of the pipeline. The keys are the IDs of the source nodes 
-            and the values are the dependencies formed by the IDs of the 
-            destination nodes.
+            Graph of the pipeline. The keys are the source node IDs and the 
+            values are a list of destination node IDs.
         nodes : Dict[str, Node], optional
             Nodes of the graph. The keys are the node IDs and the values are 
-            the node instances.
+            the nodes.
         links : Dict[str, Link], optional
             Links of the graph. The keys are the link IDs and the values are 
-            the link instances.
+            the links.
         tags : List[str], optional
             Tags of the pipeline to provide more context.
 
         Raises
         ------
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
         """
 
         super().__init__(id, tags=tags)
@@ -74,43 +72,81 @@ class Pipeline(Info):
 
     @property
     def graph(self) -> Dict[str, list]:
-        """Obtains the _graph attribute.
+        """Gets the _graph attribute.
 
         Returns
         -------
         graph : Dict[str, list]
-            Graph of the pipeline. The keys are the IDs of the source nodes 
-            and the values are the dependencies formed by the IDs of the 
-            destination nodes.
+            Graph of the pipeline. The keys are the source node IDs and the 
+            values are a list of destination node IDs.
         """
 
         return self._graph
 
+    @graph.setter
+    def graph(self, graph: Dict[str, list]) -> None:
+        """Sets the _graph attribute.
+
+        Parameters
+        ----------
+        graph : Dict[str, list]
+            Graph of the pipeline. The keys are the source node IDs and the 
+            values are a list of destination node IDs.
+        """
+
+        self._graph = graph
+
     @property
     def nodes(self) -> Dict[str, Node]:
-        """Obtains the _nodes attribute.
+        """Gets the _nodes attribute.
 
         Returns
         -------
         nodes : Dict[str, Node]
             Nodes of the graph. The keys are the node IDs and the values are 
-            the node instances.
+            the nodes.
         """
 
         return self._nodes
 
+    @nodes.setter
+    def nodes(self, nodes: Dict[str, Node]) -> None:
+        """Sets the _nodes attribute.
+
+        Parameters
+        ----------
+        nodes : Dict[str, Node]
+            Nodes of the graph. The keys are the node IDs and the values are 
+            the nodes.
+        """
+
+        self._nodes = nodes
+
     @property
     def links(self) -> Dict[str, Link]:
-        """Obtains the _links attribute.
+        """Gets the _links attribute.
 
         Returns
         -------
-        links : Dict[str, Link], optional
+        links : Dict[str, Link]
             Links of the graph. The keys are the link IDs and the values are 
-            the link instances.
+            the links.
         """
 
         return self._links
+
+    @links.setter
+    def links(self, links: Dict[str, Link]) -> None:
+        """Sets the _links attribute.
+
+        Parameters
+        ----------
+        links : Dict[str, Link]
+            Links of the graph. The keys are the link IDs and the values are 
+            the links.
+        """
+
+        self._links = links
 
     def add_node(
         self, 
