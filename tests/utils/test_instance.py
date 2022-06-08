@@ -9,34 +9,34 @@ from ipipeline.utils.instance import build_repr, get_inst
 class MockClass1:
     def __init__(
         self, 
-        param1: int, 
-        param2: str, 
-        param3: List[int] = [3], 
-        param4: List[str] = ['4']
+        arg1: int, 
+        arg2: str, 
+        arg3: List[int] = [3], 
+        arg4: List[str] = ['4']
     ) -> None:
-        self._param1 = param1
-        self._param2 = param2
-        self.param3 = param3
-        self.param4 = param4
+        self._arg1 = arg1
+        self._arg2 = arg2
+        self.arg3 = arg3
+        self.arg4 = arg4
 
 
 class MockClass2:
     def __init__(
         self, 
-        param1: int, 
-        param2: str, 
-        param3: List[int] = [3], 
-        param4: List[str] = ['4']
+        arg1: int, 
+        arg2: str, 
+        arg3: List[int] = [3], 
+        arg4: List[str] = ['4']
     ) -> None:
         pass
 
 
 class MockClass3:
     def __init__(self) -> None:
-        self._param1 = 1
-        self._param2 = '2'
-        self.param3 = [3]
-        self.param4 = ['4']
+        self._arg1 = 1
+        self._arg2 = '2'
+        self.arg3 = [3]
+        self.arg4 = ['4']
 
 
 class MockClass4:
@@ -45,28 +45,28 @@ class MockClass4:
 
 
 class TestBuildRepr(TestCase):
-    def test_build_repr__inst_eq_mock_wi_params_wi_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wi_args_wi_attrs(self) -> None:
         repr = build_repr(MockClass1(1, '2'))
 
         self.assertEqual(
             repr, 
-            'MockClass1(param1=1, param2=\'2\', param3=[3], param4=[\'4\'])'
+            'MockClass1(arg1=1, arg2=\'2\', arg3=[3], arg4=[\'4\'])'
         )
 
-    def test_build_repr__inst_eq_mock_wi_params_wo_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wi_args_wo_attrs(self) -> None:
         repr = build_repr(MockClass2(1, '2'))
 
         self.assertEqual(
             repr, 
-            'MockClass2(param1=None, param2=None, param3=None, param4=None)'
+            'MockClass2(arg1=None, arg2=None, arg3=None, arg4=None)'
         )
 
-    def test_build_repr__inst_eq_mock_wo_params_wi_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wo_args_wi_attrs(self) -> None:
         repr = build_repr(MockClass3())
 
         self.assertEqual(repr, 'MockClass3()')
 
-    def test_build_repr__inst_eq_mock_wo_params_wo_attrs(self) -> None:
+    def test_build_repr__inst_eq_mock_wo_args_wo_attrs(self) -> None:
         repr = build_repr(MockClass4())
 
         self.assertEqual(repr, 'MockClass4()')
