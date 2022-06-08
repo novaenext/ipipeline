@@ -231,6 +231,24 @@ class Pipeline(Info):
                 'node_id found in the _nodes', [f'node_id == {node_id}']
             )
 
+    def check_link(self, id: str) -> bool:
+        """Checks if a link exists.
+
+        Parameters
+        ----------
+        id : str
+            ID of the link.
+
+        Returns
+        -------
+        checked : bool
+            Flag that indicates if a link exists.
+        """
+
+        checked = id in self._links.keys()
+
+        return checked
+
     def add_link(
         self, 
         id: str, 
