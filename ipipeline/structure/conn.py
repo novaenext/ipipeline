@@ -6,17 +6,17 @@ from ipipeline.structure.info import Info
 
 
 class Conn(Info):
-    """Stores a relation between two nodes.
+    """Stores a connection between two nodes.
 
-    The relation defines the dependency between the nodes.
+    The connection defines the dependency between the nodes.
 
     Attributes
     ----------
     _id : str
         ID of the connection.
-    _src_node_id : str
+    _src_id : str
         ID of the source node.
-    _dst_node_id : str
+    _dst_id : str
         ID of the destination node.
     _tags : List[str]
         Tags of the connection to provide more context.
@@ -25,8 +25,8 @@ class Conn(Info):
     def __init__(
         self, 
         id: str, 
-        src_node_id: str, 
-        dst_node_id: str, 
+        src_id: str, 
+        dst_id: str, 
         tags: List[str] = None
     ) -> None:
         """Initializes the attributes.
@@ -35,9 +35,9 @@ class Conn(Info):
         ----------
         id : str
             ID of the connection.
-        src_node_id : str
+        src_id : str
             ID of the source node.
-        dst_node_id : str
+        dst_id : str
             ID of the destination node.
         tags : List[str], optional
             Tags of the connection to provide more context.
@@ -50,29 +50,29 @@ class Conn(Info):
 
         super().__init__(id, tags=tags)
 
-        self._src_node_id = src_node_id
-        self._dst_node_id = dst_node_id
+        self._src_id = src_id
+        self._dst_id = dst_id
 
     @property
-    def src_node_id(self) -> str:
-        """Gets the _src_node_id attribute.
+    def src_id(self) -> str:
+        """Gets the _src_id attribute.
 
         Returns
         -------
-        src_node_id : str
+        src_id : str
             ID of the source node.
         """
 
-        return self._src_node_id
+        return self._src_id
 
     @property
-    def dst_node_id(self) -> str:
-        """Gets the _dst_node_id attribute.
+    def dst_id(self) -> str:
+        """Gets the _dst_id attribute.
 
         Returns
         -------
-        dst_node_id : str
+        dst_id : str
             ID of the destination node.
         """
 
-        return self._dst_node_id
+        return self._dst_id
