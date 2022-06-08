@@ -53,6 +53,18 @@ class Info:
 
         return self._id
 
+    @id.setter
+    def id(self, id: str) -> None:
+        """Sets the _id attribute.
+
+        Parameters
+        ----------
+        id : str
+            ID of the instance.
+        """
+
+        self._id = id
+
     @property
     def tags(self) -> List[str]:
         """Gets the _tags attribute.
@@ -64,6 +76,18 @@ class Info:
         """
 
         return self._tags
+
+    @tags.setter
+    def tags(self, tags: List[str]) -> None:
+        """Sets the _tags attribute.
+
+        Parameters
+        ----------
+        tags : List[str]
+            Tags of the instance to provide more context.
+        """
+
+        self._tags = tags
 
     def _check_id(self, id: str) -> str:
         """Checks if the ID matches a pattern.
