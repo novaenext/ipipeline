@@ -9,7 +9,7 @@ from ipipeline.utils.checking import check_none
 class Node(Info):
     """Stores a node with its settings.
 
-    The node defines an executable unit.
+    The node represents an executable unit.
 
     Attributes
     ----------
@@ -19,7 +19,7 @@ class Node(Info):
         Task of the node.
     _inputs : Dict[str, Any], optional
         Inputs of the task. The keys are the callable parameters and the 
-        items are the data required for the parameters. The items can also 
+        values are the data required for the parameters. The values can also 
         be placeholders for the catalog items.
 
         Placeholders:
@@ -50,8 +50,8 @@ class Node(Info):
             Task of the node.
         inputs : Dict[str, Any], optional
             Inputs of the task. The keys are the callable parameters and the 
-            items are the data required for the parameters. The items can also 
-            be placeholders for the catalog items.
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
 
             Placeholders:
                 'c.<item_id>': gets an item.
@@ -106,8 +106,8 @@ class Node(Info):
         -------
         inputs : Dict[str, Any]
             Inputs of the task. The keys are the callable parameters and the 
-            items are the data required for the parameters. The items can also 
-            be placeholders for the catalog items.
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
 
             Placeholders:
                 'c.<item_id>': gets an item.
@@ -124,8 +124,8 @@ class Node(Info):
         ----------
         inputs : Dict[str, Any]
             Inputs of the task. The keys are the callable parameters and the 
-            items are the data required for the parameters. The items can also 
-            be placeholders for the catalog items.
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
 
             Placeholders:
                 'c.<item_id>': gets an item.
