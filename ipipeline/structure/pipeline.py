@@ -207,7 +207,9 @@ class Pipeline(Info):
         node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
 
         if self.check_node(node.id):
-            raise PipelineError('id was found in the _nodes', [f'id == {id}'])
+            raise PipelineError(
+                'id was found in the _nodes', [f'id == {node.id}']
+            )
 
         self._graph[node.id] = []
         self._nodes[node.id] = node
@@ -271,18 +273,34 @@ class Pipeline(Info):
 
         Raises
         ------
-        PipelineError
-            Informs that the link_id was found in the _link.
-        PipelineError
-            Informs that the node_id was not found in the _nodes.
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
+        PipelineError
+            Informs that the id was found in the _links.
+        PipelineError
+            Informs that the src_id was not found in the _nodes.
+        PipelineError
+            Informs that the dst_id was not found in the _nodes.
         """
 
-        self._check_existent_link_id(id)
-        self._check_inexistent_node_id(src_id)
-        self._check_inexistent_node_id(dst_id)
         link = Link(id, src_id, dst_id, tags=tags)
+
+        if self.check_link(link.id):
+            raise PipelineError(
+                'id was found in the _links', [f'id == {link.id}']
+            )
+
+        if not self.check_node(link.src_id):
+            raise PipelineError(
+                'src_id was not found in the _nodes', 
+                [f'src_id == {link.src_id}']
+            )
+
+        if not self.check_node(link.dst_id):
+            raise PipelineError(
+                'dst_id was not found in the _nodes', 
+                [f'dst_id == {link.dst_id}']
+            )
 
         self._graph[link.src_id].append(link.dst_id)
         self._links[link.id] = link
