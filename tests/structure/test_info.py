@@ -47,6 +47,14 @@ class TestInfo(TestCase):
         ):
             _ = info._check_id('')
 
+    def test_check_id__id_eq_none(self) -> None:
+        info = Info('i1')
+
+        with self.assertRaisesRegex(
+            InfoError, r'id did not match the pattern: id == None'
+        ):
+            _ = info._check_id(None)
+
     def test_repr(self) -> None:
         info = Info('i1', tags=['t1', 't2'])
         repr = info.__repr__()
