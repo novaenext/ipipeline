@@ -131,47 +131,6 @@ class Pipeline(Info):
 
         return checked
 
-    def add_node(
-        self, 
-        id: str, 
-        task: Callable, 
-        inputs: Dict[str, Any] = None, 
-        outputs: List[str] = None, 
-        tags: List[str] = None
-    ) -> None:
-        """Adds a node.
-
-        Parameters
-        ----------
-        id : str
-            ID of the node.
-        task : Callable
-            Task of the node.
-        inputs : Dict[str, Any], optional
-            Inputs of the task. The keys are the callable parameters and the 
-            values are the data required for the parameters. The values can 
-            also be placeholders for the catalog items.
-
-            Placeholders:
-                'c.<item_id>': gets an item.
-                'c.[<item_id>, ..., <item_id>]': gets a list of items.
-        outputs : List[str], optional
-            Outputs of the task. The outputs must match the returns in terms 
-            of size.
-        tags : List[str], optional
-            Tags of the node to provide more context.
-
-        Raises
-        ------
-        InfoError
-            Informs that the id did not match the pattern.
-        PipelineError
-            Informs that the id was found in the _nodes.
-        """
-
-        node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
-        self.set_node(node)
-
     def get_node(self, id: str) -> Node:
         """Gets a node.
 
@@ -241,6 +200,47 @@ class Pipeline(Info):
             raise PipelineError(
                 'id was not found in the _nodes', [f'id == {id}']
             ) from error
+
+    def add_node(
+        self, 
+        id: str, 
+        task: Callable, 
+        inputs: Dict[str, Any] = None, 
+        outputs: List[str] = None, 
+        tags: List[str] = None
+    ) -> None:
+        """Adds a node.
+
+        Parameters
+        ----------
+        id : str
+            ID of the node.
+        task : Callable
+            Task of the node.
+        inputs : Dict[str, Any], optional
+            Inputs of the task. The keys are the callable parameters and the 
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
+
+            Placeholders:
+                'c.<item_id>': gets an item.
+                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        outputs : List[str], optional
+            Outputs of the task. The outputs must match the returns in terms 
+            of size.
+        tags : List[str], optional
+            Tags of the node to provide more context.
+
+        Raises
+        ------
+        InfoError
+            Informs that the id did not match the pattern.
+        PipelineError
+            Informs that the id was found in the _nodes.
+        """
+
+        node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
+        self.set_node(node)
 
     def check_link(self, id: str) -> bool:
         """Checks if a link exists.
