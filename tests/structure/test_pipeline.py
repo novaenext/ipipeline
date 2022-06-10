@@ -1,39 +1,40 @@
 from unittest import TestCase
 
 from ipipeline.exceptions import PipelineError
+from ipipeline.structure.link import Link
+from ipipeline.structure.node import Node
 from ipipeline.structure.pipeline import Pipeline
 
 
 class TestPipeline(TestCase):
     def setUp(self) -> None:
-        self._mock_nodes = {'n1': None, 'n2': None}
-        self._mock_links = {'l1': None}
-        self._mock_node = object()
-        self._mock_task = [lambda arg1, arg2: arg1 + arg2]
+        self._nodes = {'n1': Node('n1', None), 'n2': Node('n2', None)}
+        self._links = {'l1': Link('l1', 'n1', 'n2')}
+        self._task = [lambda arg1, arg2: arg1 + arg2]
 
     def test_init__nodes_eq_dict__links_eq_dict(self) -> None:
         pipeline = Pipeline(
-            'p1', nodes=self._mock_nodes, links=self._mock_links, tags=['t1']
+            'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
 
         self.assertEqual(pipeline._id, 'p1')
-        self.assertDictEqual(pipeline._nodes, {'n1': None, 'n2': None})
-        self.assertDictEqual(pipeline._links, {'l1': None})
+        self.assertDictEqual(pipeline._nodes, self._nodes)
+        self.assertDictEqual(pipeline._links, self._links)
         self.assertListEqual(pipeline._tags, ['t1'])
 
     def test_get__nodes_eq_dict__links_eq_dict(self) -> None:
         pipeline = Pipeline(
-            'p1', nodes=self._mock_nodes, links=self._mock_links, tags=['t1']
+            'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
 
         self.assertEqual(pipeline.id, 'p1')
-        self.assertDictEqual(pipeline.nodes, {'n1': None, 'n2': None})
-        self.assertDictEqual(pipeline.links, {'l1': None})
+        self.assertDictEqual(pipeline.nodes, self._nodes)
+        self.assertDictEqual(pipeline.links, self._links)
         self.assertListEqual(pipeline.tags, ['t1'])
 
     def test_set__nodes_eq_dict__links_eq_dict(self) -> None:
         pipeline = Pipeline(
-            'p1', nodes=self._mock_nodes, links=self._mock_links, tags=['t1']
+            'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
         pipeline.id = 'p2'
         pipeline.nodes = {'n3': None}
@@ -46,7 +47,7 @@ class TestPipeline(TestCase):
         self.assertListEqual(pipeline.tags, ['t2'])
 
     def test_check_node__id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
+        pipeline = Pipeline('p1', nodes=self._nodes)
         checked = pipeline.check_node('n1')
 
         self.assertTrue(checked)
@@ -57,38 +58,11 @@ class TestPipeline(TestCase):
 
         self.assertFalse(checked)
 
-    def test_add_node__id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
-
-        with self.assertRaisesRegex(
-            PipelineError, r'id was found in the _nodes: id == n1'
-        ):
-            pipeline.add_node(
-                'n1', 
-                self._mock_task, 
-                inputs={'arg1': 2, 'arg2': 4}, 
-                outputs=['sum']
-            )
-
-    def test_add_node__id_ne_id(self) -> None:
-        pipeline = Pipeline('p1')
-        pipeline.add_node(
-            'n1', 
-            self._mock_task, 
-            inputs={'arg1': 2, 'arg2': 4}, 
-            outputs=['sum']
-        )
-
-        self.assertListEqual(list(pipeline.nodes.keys()), ['n1'])
-        self.assertListEqual(
-            [node.id for node in pipeline.nodes.values()], ['n1']
-        )
-
     def test_get_node__id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
+        pipeline = Pipeline('p1', nodes=self._nodes)
         node = pipeline.get_node('n1')
 
-        self.assertEqual(node, None)
+        self.assertEqual(node, self._nodes['n1'])
 
     def test_get_node__id_ne_id(self) -> None:
         pipeline = Pipeline('p1')
@@ -99,19 +73,21 @@ class TestPipeline(TestCase):
             _ = pipeline.get_node('n1')
 
     def test_set_node__id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
-        pipeline.set_node('n1', self._mock_node)
+        pipeline = Pipeline('p1', nodes=self._nodes)
 
-        self.assertEqual(pipeline._nodes['n1'], self._mock_node)
+        with self.assertRaisesRegex(
+            PipelineError, r'id was found in the _nodes: id == n1'
+        ):
+            pipeline.set_node(self._nodes['n1'])
 
     def test_set_node__id_ne_id(self) -> None:
         pipeline = Pipeline('p1')
-        pipeline.set_node('n1', self._mock_node)
+        pipeline.set_node(self._nodes['n1'])
 
-        self.assertEqual(pipeline._nodes['n1'], self._mock_node)
+        self.assertEqual(pipeline._nodes['n1'], self._nodes['n1'])
 
     def test_delete_node__id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
+        pipeline = Pipeline('p1', nodes=self._nodes)
         pipeline.delete_node('n1')
 
         self.assertEqual(list(pipeline._nodes.keys()), ['n2'])
@@ -124,8 +100,35 @@ class TestPipeline(TestCase):
         ):
             pipeline.delete_node('n1')
 
+    def test_add_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was found in the _nodes: id == n1'
+        ):
+            pipeline.add_node(
+                'n1', 
+                self._task, 
+                inputs={'arg1': 2, 'arg2': 4}, 
+                outputs=['sum']
+            )
+
+    def test_add_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline.add_node(
+            'n1', 
+            self._task, 
+            inputs={'arg1': 2, 'arg2': 4}, 
+            outputs=['sum']
+        )
+
+        self.assertListEqual(list(pipeline.nodes.keys()), ['n1'])
+        self.assertListEqual(
+            [node.id for node in pipeline.nodes.values()], ['n1']
+        )
+
     def test_check_link__id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', links=self._mock_links)
+        pipeline = Pipeline('p1', links=self._links)
         checked = pipeline.check_link('l1')
 
         self.assertTrue(checked)
@@ -138,7 +141,7 @@ class TestPipeline(TestCase):
 
     def test_add_link__id_eq_id__src_id_eq_id__dst_id_eq_id(self) -> None:
         pipeline = Pipeline(
-            'p1', nodes=self._mock_nodes, links=self._mock_links
+            'p1', nodes=self._nodes, links=self._links
         )
 
         with self.assertRaisesRegex(
@@ -147,7 +150,7 @@ class TestPipeline(TestCase):
             pipeline.add_link('l1', 'n1', 'n2')
 
     def test_add_link__id_ne_id__src_id_eq_id__dst_id_eq_id(self) -> None:
-        pipeline = Pipeline('p1',  nodes=self._mock_nodes)
+        pipeline = Pipeline('p1',  nodes=self._nodes)
         pipeline.add_link('l1', 'n1', 'n2')
 
         self.assertListEqual(list(pipeline.links.keys()), ['l1'])
@@ -156,7 +159,7 @@ class TestPipeline(TestCase):
         )
 
     def test_add_link__id_ne_id__src_id_ne_id__dst_id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
+        pipeline = Pipeline('p1', nodes=self._nodes)
 
         with self.assertRaisesRegex(
             PipelineError, r'src_id was not found in the _nodes: src_id == n0'
@@ -164,7 +167,7 @@ class TestPipeline(TestCase):
             pipeline.add_link('l1', 'n0', 'n1')
 
     def test_add_link__id_ne_id__src_id_eq_id__dst_id_ne_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._mock_nodes)
+        pipeline = Pipeline('p1', nodes=self._nodes)
 
         with self.assertRaisesRegex(
             PipelineError, r'dst_id was not found in the _nodes: dst_id == n3'
