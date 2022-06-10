@@ -214,6 +214,29 @@ class Pipeline(Info):
         self._graph[node.id] = []
         self._nodes[node.id] = node
 
+    def get_node(self, id: str) -> Node:
+        """Gets a node.
+
+        Parameters
+        ----------
+        id : str
+            ID of the node.
+
+        Returns
+        -------
+        node : Node
+            Node that represents an executable unit.
+        """
+
+        try:
+            node = self._nodes[id]
+
+            return node
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _nodes', [f'id == {id}']
+            ) from error
+
     def check_link(self, id: str) -> bool:
         """Checks if a link exists.
 
