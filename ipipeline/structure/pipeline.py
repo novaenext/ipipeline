@@ -356,29 +356,7 @@ class Pipeline(Info):
             Informs that the id did not match the pattern.
         PipelineError
             Informs that the id was found in the _links.
-        PipelineError
-            Informs that the src_id was not found in the _nodes.
-        PipelineError
-            Informs that the dst_id was not found in the _nodes.
         """
 
         link = Link(id, src_id, dst_id, tags=tags)
-
-        if self.check_link(link.id):
-            raise PipelineError(
-                'id was found in the _links', [f'id == {link.id}']
-            )
-
-        if not self.check_node(link.src_id):
-            raise PipelineError(
-                'src_id was not found in the _nodes', 
-                [f'src_id == {link.src_id}']
-            )
-
-        if not self.check_node(link.dst_id):
-            raise PipelineError(
-                'dst_id was not found in the _nodes', 
-                [f'dst_id == {link.dst_id}']
-            )
-
-        self._links[link.id] = link
+        self.set_link(link)
