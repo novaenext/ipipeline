@@ -260,6 +260,34 @@ class Pipeline(Info):
 
         return checked
 
+    def get_link(self, id: str) -> Link:
+        """Gets a link.
+
+        Parameters
+        ----------
+        id : str
+            ID of the link.
+
+        Returns
+        -------
+        link : Link
+            Link that represents the dependency between the nodes of the graph.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _links.
+        """
+
+        try:
+            link = self._links[id]
+
+            return link
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _links', [f'id == {id}']
+            ) from error
+
     def add_link(
         self, 
         id: str, 
