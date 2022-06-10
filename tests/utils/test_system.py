@@ -7,7 +7,7 @@ from ipipeline.utils.system import build_directory, build_file
 
 class TestBuildDirectory(TestCase):
     def setUp(self) -> None:
-        self._path = Path(__file__).resolve().parents[0] / 'mock_dir'
+        self._path = Path(__file__).resolve().parents[0] / 'dir'
 
     def tearDown(self) -> None:
         if self._path.exists():
@@ -30,12 +30,12 @@ class TestBuildDirectory(TestCase):
         with self.assertRaisesRegex(
             SystemError, r'path was not found in the file system: path == *'
         ):
-            build_directory(str(self._path / 'mock_dir'))
+            build_directory(str(self._path / 'dir'))
 
 
 class TestBuildFile(TestCase):
     def setUp(self) -> None:
-        self._path = Path(__file__).resolve().parents[0] / 'mock_file'
+        self._path = Path(__file__).resolve().parents[0] / 'file'
 
     def tearDown(self) -> None:
         if self._path.exists():
@@ -58,4 +58,4 @@ class TestBuildFile(TestCase):
         with self.assertRaisesRegex(
             SystemError, r'path was not found in the file system: path == *'
         ):
-            build_file(str(self._path / 'mock_file'))
+            build_file(str(self._path / 'file'))
