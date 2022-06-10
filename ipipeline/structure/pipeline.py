@@ -309,6 +309,27 @@ class Pipeline(Info):
 
         self._links[link.id] = link
 
+    def delete_link(self, id: str) -> None:
+        """Deletes a link.
+
+        Parameters
+        ----------
+        id : str
+            ID of the link.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _links.
+        """
+
+        try:
+            del self._links[id]
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _links', [f'id == {id}']
+            ) from error
+
     def add_link(
         self, 
         id: str, 
