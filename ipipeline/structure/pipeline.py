@@ -12,16 +12,12 @@ from ipipeline.utils.checking import check_none
 class Pipeline(Info):
     """Stores a pipeline composed of nodes and links.
 
-    The pipeline represents the graph that must be directed and acyclic in 
-    order to obtain the topological order.
+    The links between the nodes must compose a directed acyclic graph.
 
     Attributes
     ----------
     _id : str
         ID of the pipeline.
-    _graph : Dict[str, list]
-        Graph of the pipeline. The keys are the source node IDs and the 
-        values are a list of destination node IDs.
     _nodes : Dict[str, Node]
         Nodes of the graph. The keys are the node IDs and the values are 
         the nodes.
@@ -35,7 +31,6 @@ class Pipeline(Info):
     def __init__(
         self, 
         id: str, 
-        graph: Dict[str, list] = None,
         nodes: Dict[str, Node] = None, 
         links: Dict[str, Link] = None, 
         tags: List[str] = None
@@ -46,9 +41,6 @@ class Pipeline(Info):
         ----------
         id : str
             ID of the pipeline.
-        graph : Dict[str, list], optional
-            Graph of the pipeline. The keys are the source node IDs and the 
-            values are a list of destination node IDs.
         nodes : Dict[str, Node], optional
             Nodes of the graph. The keys are the node IDs and the values are 
             the nodes.
@@ -66,35 +58,8 @@ class Pipeline(Info):
 
         super().__init__(id, tags=tags)
 
-        self._graph = check_none(graph, {})
         self._nodes = check_none(nodes, {})
         self._links = check_none(links, {})
-
-    @property
-    def graph(self) -> Dict[str, list]:
-        """Gets the _graph attribute.
-
-        Returns
-        -------
-        graph : Dict[str, list]
-            Graph of the pipeline. The keys are the source node IDs and the 
-            values are a list of destination node IDs.
-        """
-
-        return self._graph
-
-    @graph.setter
-    def graph(self, graph: Dict[str, list]) -> None:
-        """Sets the _graph attribute.
-
-        Parameters
-        ----------
-        graph : Dict[str, list]
-            Graph of the pipeline. The keys are the source node IDs and the 
-            values are a list of destination node IDs.
-        """
-
-        self._graph = graph
 
     @property
     def nodes(self) -> Dict[str, Node]:
@@ -211,7 +176,6 @@ class Pipeline(Info):
                 'id was found in the _nodes', [f'id == {node.id}']
             )
 
-        self._graph[node.id] = []
         self._nodes[node.id] = node
 
     def get_node(self, id: str) -> Node:
@@ -345,5 +309,4 @@ class Pipeline(Info):
                 [f'dst_id == {link.dst_id}']
             )
 
-        self._graph[link.src_id].append(link.dst_id)
         self._links[link.id] = link
