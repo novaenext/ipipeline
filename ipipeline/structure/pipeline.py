@@ -237,6 +237,19 @@ class Pipeline(Info):
                 'id was not found in the _nodes', [f'id == {id}']
             ) from error
 
+    def set_node(self, id: str, node: Node) -> None:
+        """Sets a node.
+
+        Parameters
+        ----------
+        id : str
+            ID of the node.
+        node : Node
+            Node that represents an executable unit.
+        """
+
+        self._nodes[id] = node
+
     def check_link(self, id: str) -> bool:
         """Checks if a link exists.
 
