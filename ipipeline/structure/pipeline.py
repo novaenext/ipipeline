@@ -209,7 +209,7 @@ class Pipeline(Info):
         outputs: List[str] = None, 
         tags: List[str] = None
     ) -> None:
-        """Adds a node.
+        """Adds a node through its settings.
 
         Parameters
         ----------
@@ -288,6 +288,27 @@ class Pipeline(Info):
                 'id was not found in the _links', [f'id == {id}']
             ) from error
 
+    def set_link(self, link: Link) -> None:
+        """Sets a link.
+
+        Parameters
+        ----------
+        link : Link
+            Link that represents the dependency between the nodes of the graph.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was found in the _links.
+        """
+
+        if self.check_link(link.id):
+            raise PipelineError(
+                'id was found in the _links', [f'id == {link.id}']
+            )
+
+        self._links[link.id] = link
+
     def add_link(
         self, 
         id: str, 
@@ -295,7 +316,7 @@ class Pipeline(Info):
         dst_id: str, 
         tags: List[str] = None
     ) -> None:
-        """Adds a link in the graph.
+        """Adds a link through its settings.
 
         Parameters
         ----------
