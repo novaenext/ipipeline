@@ -106,6 +106,20 @@ class TestPipeline(TestCase):
             [node.id for node in pipeline.nodes.values()], ['n1']
         )
 
+    def test_get_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._mock_nodes)
+        node = pipeline.get_node('n1')
+
+        self.assertEqual(node, None)
+
+    def test_get_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was not found in the _nodes: id == n1'
+        ):
+            _ = pipeline.get_node('n1')
+
     def test_check_link__id_eq_id(self) -> None:
         pipeline = Pipeline('p1', links=self._mock_links)
         checked = pipeline.check_link('l1')
