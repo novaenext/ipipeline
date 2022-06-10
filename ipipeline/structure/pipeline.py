@@ -226,6 +226,11 @@ class Pipeline(Info):
         -------
         node : Node
             Node that represents an executable unit.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _nodes.
         """
 
         try:
@@ -249,6 +254,27 @@ class Pipeline(Info):
         """
 
         self._nodes[id] = node
+
+    def delete_node(self, id: str) -> None:
+        """Deletes a node.
+
+        Parameters
+        ----------
+        id : str
+            ID of the node.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _nodes.
+        """
+
+        try:
+            del self._nodes[id]
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _nodes', [f'id == {id}']
+            ) from error
 
     def check_link(self, id: str) -> bool:
         """Checks if a link exists.
