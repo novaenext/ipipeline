@@ -181,37 +181,19 @@ class TestPipeline(TestCase):
         ):
             pipeline.delete_link('l1')
 
-    def test_add_link__id_eq_id__src_id_eq_id__dst_id_eq_id(self) -> None:
-        pipeline = Pipeline(
-            'p1', nodes=self._nodes, links=self._links
-        )
+    def test_add_link__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', links=self._links)
 
         with self.assertRaisesRegex(
             PipelineError, r'id was found in the _links: id == l1'
         ):
             pipeline.add_link('l1', 'n1', 'n2')
 
-    def test_add_link__id_ne_id__src_id_eq_id__dst_id_eq_id(self) -> None:
-        pipeline = Pipeline('p1',  nodes=self._nodes)
+    def test_add_link__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
         pipeline.add_link('l1', 'n1', 'n2')
 
         self.assertListEqual(list(pipeline.links.keys()), ['l1'])
         self.assertListEqual(
             [link.id for link in pipeline.links.values()], ['l1']
         )
-
-    def test_add_link__id_ne_id__src_id_ne_id__dst_id_eq_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._nodes)
-
-        with self.assertRaisesRegex(
-            PipelineError, r'src_id was not found in the _nodes: src_id == n0'
-        ):
-            pipeline.add_link('l1', 'n0', 'n1')
-
-    def test_add_link__id_ne_id__src_id_eq_id__dst_id_ne_id(self) -> None:
-        pipeline = Pipeline('p1', nodes=self._nodes)
-
-        with self.assertRaisesRegex(
-            PipelineError, r'dst_id was not found in the _nodes: dst_id == n3'
-        ):
-            pipeline.add_link('l1', 'n2', 'n3')
