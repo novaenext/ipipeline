@@ -9,7 +9,7 @@ from ipipeline.utils.checking import check_none
 class Node(Info):
     """Stores a node with its settings.
 
-    The node represents an executable unit.
+    The node represents an executable unit of the graph.
 
     Attributes
     ----------
