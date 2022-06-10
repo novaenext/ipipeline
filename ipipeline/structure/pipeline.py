@@ -139,7 +139,7 @@ class Pipeline(Info):
         outputs: List[str] = None, 
         tags: List[str] = None
     ) -> None:
-        """Adds a node in the graph.
+        """Adds a node.
 
         Parameters
         ----------
@@ -170,13 +170,7 @@ class Pipeline(Info):
         """
 
         node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
-
-        if self.check_node(node.id):
-            raise PipelineError(
-                'id was found in the _nodes', [f'id == {node.id}']
-            )
-
-        self._nodes[node.id] = node
+        self.set_node(node)
 
     def get_node(self, id: str) -> Node:
         """Gets a node.
@@ -189,7 +183,7 @@ class Pipeline(Info):
         Returns
         -------
         node : Node
-            Node that represents an executable unit.
+            Node that represents an executable unit of the graph.
 
         Raises
         ------
@@ -206,18 +200,26 @@ class Pipeline(Info):
                 'id was not found in the _nodes', [f'id == {id}']
             ) from error
 
-    def set_node(self, id: str, node: Node) -> None:
+    def set_node(self, node: Node) -> None:
         """Sets a node.
 
         Parameters
         ----------
-        id : str
-            ID of the node.
         node : Node
-            Node that represents an executable unit.
+            Node that represents an executable unit of the graph.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was found in the _nodes.
         """
 
-        self._nodes[id] = node
+        if self.check_node(node.id):
+            raise PipelineError(
+                'id was found in the _nodes', [f'id == {node.id}']
+            )
+
+        self._nodes[node.id] = node
 
     def delete_node(self, id: str) -> None:
         """Deletes a node.
