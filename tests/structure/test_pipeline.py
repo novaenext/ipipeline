@@ -9,6 +9,7 @@ class TestPipeline(TestCase):
         self._mock_graph = {'n1': [], 'n2': []}
         self._mock_nodes = {'n1': None, 'n2': None}
         self._mock_links = {'l1': None}
+        self._mock_node = object()
         self._mock_task = [lambda arg1, arg2: arg1 + arg2]
 
     def test_init__graph_eq_dict__nodes_eq_dict__links_eq_dict(self) -> None:
@@ -119,6 +120,18 @@ class TestPipeline(TestCase):
             PipelineError, r'id was not found in the _nodes: id == n1'
         ):
             _ = pipeline.get_node('n1')
+
+    def test_set_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._mock_nodes)
+        pipeline.set_node('n1', self._mock_node)
+
+        self.assertEqual(pipeline._nodes['n1'], self._mock_node)
+
+    def test_set_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline.set_node('n1', self._mock_node)
+
+        self.assertEqual(pipeline._nodes['n1'], self._mock_node)
 
     def test_check_link__id_eq_id(self) -> None:
         pipeline = Pipeline('p1', links=self._mock_links)
