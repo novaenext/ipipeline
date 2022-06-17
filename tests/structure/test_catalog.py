@@ -15,6 +15,23 @@ class TestCatalog(TestCase):
         self.assertDictEqual(catalog._items, self._items)
         self.assertListEqual(catalog._tags, ['t1'])
 
+    def test_get__items_eq_dict(self) -> None:
+        catalog = Catalog('c1', items=self._items, tags=['t1'])
+
+        self.assertEqual(catalog.id, 'c1')
+        self.assertDictEqual(catalog.items, self._items)
+        self.assertListEqual(catalog.tags, ['t1'])
+
+    def test_set__items_eq_dict(self) -> None:
+        catalog = Catalog('c1', items=self._items, tags=['t1'])
+        catalog.id = 'c2'
+        catalog.items = {'i3': 8}
+        catalog.tags = ['t2']
+
+        self.assertEqual(catalog.id, 'c2')
+        self.assertDictEqual(catalog.items, {'i3': 8})
+        self.assertListEqual(catalog.tags, ['t2'])
+
     def test_add_inexistent_item(self) -> None:
         catalog = Catalog('c1', items=None, tags=None)
         catalog.add_item('i1', 7)
