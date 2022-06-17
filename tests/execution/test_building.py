@@ -1,10 +1,56 @@
 from unittest import TestCase
 
 from ipipeline.execution.building import (
-    build_task_inputs, build_task_outputs, _check_diff_outputs_qty
+    build_graph, build_task_inputs, build_task_outputs, _check_diff_outputs_qty
 )
 from ipipeline.exceptions import BuildingError, CatalogError
 from ipipeline.structure.catalog import Catalog
+from ipipeline.structure.link import Link
+from ipipeline.structure.pipeline import Pipeline
+
+
+class TestBuildGraph(TestCase):
+    def test_build_graph__pipe_eq_class_wi_src_id_wi_dst_id(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            {'n1': None, 'n2': None, 'n3': None, 'n4': None}, 
+            {
+                'l1': Link('l1', 'n1', 'n2'), 
+                'l2': Link('l2', 'n1', 'n3'), 
+                'l3': Link('l3', 'n2', 'n4')
+            }
+        )
+        graph = build_graph(pipeline)
+
+        self.assertDictEqual(graph, {'n1': ['n2', 'n3'], 'n2': ['n4']})
+
+    def test_build_graph__pipe_eq_class_wo_src_id_wi_dst_id(self) -> None:
+        pipeline = Pipeline(
+            'p1', {'n2': None}, {'l1': Link('l1', 'n1', 'n2')}
+        )
+
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'src_id was not found in the pipeline._nodes: src_id == n1'
+        ):
+            _ = build_graph(pipeline)
+
+    def test_build_graph__pipe_eq_class_wi_src_id_wo_dst_id(self) -> None:
+        pipeline = Pipeline(
+            'p1', {'n1': None}, {'l1': Link('l1', 'n1', 'n2')}
+        )
+
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'dst_id was not found in the pipeline._nodes: dst_id == n2'
+        ):
+            _ = build_graph(pipeline)
+
+    def test_build_graph__pipe_eq_class_wi_empty_links(self) -> None:
+        pipeline = Pipeline('p1')
+        graph = build_graph(pipeline)
+
+        self.assertDictEqual(graph, {})
 
 
 class TestBuildTaskInputs(TestCase):
@@ -27,7 +73,7 @@ class TestBuildTaskInputs(TestCase):
 
     def test_invalid_placeholders(self) -> None:
         with self.assertRaisesRegex(
-            CatalogError, r'id not found in the _items: id == i3'
+            CatalogError, r'id was not found in the _items: id == i3'
         ):
             _ = build_task_inputs(
                 {'in1': 'c.i3', 'in2': 'c.[]'}, self._catalog
