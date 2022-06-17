@@ -4,7 +4,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from ipipeline.execution.building import build_task_inputs, build_task_outputs
+from ipipeline.execution.building import (
+    build_graph, build_task_inputs, build_task_outputs
+)
 from ipipeline.execution.sorting import sort_graph_topo
 from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
@@ -244,7 +246,8 @@ class BaseExecutor(ABC):
             Informs that a circular dependency was found in the graph.
         """
 
-        topo_order = sort_graph_topo(self._pipeline.graph)
+        graph = build_graph(self._pipeline)
+        topo_order = sort_graph_topo(graph)
         logger.info(f'topo_order: {topo_order}')
 
         return topo_order
