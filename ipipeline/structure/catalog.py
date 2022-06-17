@@ -150,8 +150,3 @@ class Catalog(Info):
             raise CatalogError(
                 'id not found in the _items', [f'id == {id}']
             ) from error
-
-    def remove_items(self) -> None:
-        """Remove the items."""
-
-        self._items.clear()
