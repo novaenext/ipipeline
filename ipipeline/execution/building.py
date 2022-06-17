@@ -47,10 +47,10 @@ def build_task_inputs(
 
                 for item_id in in_value[1:-1].split(','):
                     task_inputs[in_key].append(
-                        catalog.obtain_item(item_id.strip())
+                        catalog.get_item(item_id.strip())
                     )
             else:
-                task_inputs[in_key] = catalog.obtain_item(in_value)
+                task_inputs[in_key] = catalog.get_item(in_value)
         else:
             task_inputs[in_key] = in_value
 
