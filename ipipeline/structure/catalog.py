@@ -118,18 +118,15 @@ class Catalog(Info):
                 'id was not found in the _items', [f'id == {id}']
             ) from error
 
-    def add_item(self, id: str, item: Any) -> None:
-        """Adds an item.
-
-        If the item does not exist, a new one is added, otherwise the existing 
-        one is updated.
+    def set_item(self, id: str, item: Any) -> None:
+        """Sets an item.
 
         Parameters
         ----------
         id : str
-            ID of the item obtained from the node outputs.
+            ID of the item.
         item : Any
-            Item obtained from the node returns.
+            Item of an execution.
         """
 
         self._items[id] = item
