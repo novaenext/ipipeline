@@ -32,18 +32,6 @@ class TestCatalog(TestCase):
         self.assertDictEqual(catalog.items, {'i3': 8})
         self.assertListEqual(catalog.tags, ['t2'])
 
-    def test_add_inexistent_item(self) -> None:
-        catalog = Catalog('c1', items=None, tags=None)
-        catalog.add_item('i1', 7)
-
-        self.assertDictEqual(catalog.items, {'i1': 7})
-
-    def test_add_existent_item(self) -> None:
-        catalog = Catalog('c1', items={'i1': 0, 'i2': 0}, tags=None)
-        catalog.add_item('i1', 7)
-
-        self.assertDictEqual(catalog.items, {'i1': 7, 'i2': 0})
-
     def test_check_existent_item(self) -> None:
         catalog = Catalog('c1', items={'i1': 7, 'i2': 0}, tags=None)
         checked = catalog.check_item('i1')
@@ -69,6 +57,18 @@ class TestCatalog(TestCase):
             CatalogError, r'id not found in the _items: id == i1'
         ):
             _ = catalog.obtain_item('i1')
+
+    def test_add_inexistent_item(self) -> None:
+        catalog = Catalog('c1', items=None, tags=None)
+        catalog.add_item('i1', 7)
+
+        self.assertDictEqual(catalog.items, {'i1': 7})
+
+    def test_add_existent_item(self) -> None:
+        catalog = Catalog('c1', items={'i1': 0, 'i2': 0}, tags=None)
+        catalog.add_item('i1', 7)
+
+        self.assertDictEqual(catalog.items, {'i1': 7, 'i2': 0})
 
     def test_remove_existent_item(self) -> None:
         catalog = Catalog('c1', items={'i1': 7, 'i2': 0}, tags=None)
