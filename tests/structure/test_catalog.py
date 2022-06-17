@@ -32,14 +32,14 @@ class TestCatalog(TestCase):
         self.assertDictEqual(catalog.items, {'i3': 8})
         self.assertListEqual(catalog.tags, ['t2'])
 
-    def test_check_existent_item(self) -> None:
-        catalog = Catalog('c1', items={'i1': 7, 'i2': 0}, tags=None)
+    def test_check_item__id_eq_id(self) -> None:
+        catalog = Catalog('c1', items=self._items)
         checked = catalog.check_item('i1')
 
         self.assertTrue(checked)
 
-    def test_check_inexistent_item(self) -> None:
-        catalog = Catalog('c1', items=None, tags=None)
+    def test_check_item__id_ne_id(self) -> None:
+        catalog = Catalog('c1', items=None)
         checked = catalog.check_item('i1')
 
         self.assertFalse(checked)
