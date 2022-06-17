@@ -90,18 +90,18 @@ class Catalog(Info):
 
         return checked
 
-    def obtain_item(self, id: str) -> Any:
-        """Obtains an item.
+    def get_item(self, id: str) -> Any:
+        """Gets an item.
 
         Parameters
         ----------
         id : str
-            ID of the item obtained from the node outputs.
+            ID of the item.
 
         Returns
         -------
         item : Any
-            Item obtained from the node returns.
+            Item of an execution.
 
         Raises
         ------
@@ -110,10 +110,12 @@ class Catalog(Info):
         """
 
         try:
-            return self._items[id]
+            item = self._items[id]
+
+            return item
         except KeyError as error:
             raise CatalogError(
-                'id not found in the _items', [f'id == {id}']
+                'id was not found in the _items', [f'id == {id}']
             ) from error
 
     def add_item(self, id: str, item: Any) -> None:
