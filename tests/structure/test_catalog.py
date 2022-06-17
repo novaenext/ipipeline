@@ -58,17 +58,17 @@ class TestCatalog(TestCase):
         ):
             _ = catalog.get_item('i1')
 
-    def test_add_inexistent_item(self) -> None:
-        catalog = Catalog('c1', items=None, tags=None)
-        catalog.add_item('i1', 7)
+    def test_set_item__id_eq_id(self) -> None:
+        catalog = Catalog('c1', items=self._items)
+        catalog.set_item('i1', 8)
 
-        self.assertDictEqual(catalog.items, {'i1': 7})
+        self.assertDictEqual(catalog.items, {'i1': 8, 'i2': 4})
 
-    def test_add_existent_item(self) -> None:
-        catalog = Catalog('c1', items={'i1': 0, 'i2': 0}, tags=None)
-        catalog.add_item('i1', 7)
+    def test_set_item__id_ne_id(self) -> None:
+        catalog = Catalog('c1', items=None)
+        catalog.set_item('i1', 2)
 
-        self.assertDictEqual(catalog.items, {'i1': 7, 'i2': 0})
+        self.assertDictEqual(catalog.items, {'i1': 2})
 
     def test_remove_existent_item(self) -> None:
         catalog = Catalog('c1', items={'i1': 7, 'i2': 0}, tags=None)
