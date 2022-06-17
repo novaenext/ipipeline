@@ -8,19 +8,15 @@ from ipipeline.utils.checking import check_none
 
 
 class Catalog(Info):
-    """Stores the items from an execution.
-
-    Items are generated through the execution of the nodes and are stored 
-    in the catalog to provide access between nodes.
+    """Stores the items of an execution.
 
     Attributes
     ----------
     _id : str
         ID of the catalog.
     _items : Dict[str, Any]
-        Items obtained from the execution. The keys are the item IDs 
-        obtained from the node outputs and the values are the items 
-        obtained from the node returns.
+        Items of an execution. The keys are the task outputs and the 
+        values are the task returns.
     _tags : List[str]
         Tags of the catalog to provide more context.
     """
@@ -34,36 +30,47 @@ class Catalog(Info):
         ----------
         id : str
             ID of the catalog.
-        items : Dict[str, Any], default=None
-            Items obtained from the execution. The keys are the item IDs 
-            obtained from the node outputs and the values are the items 
-            obtained from the node returns.
-        tags : List[str], default=None
+        items : Dict[str, Any], optional
+            Items of an execution. The keys are the task outputs and the 
+            values are the task returns.
+        tags : List[str], optional
             Tags of the catalog to provide more context.
 
         Raises
         ------
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
         """
-
-        self._items = check_none(items, {})
 
         super().__init__(id, tags=tags)
 
+        self._items = check_none(items, {})
+
     @property
     def items(self) -> Dict[str, Any]:
-        """Obtains the _items attribute.
+        """Gets the _items attribute.
 
         Returns
         -------
         items : Dict[str, Any]
-            Items obtained from the execution. The keys are the item IDs 
-            obtained from the node outputs and the values are the items 
-            obtained from the node returns.
+            Items of an execution. The keys are the task outputs and the 
+            values are the task returns.
         """
 
         return self._items
+
+    @items.setter
+    def items(self, items: Dict[str, Any]) -> None:
+        """Sets the _items attribute.
+
+        Parameters
+        ----------
+        items : Dict[str, Any]
+            Items of an execution. The keys are the task outputs and the 
+            values are the task returns.
+        """
+
+        self._items = items
 
     def add_item(self, id: str, item: Any) -> None:
         """Adds an item.
