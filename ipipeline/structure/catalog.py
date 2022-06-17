@@ -78,15 +78,17 @@ class Catalog(Info):
         Parameters
         ----------
         id : str
-            ID of the item obtained from the node outputs.
+            ID of the item.
 
         Returns
         -------
         checked : bool
-            Indicates if an item exists or not.
+            Flag that indicates if an item exists.
         """
 
-        return id in self._items.keys()
+        checked = id in self._items.keys()
+
+        return checked
 
     def obtain_item(self, id: str) -> Any:
         """Obtains an item.
