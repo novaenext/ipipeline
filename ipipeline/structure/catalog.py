@@ -72,22 +72,6 @@ class Catalog(Info):
 
         self._items = items
 
-    def add_item(self, id: str, item: Any) -> None:
-        """Adds an item.
-
-        If the item does not exist, a new one is added, otherwise the existing 
-        one is updated.
-
-        Parameters
-        ----------
-        id : str
-            ID of the item obtained from the node outputs.
-        item : Any
-            Item obtained from the node returns.
-        """
-
-        self._items[id] = item
-
     def check_item(self, id: str) -> bool:
         """Checks if an item exists.
 
@@ -129,6 +113,22 @@ class Catalog(Info):
             raise CatalogError(
                 'id not found in the _items', [f'id == {id}']
             ) from error
+
+    def add_item(self, id: str, item: Any) -> None:
+        """Adds an item.
+
+        If the item does not exist, a new one is added, otherwise the existing 
+        one is updated.
+
+        Parameters
+        ----------
+        id : str
+            ID of the item obtained from the node outputs.
+        item : Any
+            Item obtained from the node returns.
+        """
+
+        self._items[id] = item
 
     def remove_item(self, id: str) -> None:
         """Removes an item.
