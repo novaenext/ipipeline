@@ -5,18 +5,15 @@ from ipipeline.structure.catalog import Catalog
 
 
 class TestCatalog(TestCase):
-    def test_init(self) -> None:
-        catalog = Catalog('c1', items={'i1': 7}, tags=['t1'])
+    def setUp(self) -> None:
+        self._items = {'i1': 2, 'i2': 4}
 
-        self.assertEqual(catalog.id, 'c1')
-        self.assertDictEqual(catalog.items, {'i1': 7})
-        self.assertListEqual(catalog.tags, ['t1'])
+    def test_init__items_eq_dict(self) -> None:
+        catalog = Catalog('c1', items=self._items, tags=['t1'])
 
-    def test_defaults(self) -> None:
-        catalog1 = Catalog('c1')
-        catalog2 = Catalog('c2')
-
-        self.assertIsNot(catalog1.items, catalog2.items)
+        self.assertEqual(catalog._id, 'c1')
+        self.assertDictEqual(catalog._items, self._items)
+        self.assertListEqual(catalog._tags, ['t1'])
 
     def test_add_inexistent_item(self) -> None:
         catalog = Catalog('c1', items=None, tags=None)
