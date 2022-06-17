@@ -131,13 +131,13 @@ class Catalog(Info):
 
         self._items[id] = item
 
-    def remove_item(self, id: str) -> None:
-        """Removes an item.
+    def delete_item(self, id: str) -> None:
+        """Deletes an item.
 
         Parameters
         ----------
         id : str
-            ID of the item obtained from the node outputs.
+            ID of the item.
 
         Raises
         ------
@@ -149,5 +149,5 @@ class Catalog(Info):
             del self._items[id]
         except KeyError as error:
             raise CatalogError(
-                'id not found in the _items', [f'id == {id}']
+                'id was not found in the _items', [f'id == {id}']
             ) from error
