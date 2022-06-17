@@ -14,21 +14,21 @@ def build_task_inputs(
     Parameters
     ----------
     inputs : Dict[str, Any]
-        Inputs of the task. The keys are the function parameters and 
-        the values are any default values and/or placeholders for the 
-        catalog items.
+        Inputs of the task. The keys are the callable parameters and the 
+        values are the data required for the parameters. The values can 
+        also be placeholders for the catalog items.
 
-        'c.<item_id>': obtains a single item.
-        'c.[<item_id>, ..., <item_id>]': obtains multiple items.
+        Placeholders:
+            'c.<item_id>': gets an item.
+            'c.[<item_id>, ..., <item_id>]': gets a list of items.
     catalog : Catalog
-        Catalog that stores the items from an execution.
+        Catalog that stores the items.
 
     Returns
     -------
     task_inputs : Dict[str, Any]
-        Inputs of the task. The keys are the function parameters and 
-        the values are any default values and/or items obtained from the 
-        catalog.
+        Inputs of the task. The keys are the callable parameters and 
+        the values are the data required for the parameters.
 
     Raises
     ------
@@ -63,18 +63,16 @@ def build_task_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
     Parameters
     ----------
     outputs : List[str]
-        Outputs of the task. The outputs must match the returns in 
-        terms of length. If one output is expected, the return can be of 
-        any type, however, in cases with more than one output, the returns 
-        must be a sequence.
+        Outputs of the task. The outputs must match the returns in terms 
+        of size.
     returns : Any
         Returns of the task obtained from its execution.
 
     Returns
     -------
     task_outputs : Dict[str, Any]
-        Outputs of the task. The keys are the outputs and the values 
-        are the returns obtained from the execution.
+        Outputs of the task. The keys are the task outputs and the 
+        values are the task returns obtained from the execution.
 
     Raises
     ------
