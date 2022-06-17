@@ -10,9 +10,7 @@ from ipipeline.utils.checking import check_none
 
 
 class Pipeline(Info):
-    """Stores a pipeline composed of nodes and links.
-
-    The links between the nodes must compose a directed acyclic graph.
+    """Stores a flow of tasks that must compose a directed acyclic graph.
 
     Attributes
     ----------

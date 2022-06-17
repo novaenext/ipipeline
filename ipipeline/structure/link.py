@@ -6,9 +6,7 @@ from ipipeline.structure.info import Info
 
 
 class Link(Info):
-    """Stores a link between two nodes.
-
-    The link represents the dependency between the nodes of the graph.
+    """Stores a dependency between the nodes of the graph.
 
     Attributes
     ----------
