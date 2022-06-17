@@ -4,6 +4,52 @@ from typing import Any, Dict, List
 
 from ipipeline.exceptions import BuildingError
 from ipipeline.structure.catalog import Catalog
+from ipipeline.structure.pipeline import Pipeline
+
+
+def build_graph(pipeline: Pipeline) -> Dict[str, list]:
+    """Builds a graph.
+
+    Parameters
+    ----------
+    pipeline : Pipeline
+        Pipeline that stores a flow of tasks.
+
+    Returns
+    -------
+    graph : Dict[str, list]
+        Graph of the pipeline. The keys are the source node IDs and the 
+        values are a list of destination node IDs.
+
+    Raises
+    ------
+    BuildingError
+        Informs that the src_id was not found in the pipeline._nodes.
+    BuildingError
+        Informs that the dst_id was not found in the pipeline._nodes.
+    """
+
+    graph = {}
+
+    for link in pipeline.links.values():
+        if not pipeline.check_node(link.src_id):
+            raise BuildingError(
+                'src_id was not found in the pipeline._nodes', 
+                [f'src_id == {link.src_id}']
+            )
+
+        if not pipeline.check_node(link.dst_id):
+            raise BuildingError(
+                'dst_id was not found in the pipeline._nodes', 
+                [f'dst_id == {link.dst_id}']
+            )
+
+        if link.src_id not in graph.keys():
+            graph[link.src_id] = []
+
+        graph[link.src_id].append(link.dst_id)
+
+    return graph
 
 
 def build_task_inputs(
