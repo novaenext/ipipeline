@@ -44,19 +44,19 @@ class TestCatalog(TestCase):
 
         self.assertFalse(checked)
 
-    def test_obtain_existent_item(self) -> None:
-        catalog = Catalog('c1', items={'i1': 7, 'i2': 0}, tags=None)
-        item = catalog.obtain_item('i1')
+    def test_get_item__id_eq_id(self) -> None:
+        catalog = Catalog('c1', items=self._items)
+        item = catalog.get_item('i1')
 
-        self.assertEqual(item, 7)
+        self.assertEqual(item, 2)
 
-    def test_obtain_inexistent_item(self) -> None:
-        catalog = Catalog('c1', items=None, tags=None)
+    def test_get_item__id_ne_id(self) -> None:
+        catalog = Catalog('c1', items=None)
 
         with self.assertRaisesRegex(
-            CatalogError, r'id not found in the _items: id == i1'
+            CatalogError, r'id was not found in the _items: id == i1'
         ):
-            _ = catalog.obtain_item('i1')
+            _ = catalog.get_item('i1')
 
     def test_add_inexistent_item(self) -> None:
         catalog = Catalog('c1', items=None, tags=None)
