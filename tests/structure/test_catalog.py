@@ -83,15 +83,3 @@ class TestCatalog(TestCase):
             CatalogError, r'id not found in the _items: id == i1'
         ):
             catalog.remove_item('i1')
-
-    def test_remove_existent_items(self) -> None:
-        catalog = Catalog('c1', items={'i1': 7, 'i2': 0}, tags=None)
-        catalog.remove_items()
-
-        self.assertDictEqual(catalog.items, {})
-
-    def test_remove_inexistent_items(self) -> None:
-        catalog = Catalog('c1', items=None, tags=None)
-        catalog.remove_items()
-
-        self.assertDictEqual(catalog.items, {})
