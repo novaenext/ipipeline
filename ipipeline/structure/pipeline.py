@@ -10,7 +10,9 @@ from ipipeline.utils.checking import check_none
 
 
 class Pipeline(Info):
-    """Stores a flow of tasks that must compose a directed acyclic graph.
+    """Stores a flow of executable units.
+
+    The link between the nodes must compose a directed acyclic graph.
 
     Attributes
     ----------
@@ -140,7 +142,7 @@ class Pipeline(Info):
         Returns
         -------
         node : Node
-            Node that represents an executable unit of the graph.
+            Node that stores an executable unit of the graph.
 
         Raises
         ------
@@ -163,7 +165,7 @@ class Pipeline(Info):
         Parameters
         ----------
         node : Node
-            Node that represents an executable unit of the graph.
+            Node that stores an executable unit of the graph.
 
         Raises
         ------
@@ -269,7 +271,7 @@ class Pipeline(Info):
         Returns
         -------
         link : Link
-            Link that represents the dependency between the nodes of the graph.
+            Link that stores a dependency between the nodes of the graph.
 
         Raises
         ------
@@ -292,7 +294,7 @@ class Pipeline(Info):
         Parameters
         ----------
         link : Link
-            Link that represents the dependency between the nodes of the graph.
+            Link that stores a dependency between the nodes of the graph.
 
         Raises
         ------
