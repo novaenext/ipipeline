@@ -6,6 +6,7 @@ from ipipeline.execution.building import (
 from ipipeline.exceptions import BuildingError, CatalogError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.link import Link
+from ipipeline.structure.node import Node
 from ipipeline.structure.pipeline import Pipeline
 
 
@@ -13,7 +14,12 @@ class TestBuildGraph(TestCase):
     def test_build_graph__pipe_eq_class_wi_src_id_wi_dst_id(self) -> None:
         pipeline = Pipeline(
             'p1', 
-            {'n1': None, 'n2': None, 'n3': None, 'n4': None}, 
+            {
+                'n1': Node('n1', None), 
+                'n2': Node('n2', None), 
+                'n3': Node('n3', None), 
+                'n4': Node('n4', None)
+            }, 
             {
                 'l1': Link('l1', 'n1', 'n2'), 
                 'l2': Link('l2', 'n1', 'n3'), 
@@ -22,11 +28,13 @@ class TestBuildGraph(TestCase):
         )
         graph = build_graph(pipeline)
 
-        self.assertDictEqual(graph, {'n1': ['n2', 'n3'], 'n2': ['n4']})
+        self.assertDictEqual(
+            graph, {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': [], 'n4': []}
+        )
 
     def test_build_graph__pipe_eq_class_wo_src_id_wi_dst_id(self) -> None:
         pipeline = Pipeline(
-            'p1', {'n2': None}, {'l1': Link('l1', 'n1', 'n2')}
+            'p1', {'n2': Node('n2', None)}, {'l1': Link('l1', 'n1', 'n2')}
         )
 
         with self.assertRaisesRegex(
@@ -37,7 +45,7 @@ class TestBuildGraph(TestCase):
 
     def test_build_graph__pipe_eq_class_wi_src_id_wo_dst_id(self) -> None:
         pipeline = Pipeline(
-            'p1', {'n1': None}, {'l1': Link('l1', 'n1', 'n2')}
+            'p1', {'n1': Node('n1', None)}, {'l1': Link('l1', 'n1', 'n2')}
         )
 
         with self.assertRaisesRegex(
