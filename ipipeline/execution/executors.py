@@ -4,7 +4,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from ipipeline.execution.building import build_task_inputs, build_task_outputs
+from ipipeline.execution.building import (
+    build_graph, build_task_inputs, build_task_outputs
+)
 from ipipeline.execution.sorting import sort_graph_topo
 from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
@@ -155,7 +157,7 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        PipelineError
+        ExecutorError
             Informs that the node_id was not found in the _nodes.
         ExecutorError
             Informs that the type was not found in the valid_types.
@@ -163,7 +165,11 @@ class BaseExecutor(ABC):
             Informs that the id was not validated according to the pattern.
         """
 
-        self._pipeline._check_inexistent_node_id(node_id)
+        if not self._pipeline.check_node(node_id):
+            raise ExecutorError(
+                'node_id not found in the _nodes', [f'node_id == {node_id}']
+            )
+
         self._check_invalid_type(type)
         signal = Signal(id, node_id, type, status, tags)
 
@@ -244,7 +250,8 @@ class BaseExecutor(ABC):
             Informs that a circular dependency was found in the graph.
         """
 
-        topo_order = sort_graph_topo(self._pipeline.graph)
+        graph = build_graph(self._pipeline)
+        topo_order = sort_graph_topo(graph)
         logger.info(f'topo_order: {topo_order}')
 
         return topo_order
@@ -310,4 +317,4 @@ class SequentialExecutor(BaseExecutor):
                     task_outputs = self.execute_node(node_id)
 
                     for out_key, out_value in task_outputs.items():
-                        self._catalog.add_item(out_key, out_value)
+                        self._catalog.set_item(out_key, out_value)

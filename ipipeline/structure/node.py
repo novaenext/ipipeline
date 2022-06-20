@@ -7,30 +7,26 @@ from ipipeline.utils.checking import check_none
 
 
 class Node(Info):
-    """Stores a task and its specifications.
-
-    The specifications are used to build the inputs and outputs to execute 
-    the task that is bound to the node.
+    """Stores an executable unit of the graph.
 
     Attributes
     ----------
     _id : str
         ID of the node.
     _task : Callable
-        Task that represents an execution unit.
-    _inputs : Dict[str, Any]
-        Inputs of the task. The keys are the function parameters and 
-        the values are any default values and/or placeholders for the 
-        catalog items.
+        Task of the node.
+    _inputs : Dict[str, Any], optional
+        Inputs of the task. The keys are the callable parameters and the 
+        values are the data required for the parameters. The values can also 
+        be placeholders for the catalog items.
 
-        'c.<item_id>': obtains a single item.
-        'c.[<item_id>, ..., <item_id>]': obtains multiple items.
-    _outputs : List[str]
-        Outputs of the task. The outputs must match the returns in 
-        terms of length. If one output is expected, the return can be of 
-        any type, however, in cases with more than one output, the returns 
-        must be a sequence.
-    _tags : List[str]
+        Placeholders:
+            'c.<item_id>': gets an item.
+            'c.[<item_id>, ..., <item_id>]': gets a list of items.
+    _outputs : List[str], optional
+        Outputs of the task. The outputs must match the returns in terms 
+        of size.
+    _tags : List[str], optional
         Tags of the node to provide more context.
     """
 
@@ -49,74 +45,115 @@ class Node(Info):
         id : str
             ID of the node.
         task : Callable
-            Task that represents an execution unit.
-        inputs : Dict[str, Any], default=None
-            Inputs of the task. The keys are the function parameters and 
-            the values are any default values and/or placeholders for the 
-            catalog items.
+            Task of the node.
+        inputs : Dict[str, Any], optional
+            Inputs of the task. The keys are the callable parameters and the 
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
 
-            'c.<item_id>': obtains a single item.
-            'c.[<item_id>, ..., <item_id>]': obtains multiple items.
-        outputs : List[str], default=None
-            Outputs of the task. The outputs must match the returns in 
-            terms of length. If one output is expected, the return can be of 
-            any type, however, in cases with more than one output, the returns 
-            must be a sequence.
-        tags : List[str], default=None
+            Placeholders:
+                'c.<item_id>': gets an item.
+                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        outputs : List[str], optional
+            Outputs of the task. The outputs must match the returns in terms 
+            of size.
+        tags : List[str], optional
             Tags of the node to provide more context.
 
         Raises
         ------
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
         """
+
+        super().__init__(id, tags=tags)
 
         self._task = task
         self._inputs = check_none(inputs, {})
         self._outputs = check_none(outputs, [])
 
-        super().__init__(id, tags=tags)
-
     @property
     def task(self) -> Callable:
-        """Obtains the _task attribute.
+        """Gets the _task attribute.
 
         Returns
         -------
         task : Callable
-            Task that represents an execution unit.
+            Task of the node.
         """
 
         return self._task
 
+    @task.setter
+    def task(self, task: Callable) -> None:
+        """Sets the _task attribute.
+
+        Parameters
+        ----------
+        task : Callable
+            Task of the node.
+        """
+
+        self._task = task
+
     @property
     def inputs(self) -> Dict[str, Any]:
-        """Obtains the _inputs attribute.
+        """Gets the _inputs attribute.
 
         Returns
         -------
         inputs : Dict[str, Any]
-            Inputs of the task. The keys are the function parameters and 
-            the values are any default values and/or placeholders for the 
-            catalog items.
+            Inputs of the task. The keys are the callable parameters and the 
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
 
-            'c.<item_id>': obtains a single item.
-            'c.[<item_id>, ..., <item_id>]': obtains multiple items.
+            Placeholders:
+                'c.<item_id>': gets an item.
+                'c.[<item_id>, ..., <item_id>]': gets a list of items.
         """
 
         return self._inputs
 
+    @inputs.setter
+    def inputs(self, inputs: Dict[str, Any]) -> None:
+        """Sets the _inputs attribute.
+
+        Parameters
+        ----------
+        inputs : Dict[str, Any]
+            Inputs of the task. The keys are the callable parameters and the 
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
+
+            Placeholders:
+                'c.<item_id>': gets an item.
+                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        """
+
+        self._inputs = inputs
+
     @property
     def outputs(self) -> List[str]:
-        """Obtains the _outputs attribute.
+        """Gets the _outputs attribute.
 
         Returns
         -------
         outputs : List[str]
-            Outputs of the task. The outputs must match the returns in 
-            terms of length. If one output is expected, the return can be of 
-            any type, however, in cases with more than one output, the returns 
-            must be a sequence.
+            Outputs of the task. The outputs must match the returns in terms 
+            of size.
         """
 
         return self._outputs
+
+    @outputs.setter
+    def outputs(self, outputs: List[str]) -> None:
+        """Sets the _outputs attribute.
+
+        Parameters
+        ----------
+        outputs : List[str]
+            Outputs of the task. The outputs must match the returns in terms 
+            of size.
+        """
+
+        self._outputs = outputs

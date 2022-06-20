@@ -8,19 +8,15 @@ from ipipeline.utils.checking import check_none
 
 
 class Catalog(Info):
-    """Stores the items from an execution.
-
-    Items are generated through the execution of the nodes and are stored 
-    in the catalog to provide access between nodes.
+    """Stores the items of an execution.
 
     Attributes
     ----------
     _id : str
         ID of the catalog.
     _items : Dict[str, Any]
-        Items obtained from the execution. The keys are the item IDs 
-        obtained from the node outputs and the values are the items 
-        obtained from the node returns.
+        Items of an execution. The keys are the task outputs and the 
+        values are the task returns.
     _tags : List[str]
         Tags of the catalog to provide more context.
     """
@@ -34,52 +30,47 @@ class Catalog(Info):
         ----------
         id : str
             ID of the catalog.
-        items : Dict[str, Any], default=None
-            Items obtained from the execution. The keys are the item IDs 
-            obtained from the node outputs and the values are the items 
-            obtained from the node returns.
-        tags : List[str], default=None
+        items : Dict[str, Any], optional
+            Items of an execution. The keys are the task outputs and the 
+            values are the task returns.
+        tags : List[str], optional
             Tags of the catalog to provide more context.
 
         Raises
         ------
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
         """
-
-        self._items = check_none(items, {})
 
         super().__init__(id, tags=tags)
 
+        self._items = check_none(items, {})
+
     @property
     def items(self) -> Dict[str, Any]:
-        """Obtains the _items attribute.
+        """Gets the _items attribute.
 
         Returns
         -------
         items : Dict[str, Any]
-            Items obtained from the execution. The keys are the item IDs 
-            obtained from the node outputs and the values are the items 
-            obtained from the node returns.
+            Items of an execution. The keys are the task outputs and the 
+            values are the task returns.
         """
 
         return self._items
 
-    def add_item(self, id: str, item: Any) -> None:
-        """Adds an item.
-
-        If the item does not exist, a new one is added, otherwise the existing 
-        one is updated.
+    @items.setter
+    def items(self, items: Dict[str, Any]) -> None:
+        """Sets the _items attribute.
 
         Parameters
         ----------
-        id : str
-            ID of the item obtained from the node outputs.
-        item : Any
-            Item obtained from the node returns.
+        items : Dict[str, Any]
+            Items of an execution. The keys are the task outputs and the 
+            values are the task returns.
         """
 
-        self._items[id] = item
+        self._items = items
 
     def check_item(self, id: str) -> bool:
         """Checks if an item exists.
@@ -87,28 +78,30 @@ class Catalog(Info):
         Parameters
         ----------
         id : str
-            ID of the item obtained from the node outputs.
+            ID of the item.
 
         Returns
         -------
         checked : bool
-            Indicates if an item exists or not.
+            Flag that indicates if an item exists.
         """
 
-        return id in self._items.keys()
+        checked = id in self._items.keys()
 
-    def obtain_item(self, id: str) -> Any:
-        """Obtains an item.
+        return checked
+
+    def get_item(self, id: str) -> Any:
+        """Gets an item.
 
         Parameters
         ----------
         id : str
-            ID of the item obtained from the node outputs.
+            ID of the item.
 
         Returns
         -------
         item : Any
-            Item obtained from the node returns.
+            Item of an execution.
 
         Raises
         ------
@@ -117,19 +110,34 @@ class Catalog(Info):
         """
 
         try:
-            return self._items[id]
+            item = self._items[id]
+
+            return item
         except KeyError as error:
             raise CatalogError(
-                'id not found in the _items', [f'id == {id}']
+                'id was not found in the _items', [f'id == {id}']
             ) from error
 
-    def remove_item(self, id: str) -> None:
-        """Removes an item.
+    def set_item(self, id: str, item: Any) -> None:
+        """Sets an item.
 
         Parameters
         ----------
         id : str
-            ID of the item obtained from the node outputs.
+            ID of the item.
+        item : Any
+            Item of an execution.
+        """
+
+        self._items[id] = item
+
+    def delete_item(self, id: str) -> None:
+        """Deletes an item.
+
+        Parameters
+        ----------
+        id : str
+            ID of the item.
 
         Raises
         ------
@@ -141,10 +149,5 @@ class Catalog(Info):
             del self._items[id]
         except KeyError as error:
             raise CatalogError(
-                'id not found in the _items', [f'id == {id}']
+                'id was not found in the _items', [f'id == {id}']
             ) from error
-
-    def remove_items(self) -> None:
-        """Remove the items."""
-
-        self._items.clear()

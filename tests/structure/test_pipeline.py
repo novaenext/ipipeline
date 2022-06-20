@@ -1,234 +1,199 @@
 from unittest import TestCase
 
 from ipipeline.exceptions import PipelineError
+from ipipeline.structure.link import Link
+from ipipeline.structure.node import Node
 from ipipeline.structure.pipeline import Pipeline
 
 
 class TestPipeline(TestCase):
     def setUp(self) -> None:
-        self._graph = {'n1': [], 'n2': [], 'n3': [], 'n4': []}
-        self._nodes = {'n1': None, 'n2': None, 'n3': None, 'n4': None}
-        self._conns = {'c1': None, 'c2': None, 'c3': None}
+        self._nodes = {'n1': Node('n1', None), 'n2': Node('n2', None)}
+        self._links = {'l1': Link('l1', 'n1', 'n2')}
+        self._task = [lambda arg1, arg2: arg1 + arg2]
 
-    def test_init(self) -> None:
+    def test_init__nodes_eq_dict__links_eq_dict(self) -> None:
         pipeline = Pipeline(
-            'p1', 
-            graph=self._graph, 
-            nodes=self._nodes, 
-            conns=self._conns, 
-            tags=['t1']
+            'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
 
-        self.assertEqual(
-            pipeline.id, 'p1'
-        )
-        self.assertDictEqual(
-            pipeline.graph, {'n1': [], 'n2': [], 'n3': [], 'n4': []}
-        )
-        self.assertDictEqual(
-            pipeline.nodes, {'n1': None, 'n2': None, 'n3': None, 'n4': None}
-        )
-        self.assertDictEqual(
-            pipeline.conns, {'c1': None, 'c2': None, 'c3': None}
-        )
-        self.assertListEqual(
-            pipeline.tags, ['t1']
-        )
+        self.assertEqual(pipeline._id, 'p1')
+        self.assertDictEqual(pipeline._nodes, self._nodes)
+        self.assertDictEqual(pipeline._links, self._links)
+        self.assertListEqual(pipeline._tags, ['t1'])
 
-    def test_defaults(self) -> None:
-        pipeline1 = Pipeline('p1')
-        pipeline2 = Pipeline('p2')
-
-        self.assertIsNot(pipeline1.graph, pipeline2.graph)
-        self.assertIsNot(pipeline1.nodes, pipeline2.nodes)
-        self.assertIsNot(pipeline1.conns, pipeline2.conns)
-
-    def test_add_inexistent_nodes(self) -> None:
+    def test_get__nodes_eq_dict__links_eq_dict(self) -> None:
         pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=None, tags=None
-        )
-        pipeline.add_node(
-            'n1', 
-            mock_sum, 
-            inputs={'param1': 7, 'param2': 3}, 
-            outputs=['sum'], 
-            tags=None
-        )
-        pipeline.add_node(
-            'n2', 
-            mock_sub, 
-            inputs={'param1': 7, 'param2': 3}, 
-            outputs=['sub'], 
-            tags=None
+            'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
 
-        self.assertListEqual(
-            list(pipeline.nodes.keys()), ['n1', 'n2']
-        )
-        self.assertListEqual(
-            [node.id for node in pipeline.nodes.values()], ['n1', 'n2']
-        )
-        self.assertListEqual(
-            list(pipeline.graph.keys()), ['n1', 'n2']
-        )
-        self.assertListEqual(
-            list(pipeline.graph.values()), [[], []]
-        )
+        self.assertEqual(pipeline.id, 'p1')
+        self.assertDictEqual(pipeline.nodes, self._nodes)
+        self.assertDictEqual(pipeline.links, self._links)
+        self.assertListEqual(pipeline.tags, ['t1'])
 
-    def test_add_existent_nodes(self) -> None:
+    def test_set__nodes_eq_dict__links_eq_dict(self) -> None:
         pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=None, tags=None
+            'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
-        pipeline.add_node(
-            'n1', 
-            mock_sum, 
-            inputs={'param1': 7, 'param2': 3}, 
-            outputs=['sum'], 
-            tags=None
-        )
+        pipeline.id = 'p2'
+        pipeline.nodes = {'n3': None}
+        pipeline.links = {'l2': None}
+        pipeline.tags = ['t2']
+
+        self.assertEqual(pipeline.id, 'p2')
+        self.assertDictEqual(pipeline.nodes, {'n3': None})
+        self.assertDictEqual(pipeline.links, {'l2': None})
+        self.assertListEqual(pipeline.tags, ['t2'])
+
+    def test_check_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+        checked = pipeline.check_node('n1')
+
+        self.assertTrue(checked)
+
+    def test_check_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        checked = pipeline.check_node('n1')
+
+        self.assertFalse(checked)
+
+    def test_get_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+        node = pipeline.get_node('n1')
+
+        self.assertEqual(node, self._nodes['n1'])
+
+    def test_get_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
 
         with self.assertRaisesRegex(
-            PipelineError, r'node_id found in the _nodes: node_id == n1'
+            PipelineError, r'id was not found in the _nodes: id == n1'
+        ):
+            _ = pipeline.get_node('n1')
+
+    def test_set_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was found in the _nodes: id == n1'
+        ):
+            pipeline.set_node(self._nodes['n1'])
+
+    def test_set_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline.set_node(self._nodes['n1'])
+
+        self.assertEqual(pipeline._nodes['n1'], self._nodes['n1'])
+
+    def test_delete_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+        pipeline.delete_node('n1')
+
+        self.assertEqual(list(pipeline._nodes.keys()), ['n2'])
+
+    def test_delete_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was not found in the _nodes: id == n1'
+        ):
+            pipeline.delete_node('n1')
+
+    def test_add_node__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', nodes=self._nodes)
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was found in the _nodes: id == n1'
         ):
             pipeline.add_node(
                 'n1', 
-                mock_sub, 
-                inputs={'param1': 7, 'param2': 3}, 
-                outputs=['sub'], 
-                tags=None
+                self._task, 
+                inputs={'arg1': 2, 'arg2': 4}, 
+                outputs=['sum']
             )
 
-    def test_check_existent_node_id_aff(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=self._nodes, conns=None, tags=None
+    def test_add_node__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline.add_node(
+            'n1', 
+            self._task, 
+            inputs={'arg1': 2, 'arg2': 4}, 
+            outputs=['sum']
         )
 
-        with self.assertRaisesRegex(
-            PipelineError, r'node_id found in the _nodes: node_id == n1'
-        ):
-            pipeline._check_existent_node_id('n1')
-
-    def test_check_inexistent_node_id_aff(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=None, tags=None
-        )
-        pipeline._check_existent_node_id('n1')
-
-        self.assertTrue(True)
-
-    def test_add_inexistent_conns_with_existent_nodes(self) -> None:
-        pipeline = Pipeline(
-            'p1', 
-            graph=self._graph, 
-            nodes=self._nodes, 
-            conns=None, 
-            tags=None
-        )
-        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
-        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
-        pipeline.add_conn('c3', 'n2', 'n4', power=None, tags=None)
-
+        self.assertListEqual(list(pipeline.nodes.keys()), ['n1'])
         self.assertListEqual(
-            list(pipeline.conns.keys()), ['c1', 'c2', 'c3']
+            [node.id for node in pipeline.nodes.values()], ['n1']
         )
+
+    def test_check_link__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', links=self._links)
+        checked = pipeline.check_link('l1')
+
+        self.assertTrue(checked)
+
+    def test_check_link__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        checked = pipeline.check_link('l1')
+
+        self.assertFalse(checked)
+
+    def test_get_link__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', links=self._links)
+        link = pipeline.get_link('l1')
+
+        self.assertEqual(link, self._links['l1'])
+
+    def test_get_link__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was not found in the _links: id == l1'
+        ):
+            _ = pipeline.get_link('l1')
+
+    def test_set_link__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', links=self._links)
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was found in the _links: id == l1'
+        ):
+            pipeline.set_link(self._links['l1'])
+
+    def test_set_link__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline.set_link(self._links['l1'])
+
+        self.assertEqual(pipeline._links['l1'], self._links['l1'])
+
+    def test_delete_link__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', links=self._links)
+        pipeline.delete_link('l1')
+
+        self.assertEqual(list(pipeline._links.keys()), [])
+
+    def test_delete_link__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was not found in the _links: id == l1'
+        ):
+            pipeline.delete_link('l1')
+
+    def test_add_link__id_eq_id(self) -> None:
+        pipeline = Pipeline('p1', links=self._links)
+
+        with self.assertRaisesRegex(
+            PipelineError, r'id was found in the _links: id == l1'
+        ):
+            pipeline.add_link('l1', 'n1', 'n2')
+
+    def test_add_link__id_ne_id(self) -> None:
+        pipeline = Pipeline('p1')
+        pipeline.add_link('l1', 'n1', 'n2')
+
+        self.assertListEqual(list(pipeline.links.keys()), ['l1'])
         self.assertListEqual(
-            [conn.id for conn in pipeline.conns.values()], ['c1', 'c2', 'c3']
+            [link.id for link in pipeline.links.values()], ['l1']
         )
-        self.assertListEqual(
-            list(pipeline.graph.keys()), ['n1', 'n2', 'n3', 'n4']
-        )
-        self.assertListEqual(
-            list(pipeline.graph.values()), [['n2', 'n3'], ['n4'], [], []]
-        )
-
-    def test_add_existent_conns_with_existent_nodes(self) -> None:
-        pipeline = Pipeline(
-            'p1', 
-            graph=self._graph, 
-            nodes=self._nodes, 
-            conns=None, 
-            tags=None
-        )
-        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
-        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
-
-        with self.assertRaisesRegex(
-            PipelineError, r'conn_id found in the _conns: conn_id == c1'
-        ):
-            pipeline.add_conn('c1', 'n2', 'n4', power=None, tags=None)
-
-    def test_add_inexistent_conns_with_inexistent_src_node(self) -> None:
-        pipeline = Pipeline(
-            'p1', 
-            graph=self._graph, 
-            nodes=self._nodes, 
-            conns=None, 
-            tags=None
-        )
-        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
-        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
-
-        with self.assertRaisesRegex(
-            PipelineError, r'node_id not found in the _nodes: node_id == n7'
-        ):
-            pipeline.add_conn('c3', 'n7', 'n4', power=None, tags=None)
-
-    def test_add_inexistent_conns_with_inexistent_dst_node(self) -> None:
-        pipeline = Pipeline(
-            'p1', 
-            graph=self._graph, 
-            nodes=self._nodes, 
-            conns=None, 
-            tags=None
-        )
-        pipeline.add_conn('c1', 'n1', 'n2', power=None, tags=None)
-        pipeline.add_conn('c2', 'n1', 'n3', power=None, tags=None)
-
-        with self.assertRaisesRegex(
-            PipelineError, r'node_id not found in the _nodes: node_id == n7'
-        ):
-            pipeline.add_conn('c3', 'n2', 'n7', power=None, tags=None)
-
-    def test_check_existent_conn_id(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=self._conns, tags=None
-        )
-
-        with self.assertRaisesRegex(
-            PipelineError, r'conn_id found in the _conns: conn_id == c1'
-        ):
-            pipeline._check_existent_conn_id('c1')
-
-    def test_check_inexistent_conn_id(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=None, tags=None
-        )
-        pipeline._check_existent_conn_id('c1')
-
-        self.assertTrue(True)
-
-    def test_check_inexistent_node_id_neg(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=None, tags=None
-        )
-
-        with self.assertRaisesRegex(
-            PipelineError, r'node_id not found in the _nodes: node_id == n1'
-        ):
-            pipeline._check_inexistent_node_id('n1')
-
-    def test_check_existent_node_id_neg(self) -> None:
-        pipeline = Pipeline(
-            'p1', graph=None, nodes=self._nodes, conns=None, tags=None
-        )
-        pipeline._check_inexistent_node_id('n1')
-
-        self.assertTrue(True)
-
-
-def mock_sum(param1: int, param2: int) -> int:
-    return param1 + param2
-
-
-def mock_sub(param1: int, param2: int) -> int:
-    return param1 - param2

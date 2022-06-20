@@ -47,7 +47,7 @@ class TestCreateProject(TestCase):
         create_project(str(self._path.parents[0]), 'mock_proj')
 
         with self.assertRaisesRegex(
-            SystemError, r'path found in the file system: path == *'
+            SystemError, r'path was found in the file system: path == *'
         ):
             create_project(str(self._path.parents[0]), 'mock_proj')
 
@@ -63,7 +63,7 @@ class TestExecutePipeline(TestCase):
     def test_inexistent_pipeline(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'inst_name not found in the module: inst_name == '
+            r'inst_name was not found in the module: inst_name == '
             r'mock_build_pipelines'
         ):
             execute_pipeline(

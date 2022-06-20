@@ -3,32 +3,27 @@
 from typing import Any, Callable, Dict, List
 
 from ipipeline.exceptions import PipelineError
-from ipipeline.structure.conn import Conn
 from ipipeline.structure.info import Info
+from ipipeline.structure.link import Link
 from ipipeline.structure.node import Node
 from ipipeline.utils.checking import check_none
 
 
 class Pipeline(Info):
-    """Stores a graph formed by nodes and their connections.
+    """Stores a flow of executable units.
 
-    The graph must be acyclic to be able to obtain its topological order 
-    that is used to order the execution of the nodes.
+    The link between the nodes must compose a directed acyclic graph.
 
     Attributes
     ----------
     _id : str
         ID of the pipeline.
-    _graph : Dict[str, list]
-        Graph of the pipeline. The keys are the IDs of the source nodes 
-        and the values are the dependencies formed by the IDs of the 
-        destination nodes.
     _nodes : Dict[str, Node]
         Nodes of the graph. The keys are the node IDs and the values are 
-        the node instances.
-    _conns : Dict[str, Conn]
-        Connections of the graph. The keys are the connection IDs and the 
-        values are the connection instances.
+        the nodes.
+    _links : Dict[str, Link]
+        Links of the graph. The keys are the link IDs and the values are 
+        the links.
     _tags : List[str]
         Tags of the pipeline to provide more context.
     """
@@ -36,9 +31,8 @@ class Pipeline(Info):
     def __init__(
         self, 
         id: str, 
-        graph: Dict[str, list] = None,
         nodes: Dict[str, Node] = None, 
-        conns: Dict[str, Conn] = None, 
+        links: Dict[str, Link] = None, 
         tags: List[str] = None
     ) -> None:
         """Initializes the attributes.
@@ -47,70 +41,165 @@ class Pipeline(Info):
         ----------
         id : str
             ID of the pipeline.
-        graph : Dict[str, list], default=None
-            Graph of the pipeline. The keys are the IDs of the source nodes 
-            and the values are the dependencies formed by the IDs of the 
-            destination nodes.
-        nodes : Dict[str, Node], default=None
+        nodes : Dict[str, Node], optional
             Nodes of the graph. The keys are the node IDs and the values are 
-            the node instances.
-        conns : Dict[str, Conn], default=None
-            Connections of the graph. The keys are the connection IDs and the 
-            values are the connection instances.
-        tags : List[str], default=None
+            the nodes.
+        links : Dict[str, Link], optional
+            Links of the graph. The keys are the link IDs and the values are 
+            the links.
+        tags : List[str], optional
             Tags of the pipeline to provide more context.
 
         Raises
         ------
         InfoError
-            Informs that the id was not validated according to the pattern.
+            Informs that the id did not match the pattern.
         """
-
-        self._graph = check_none(graph, {})
-        self._nodes = check_none(nodes, {})
-        self._conns = check_none(conns, {})
 
         super().__init__(id, tags=tags)
 
-    @property
-    def graph(self) -> Dict[str, list]:
-        """Obtains the _graph attribute.
-
-        Returns
-        -------
-        graph : Dict[str, list]
-            Graph of the pipeline. The keys are the IDs of the source nodes 
-            and the values are the dependencies formed by the IDs of the 
-            destination nodes.
-        """
-
-        return self._graph
+        self._nodes = check_none(nodes, {})
+        self._links = check_none(links, {})
 
     @property
     def nodes(self) -> Dict[str, Node]:
-        """Obtains the _nodes attribute.
+        """Gets the _nodes attribute.
 
         Returns
         -------
         nodes : Dict[str, Node]
             Nodes of the graph. The keys are the node IDs and the values are 
-            the node instances.
+            the nodes.
         """
 
         return self._nodes
 
+    @nodes.setter
+    def nodes(self, nodes: Dict[str, Node]) -> None:
+        """Sets the _nodes attribute.
+
+        Parameters
+        ----------
+        nodes : Dict[str, Node]
+            Nodes of the graph. The keys are the node IDs and the values are 
+            the nodes.
+        """
+
+        self._nodes = nodes
+
     @property
-    def conns(self) -> Dict[str, Conn]:
-        """Obtains the _conns attribute.
+    def links(self) -> Dict[str, Link]:
+        """Gets the _links attribute.
 
         Returns
         -------
-        conns : Dict[str, Conn]
-            Connections of the graph. The keys are the connection IDs and the 
-            values are the connection instances.
+        links : Dict[str, Link]
+            Links of the graph. The keys are the link IDs and the values are 
+            the links.
         """
 
-        return self._conns
+        return self._links
+
+    @links.setter
+    def links(self, links: Dict[str, Link]) -> None:
+        """Sets the _links attribute.
+
+        Parameters
+        ----------
+        links : Dict[str, Link]
+            Links of the graph. The keys are the link IDs and the values are 
+            the links.
+        """
+
+        self._links = links
+
+    def check_node(self, id: str) -> bool:
+        """Checks if a node exists.
+
+        Parameters
+        ----------
+        id : str
+            ID of the node.
+
+        Returns
+        -------
+        checked : bool
+            Flag that indicates if a node exists.
+        """
+
+        checked = id in self._nodes.keys()
+
+        return checked
+
+    def get_node(self, id: str) -> Node:
+        """Gets a node.
+
+        Parameters
+        ----------
+        id : str
+            ID of the node.
+
+        Returns
+        -------
+        node : Node
+            Node that stores an executable unit of the graph.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _nodes.
+        """
+
+        try:
+            node = self._nodes[id]
+
+            return node
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _nodes', [f'id == {id}']
+            ) from error
+
+    def set_node(self, node: Node) -> None:
+        """Sets a node.
+
+        Parameters
+        ----------
+        node : Node
+            Node that stores an executable unit of the graph.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was found in the _nodes.
+        """
+
+        if self.check_node(node.id):
+            raise PipelineError(
+                'id was found in the _nodes', [f'id == {node.id}']
+            )
+
+        self._nodes[node.id] = node
+
+    def delete_node(self, id: str) -> None:
+        """Deletes a node.
+
+        Parameters
+        ----------
+        id : str
+            ID of the node.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _nodes.
+        """
+
+        try:
+            del self._nodes[id]
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _nodes', [f'id == {id}']
+            ) from error
 
     def add_node(
         self, 
@@ -120,137 +209,154 @@ class Pipeline(Info):
         outputs: List[str] = None, 
         tags: List[str] = None
     ) -> None:
-        """Adds a node in the graph.
+        """Adds a node through its settings.
 
         Parameters
         ----------
         id : str
             ID of the node.
         task : Callable
-            Task that represents an execution unit.
-        inputs : Dict[str, Any], default=None
-            Inputs of the task. The keys are the function parameters and 
-            the values are any default values and/or placeholders for the 
-            catalog items.
+            Task of the node.
+        inputs : Dict[str, Any], optional
+            Inputs of the task. The keys are the callable parameters and the 
+            values are the data required for the parameters. The values can 
+            also be placeholders for the catalog items.
 
-            'c.<item_id>': obtains a single item.
-            'c.[<item_id>, ..., <item_id>]': obtains multiple items.
-        outputs : List[str], default=None
-            Outputs of the task. The outputs must match the returns in 
-            terms of length. If one output is expected, the return can be of 
-            any type, however, in cases with more than one output, the returns 
-            must be a sequence.
-        tags : List[str], default=None
+            Placeholders:
+                'c.<item_id>': gets an item.
+                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        outputs : List[str], optional
+            Outputs of the task. The outputs must match the returns in terms 
+            of size.
+        tags : List[str], optional
             Tags of the node to provide more context.
 
         Raises
         ------
-        PipelineError
-            Informs that the node_id was found in the _nodes.
         InfoError
-            Informs that the id was not validated according to the pattern.
-        """
-
-        self._check_existent_node_id(id)
-        node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
-
-        self._graph[node.id] = []
-        self._nodes[node.id] = node
-
-    def _check_existent_node_id(self, node_id: str) -> None:
-        """Checks if the node ID exists.
-
-        Parameters
-        ----------
-        node_id : str
-            ID of the node.
-
-        Raises
-        ------
+            Informs that the id did not match the pattern.
         PipelineError
-            Informs that the node_id was found in the _nodes.
+            Informs that the id was found in the _nodes.
         """
 
-        if node_id in self._nodes.keys():
-            raise PipelineError(
-                'node_id found in the _nodes', [f'node_id == {node_id}']
-            )
+        node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
+        self.set_node(node)
 
-    def add_conn(
-        self, 
-        id: str, 
-        src_node_id: str, 
-        dst_node_id: str, 
-        power: Any = None, 
-        tags: List[str] = None
-    ) -> None:
-        """Adds a connection in the graph.
+    def check_link(self, id: str) -> bool:
+        """Checks if a link exists.
 
         Parameters
         ----------
         id : str
-            ID of the connection.
-        src_node_id : str
+            ID of the link.
+
+        Returns
+        -------
+        checked : bool
+            Flag that indicates if a link exists.
+        """
+
+        checked = id in self._links.keys()
+
+        return checked
+
+    def get_link(self, id: str) -> Link:
+        """Gets a link.
+
+        Parameters
+        ----------
+        id : str
+            ID of the link.
+
+        Returns
+        -------
+        link : Link
+            Link that stores a dependency between the nodes of the graph.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _links.
+        """
+
+        try:
+            link = self._links[id]
+
+            return link
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _links', [f'id == {id}']
+            ) from error
+
+    def set_link(self, link: Link) -> None:
+        """Sets a link.
+
+        Parameters
+        ----------
+        link : Link
+            Link that stores a dependency between the nodes of the graph.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was found in the _links.
+        """
+
+        if self.check_link(link.id):
+            raise PipelineError(
+                'id was found in the _links', [f'id == {link.id}']
+            )
+
+        self._links[link.id] = link
+
+    def delete_link(self, id: str) -> None:
+        """Deletes a link.
+
+        Parameters
+        ----------
+        id : str
+            ID of the link.
+
+        Raises
+        ------
+        PipelineError
+            Informs that the id was not found in the _links.
+        """
+
+        try:
+            del self._links[id]
+        except KeyError as error:
+            raise PipelineError(
+                'id was not found in the _links', [f'id == {id}']
+            ) from error
+
+    def add_link(
+        self, 
+        id: str, 
+        src_id: str, 
+        dst_id: str, 
+        tags: List[str] = None
+    ) -> None:
+        """Adds a link through its settings.
+
+        Parameters
+        ----------
+        id : str
+            ID of the link.
+        src_id : str
             ID of the source node.
-        dst_node_id : str
+        dst_id : str
             ID of the destination node.
-        power : Any
-            Power of the connection that indicates its strength.
-        tags : List[str]
-            Tags of the connection to provide more context.
+        tags : List[str], optional
+            Tags of the link to provide more context.
 
         Raises
         ------
-        PipelineError
-            Informs that the conn_id was found in the _conns.
-        PipelineError
-            Informs that the node_id was not found in the _nodes.
         InfoError
-            Informs that the id was not validated according to the pattern.
-        """
-
-        self._check_existent_conn_id(id)
-        self._check_inexistent_node_id(src_node_id)
-        self._check_inexistent_node_id(dst_node_id)
-        conn = Conn(id, src_node_id, dst_node_id, power=power, tags=tags)
-
-        self._graph[conn.src_node_id].append(conn.dst_node_id)
-        self._conns[conn.id] = conn
-
-    def _check_existent_conn_id(self, conn_id: str) -> None:
-        """Checks if the connection ID exists.
-
-        Parameters
-        ----------
-        conn_id : str
-            ID of the connection.
-
-        Raises
-        ------
+            Informs that the id did not match the pattern.
         PipelineError
-            Informs that the conn_id was found in the _conns.
+            Informs that the id was found in the _links.
         """
 
-        if conn_id in self._conns.keys():
-            raise PipelineError(
-                'conn_id found in the _conns', [f'conn_id == {conn_id}']
-            )
-
-    def _check_inexistent_node_id(self, node_id: str) -> None:
-        """Checks if the node ID does not exist.
-
-        Parameters
-        ----------
-        node_id : str
-            ID of the node.
-
-        Raises
-        ------
-        PipelineError
-            Informs that the node_id was not found in the _nodes.
-        """
-
-        if node_id not in self._nodes.keys():
-            raise PipelineError(
-                'node_id not found in the _nodes', [f'node_id == {node_id}']
-            )
+        link = Link(id, src_id, dst_id, tags=tags)
+        self.set_link(link)

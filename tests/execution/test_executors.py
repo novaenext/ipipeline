@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.execution.executors import BaseExecutor, SequentialExecutor
-from ipipeline.exceptions import ExecutorError, PipelineError
+from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 
@@ -14,7 +14,7 @@ class MockBaseExecutor(BaseExecutor):
 class TestBaseExecutor(TestCase):
     def setUp(self) -> None:
         self._pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=None, tags=['t1']
+            'p1', nodes=None, links=None, tags=['t1']
         )
         self._pipeline.add_node(
             'n1', 
@@ -32,14 +32,13 @@ class TestBaseExecutor(TestCase):
         )
 
         self._catalog = Catalog('c1', items=None, tags=['t1'])
-        self._catalog.add_item('i1', 7)
+        self._catalog.set_item('i1', 7)
 
     def test_init(self) -> None:
         executor = MockBaseExecutor(
             pipeline=self._pipeline, catalog=self._catalog, signals=None
         )
 
-        self.assertDictEqual(executor.pipeline.graph, {'n1': [], 'n2': []})
         self.assertDictEqual(executor.catalog.items, {'i1': 7})
         self.assertDictEqual(executor.signals, {})
 
@@ -119,7 +118,7 @@ class TestBaseExecutor(TestCase):
         executor.add_signal('s1', 'n1', 'skip', status=True, tags=None)
 
         with self.assertRaisesRegex(
-            PipelineError, r'node_id not found in the _nodes: node_id == n22'
+            ExecutorError, r'node_id not found in the _nodes: node_id == n22'
         ):
             executor.add_signal('s2', 'n22', 'skips', status=True, tags=None)
 
@@ -178,7 +177,7 @@ class TestBaseExecutor(TestCase):
 class TestSequentialExecutor(TestCase):
     def setUp(self) -> None:
         self._pipeline = Pipeline(
-            'p1', graph=None, nodes=None, conns=None, tags=None
+            'p1', nodes=None, links=None, tags=None
         )
         self._pipeline.add_node(
             'n1', 
@@ -208,8 +207,8 @@ class TestSequentialExecutor(TestCase):
             outputs=None, 
             tags=None
         )
-        self._pipeline.add_conn('c1', 'n1', 'n3', power=None, tags=None)
-        self._pipeline.add_conn('c2', 'n2', 'n4', power=None, tags=None)
+        self._pipeline.add_link('l1', 'n1', 'n3', tags=None)
+        self._pipeline.add_link('l2', 'n2', 'n4', tags=None)
 
     def test_deriv(self) -> None:
         executor = SequentialExecutor(

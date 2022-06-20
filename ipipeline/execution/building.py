@@ -4,6 +4,52 @@ from typing import Any, Dict, List
 
 from ipipeline.exceptions import BuildingError
 from ipipeline.structure.catalog import Catalog
+from ipipeline.structure.pipeline import Pipeline
+
+
+def build_graph(pipeline: Pipeline) -> Dict[str, list]:
+    """Builds a graph.
+
+    Parameters
+    ----------
+    pipeline : Pipeline
+        Pipeline that stores a flow of tasks.
+
+    Returns
+    -------
+    graph : Dict[str, list]
+        Graph of the pipeline. The keys are the source node IDs and the 
+        values are a list of destination node IDs.
+
+    Raises
+    ------
+    BuildingError
+        Informs that the src_id was not found in the pipeline._nodes.
+    BuildingError
+        Informs that the dst_id was not found in the pipeline._nodes.
+    """
+
+    graph = {}
+
+    for node in pipeline.nodes.values():
+        graph[node.id] = []
+
+    for link in pipeline.links.values():
+        if not pipeline.check_node(link.src_id):
+            raise BuildingError(
+                'src_id was not found in the pipeline._nodes', 
+                [f'src_id == {link.src_id}']
+            )
+
+        if not pipeline.check_node(link.dst_id):
+            raise BuildingError(
+                'dst_id was not found in the pipeline._nodes', 
+                [f'dst_id == {link.dst_id}']
+            )
+
+        graph[link.src_id].append(link.dst_id)
+
+    return graph
 
 
 def build_task_inputs(
@@ -14,21 +60,21 @@ def build_task_inputs(
     Parameters
     ----------
     inputs : Dict[str, Any]
-        Inputs of the task. The keys are the function parameters and 
-        the values are any default values and/or placeholders for the 
-        catalog items.
+        Inputs of the task. The keys are the callable parameters and the 
+        values are the data required for the parameters. The values can 
+        also be placeholders for the catalog items.
 
-        'c.<item_id>': obtains a single item.
-        'c.[<item_id>, ..., <item_id>]': obtains multiple items.
+        Placeholders:
+            'c.<item_id>': gets an item.
+            'c.[<item_id>, ..., <item_id>]': gets a list of items.
     catalog : Catalog
-        Catalog that stores the items from an execution.
+        Catalog that stores the items.
 
     Returns
     -------
     task_inputs : Dict[str, Any]
-        Inputs of the task. The keys are the function parameters and 
-        the values are any default values and/or items obtained from the 
-        catalog.
+        Inputs of the task. The keys are the callable parameters and 
+        the values are the data required for the parameters.
 
     Raises
     ------
@@ -47,10 +93,10 @@ def build_task_inputs(
 
                 for item_id in in_value[1:-1].split(','):
                     task_inputs[in_key].append(
-                        catalog.obtain_item(item_id.strip())
+                        catalog.get_item(item_id.strip())
                     )
             else:
-                task_inputs[in_key] = catalog.obtain_item(in_value)
+                task_inputs[in_key] = catalog.get_item(in_value)
         else:
             task_inputs[in_key] = in_value
 
@@ -63,18 +109,16 @@ def build_task_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
     Parameters
     ----------
     outputs : List[str]
-        Outputs of the task. The outputs must match the returns in 
-        terms of length. If one output is expected, the return can be of 
-        any type, however, in cases with more than one output, the returns 
-        must be a sequence.
+        Outputs of the task. The outputs must match the returns in terms 
+        of size.
     returns : Any
         Returns of the task obtained from its execution.
 
     Returns
     -------
     task_outputs : Dict[str, Any]
-        Outputs of the task. The keys are the outputs and the values 
-        are the returns obtained from the execution.
+        Outputs of the task. The keys are the task outputs and the 
+        values are the task returns obtained from the execution.
 
     Raises
     ------
