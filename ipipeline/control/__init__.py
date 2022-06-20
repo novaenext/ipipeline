@@ -3,4 +3,4 @@
 The execution package provides components to execute the tasks.
 """
 
-from ipipeline.execution.executors import BaseExecutor, SequentialExecutor
+from ipipeline.control.executors import BaseExecutor, SequentialExecutor

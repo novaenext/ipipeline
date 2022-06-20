@@ -4,10 +4,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from ipipeline.execution.building import (
+from ipipeline.control.building import (
     build_graph, build_task_inputs, build_task_outputs
 )
-from ipipeline.execution.sorting import sort_graph_topo
+from ipipeline.control.sorting import sort_graph_topo
 from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
