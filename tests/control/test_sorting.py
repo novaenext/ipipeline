@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ipipeline.execution.sorting import (
+from ipipeline.control.sorting import (
     sort_graph_topo, 
     _obtain_in_conns_qty, 
     _find_ind_node_ids, 
