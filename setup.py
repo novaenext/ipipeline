@@ -1,8 +1,6 @@
 from pathlib import Path
 from setuptools import find_packages, setup
 
-from ipipeline import __version__
-
 
 proj_path = Path(__file__).resolve().parents[0]
 
@@ -14,7 +12,7 @@ with open(str(proj_path / 'requirements' / 'prod.txt')) as requirements_file:
 
 setup(
     name='ipipeline', 
-    version=__version__, 
+    version='0.15.0', 
     description=(
         'A micro framework for building and executing pipelines from '
         'different domains.'
