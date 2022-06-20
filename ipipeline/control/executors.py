@@ -11,7 +11,6 @@ from ipipeline.control.sorting import sort_graph_topo
 from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
-from ipipeline.structure.signal import Signal
 from ipipeline.utils.checking import check_none
 
 
@@ -31,16 +30,10 @@ class BaseExecutor(ABC):
         Pipeline that stores a graph.
     _catalog : Catalog
         Catalog that stores the items from an execution.
-    _signals : Dict[str, Signal]
-        Signals of the execution. The keys are the node IDs and the values 
-        are the signals where the IDs are obtained.
     """
 
     def __init__(
-        self, 
-        pipeline: Pipeline = None, 
-        catalog: Catalog = None, 
-        signals: Dict[str, Signal] = None
+        self, pipeline: Pipeline = None, catalog: Catalog = None
     ) -> None:
         """Initializes the attributes.
 
@@ -50,14 +43,10 @@ class BaseExecutor(ABC):
             Pipeline that stores a graph.
         catalog : Catalog
             Catalog that stores the items from an execution.
-        signals : Dict[str, Signal]
-            Signals of the execution. The keys are the node IDs and the values 
-            are the signal instances.
         """
 
         self.add_pipeline(pipeline)
         self.add_catalog(catalog)
-        self._signals = check_none(signals, {})
 
     @property
     def pipeline(self) -> Pipeline:
@@ -82,19 +71,6 @@ class BaseExecutor(ABC):
         """
 
         return self._catalog
-
-    @property
-    def signals(self) -> Dict[str, Signal]:
-        """Obtains the _signals attribute.
-
-        Returns
-        -------
-        signals : Dict[str, Signal]
-            Signals of the execution. The keys are the node IDs and the values 
-            are the signal instances.
-        """
-
-        return self._signals
 
     def add_pipeline(self, pipeline: Pipeline) -> None:
         """Adds a pipeline in the executor.
@@ -131,72 +107,6 @@ class BaseExecutor(ABC):
         self._catalog = check_none(
             catalog, Catalog('c0', tags=['default'])
         )
-
-    def add_signal(
-        self, 
-        id: str, 
-        node_id: str, 
-        type: str, 
-        status: bool = True, 
-        tags: List[str] = None
-    ) -> None:
-        """Adds a signal to a node.
-
-        Parameters
-        ----------
-        id : str
-            ID of the signal.
-        node_id : str
-            ID of the node.
-        type : str
-            Type of the signal used to trigger an action.
-        status : bool, default=True
-            Indicates if the signal is enable or disable.
-        tags : List[str], default=None
-            Tags of the signal to provide more context.
-
-        Raises
-        ------
-        ExecutorError
-            Informs that the node_id was not found in the _nodes.
-        ExecutorError
-            Informs that the type was not found in the valid_types.
-        InfoError
-            Informs that the id was not validated according to the pattern.
-        """
-
-        if not self._pipeline.check_node(node_id):
-            raise ExecutorError(
-                'node_id not found in the _nodes', [f'node_id == {node_id}']
-            )
-
-        self._check_invalid_type(type)
-        signal = Signal(id, node_id, type, status, tags)
-
-        self._signals[signal.node_id] = signal
-
-    def _check_invalid_type(self, type: str) -> None:
-        """Checks if the type is invalid.
-
-        Parameters
-        ----------
-        type : {'skip'}
-            Type of the signal that triggers an action.
-
-            skip: skips the node execution.
-
-        Raises
-        ------
-        ExecutorError
-            Informs that the type was not found in the valid_types.
-        """
-
-        valid_types = ['skip']
-
-        if type not in valid_types:
-            raise ExecutorError(
-                'type not found in the valid_types', [f'type == {type}']
-            )
 
     def execute_node(self, id: str) -> Dict[str, Any]:
         """Executes a node.
@@ -284,9 +194,6 @@ class SequentialExecutor(BaseExecutor):
         Pipeline that stores a graph.
     _catalog : Catalog
         Catalog that stores the items from an execution.
-    _signals : Dict[str, Signal]
-        Signals of the execution. The keys are the node IDs and the values 
-        are the signals where the IDs are obtained.
     """
 
     def execute_pipeline(self, topo_order: List[list]) -> None:
@@ -307,14 +214,7 @@ class SequentialExecutor(BaseExecutor):
 
         for group in topo_order:
             for node_id in group:
-                signal = self._signals.get(
-                    node_id, Signal('s0', node_id, 'default')
-                )
+                task_outputs = self.execute_node(node_id)
 
-                if signal.type == 'skip' and signal.status == True:
-                    continue
-                else:
-                    task_outputs = self.execute_node(node_id)
-
-                    for out_key, out_value in task_outputs.items():
-                        self._catalog.set_item(out_key, out_value)
+                for out_key, out_value in task_outputs.items():
+                    self._catalog.set_item(out_key, out_value)
