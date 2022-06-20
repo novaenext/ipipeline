@@ -77,7 +77,7 @@ def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
 
     pipeline = get_inst(mod_name, func_name)()
     executor = get_inst(
-        'ipipeline.execution.executors', f'{exe_type.capitalize()}Executor'
+        'ipipeline.control.executors', f'{exe_type.capitalize()}Executor'
     )()
     executor.add_pipeline(pipeline)
     topo_order = executor.obtain_topo_order()
