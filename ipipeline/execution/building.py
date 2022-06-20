@@ -31,6 +31,9 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
 
     graph = {}
 
+    for node in pipeline.nodes.values():
+        graph[node.id] = []
+
     for link in pipeline.links.values():
         if not pipeline.check_node(link.src_id):
             raise BuildingError(
@@ -43,9 +46,6 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
                 'dst_id was not found in the pipeline._nodes', 
                 [f'dst_id == {link.dst_id}']
             )
-
-        if link.src_id not in graph.keys():
-            graph[link.src_id] = []
 
         graph[link.src_id].append(link.dst_id)
 
