@@ -14,9 +14,8 @@ def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
     Parameters
     ----------
     graph : Dict[str, list]
-        Graph of the pipeline. The keys are the IDs of the source nodes 
-        and the values are the dependencies formed by the IDs of the 
-        destination nodes.
+        Graph of the pipeline. The keys are the source node IDs and the 
+        values are a list of destination node IDs.
 
     Returns
     -------
