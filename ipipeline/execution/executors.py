@@ -157,7 +157,7 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        PipelineError
+        ExecutorError
             Informs that the node_id was not found in the _nodes.
         ExecutorError
             Informs that the type was not found in the valid_types.
@@ -165,7 +165,11 @@ class BaseExecutor(ABC):
             Informs that the id was not validated according to the pattern.
         """
 
-        self._pipeline._check_inexistent_node_id(node_id)
+        if not self._pipeline.check_node(node_id):
+            raise ExecutorError(
+                'node_id not found in the _nodes', [f'node_id == {node_id}']
+            )
+
         self._check_invalid_type(type)
         signal = Signal(id, node_id, type, status, tags)
 
@@ -313,4 +317,4 @@ class SequentialExecutor(BaseExecutor):
                     task_outputs = self.execute_node(node_id)
 
                     for out_key, out_value in task_outputs.items():
-                        self._catalog.add_item(out_key, out_value)
+                        self._catalog.set_item(out_key, out_value)
