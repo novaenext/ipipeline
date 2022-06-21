@@ -54,7 +54,12 @@ def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
 
             ind_nodes_qty += 1
         ind_node_ids = cand_node_ids
-    _check_circular_dependency(len(graph.keys()), ind_nodes_qty)
+
+    if len(graph.keys()) != ind_nodes_qty:
+        raise SortingError(
+            'circular dependency found in the graph', 
+            [f'{len(graph.keys())} != {ind_nodes_qty}']
+        )
 
     return topo_order
 
@@ -116,28 +121,3 @@ def _get_unbound_ids(incomings_qty: Dict[str, int]) -> List[str]:
             unbound_ids.append(id)
 
     return unbound_ids
-
-
-def _check_circular_dependency(nodes_qty: int, ind_nodes_qty: int) -> None:
-    """Checks for a circular dependency.
-
-    The circular dependency prevents the formation of the topological order.
-
-    Parameters
-    ----------
-    nodes_qty : int
-        Quantity of nodes.
-    ind_nodes_qty : int
-        Quantity of independent nodes.
-
-    Raises
-    ------
-    SortingError
-        Informs that a circular dependency was found in the graph.
-    """
-
-    if nodes_qty != ind_nodes_qty:
-        raise SortingError(
-            'circular dependency found in the graph', 
-            [f'{nodes_qty} != {ind_nodes_qty}']
-        )
