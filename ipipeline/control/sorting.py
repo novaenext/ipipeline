@@ -39,7 +39,7 @@ def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
     topo_order = []
     ind_nodes_qty = 0
     in_conns_qty = _get_incomings_qty(graph)
-    ind_node_ids = _find_ind_node_ids(in_conns_qty)
+    ind_node_ids = _get_unbound_ids(in_conns_qty)
 
     while ind_node_ids:
         cand_node_ids = []
@@ -94,30 +94,28 @@ def _get_incomings_qty(graph: Dict[str, list]) -> Dict[str, int]:
     return incomings_qty
 
 
-def _find_ind_node_ids(in_conns_qty: Dict[str, int]) -> List[str]:
-    """Finds the IDs of the independent nodes.
-
-    An independent node is a node that has no incoming connections.
+def _get_unbound_ids(incomings_qty: Dict[str, int]) -> List[str]:
+    """Gets the node IDs that has no incoming links.
 
     Parameters
     ----------
-    in_conns_qty : Dict[str, int]
-        Quantity of incoming connections for each node. The keys are the 
-        node IDs and the values are the quantity of incoming connections.
+    incomings_qty : Dict[str, int]
+        Quantity of incoming links for each node. The keys are the node IDs 
+        and the values are the quantity of incoming links.
 
     Returns
     -------
-    ind_node_ids : List[str]
-        IDs of the independent nodes.
+    unbound_ids : List[str]
+        IDs of the nodes that has no incoming links.
     """
 
-    ind_node_ids = []
+    unbound_ids = []
 
-    for node_id, in_qty in in_conns_qty.items():
+    for id, in_qty in incomings_qty.items():
         if in_qty == 0:
-            ind_node_ids.append(node_id)
+            unbound_ids.append(id)
 
-    return ind_node_ids
+    return unbound_ids
 
 
 def _check_circular_dependency(nodes_qty: int, ind_nodes_qty: int) -> None:
