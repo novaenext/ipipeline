@@ -49,7 +49,7 @@ class TestSortGraphTopo(TestCase):
 
 
 class TestGetIncomingsQty(TestCase):
-    def test_get_incomings_qty__graph_eq_dag_wi_src_ids(self) -> None:
+    def test_get_incomings_qty__graph_eq_graph_wi_src_ids(self) -> None:
         incomings_qty = _get_incomings_qty(
             {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4'], 'n4': []}
         )
@@ -58,13 +58,18 @@ class TestGetIncomingsQty(TestCase):
             incomings_qty, {'n1': 0, 'n2': 1, 'n3': 1, 'n4': 2}
         )
 
-    def test_get_incomings_qty__graph_eq_dag_wo_src_ids(self) -> None:
+    def test_get_incomings_qty__graph_eq_graph_wo_src_ids(self) -> None:
         with self.assertRaisesRegex(
             SortingError, r'dst_id was not set as a src_id: dst_id == n4'
         ):
             _ = _get_incomings_qty(
                 {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4']}
             )
+
+    def test_get_incomings_qty__graph_eq_empty_graph(self) -> None:
+        incomings_qty = _get_incomings_qty({})
+
+        self.assertDictEqual(incomings_qty, {})
 
 
 class TestFindIndNodeIds(TestCase):
