@@ -38,7 +38,7 @@ def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
 
     topo_order = []
     ind_nodes_qty = 0
-    in_conns_qty = _obtain_in_conns_qty(graph)
+    in_conns_qty = _get_incomings_qty(graph)
     ind_node_ids = _find_ind_node_ids(in_conns_qty)
 
     while ind_node_ids:
@@ -59,44 +59,39 @@ def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
     return topo_order
 
 
-def _obtain_in_conns_qty(graph: Dict[str, list]) -> Dict[str, int]:
-    """Obtains the quantity of incoming connections for each node.
-
-    An incoming connection received by a destination node implies a 
-    dependency on the source node.
+def _get_incomings_qty(graph: Dict[str, list]) -> Dict[str, int]:
+    """Gets the quantity of incoming links for each node.
 
     Parameters
     ----------
     graph : Dict[str, list]
-        Graph of the pipeline. The keys are the IDs of the source nodes 
-        and the values are the dependencies formed by the IDs of the 
-        destination nodes.
+        Graph of the pipeline. The keys are the source node IDs and the 
+        values are the lists of destination node IDs.
 
     Returns
     -------
-    in_conns_qty : Dict[str, int]
-        Quantity of incoming connections for each node. The keys are the 
-        node IDs and the values are the quantity of incoming connections.
+    incomings_qty : Dict[str, int]
+        Quantity of incoming links for each node. The keys are the node IDs 
+        and the values are the quantity of incoming links.
 
     Raises
     ------
     SortingError
-        Informs that the dst_node_id was not specified as a src_node_id.
+        Informs that the dst_id was not set as a src_id.
     """
 
-    in_conns_qty = dict.fromkeys(graph.keys(), 0)
+    incomings_qty = dict.fromkeys(graph.keys(), 0)
 
-    for dep_node_ids in graph.values():
-        for dst_node_id in dep_node_ids:
+    for dst_ids in graph.values():
+        for dst_id in dst_ids:
             try:
-                in_conns_qty[dst_node_id] += 1
+                incomings_qty[dst_id] += 1
             except KeyError as error:
                 raise SortingError(
-                    'dst_node_id not specified as a src_node_id', 
-                    [f'dst_node_id == {dst_node_id}']
+                    'dst_id was not set as a src_id', [f'dst_id == {dst_id}']
                 ) from error
 
-    return in_conns_qty
+    return incomings_qty
 
 
 def _find_ind_node_ids(in_conns_qty: Dict[str, int]) -> List[str]:
