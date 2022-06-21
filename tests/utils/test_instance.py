@@ -45,7 +45,7 @@ class Class4:
 
 
 class TestBuildRepr(TestCase):
-    def test_build_repr__inst_eq_class_wi_args_wi_attrs(self) -> None:
+    def test_build_repr__inst_wi_args_wi_attrs(self) -> None:
         repr = build_repr(Class1(1, '2'))
 
         self.assertEqual(
@@ -53,7 +53,7 @@ class TestBuildRepr(TestCase):
             'Class1(arg1=1, arg2=\'2\', arg3=[3], arg4=[\'4\'])'
         )
 
-    def test_build_repr__inst_eq_class_wi_args_wo_attrs(self) -> None:
+    def test_build_repr__inst_wi_args_wo_attrs(self) -> None:
         repr = build_repr(Class2(1, '2'))
 
         self.assertEqual(
@@ -61,12 +61,12 @@ class TestBuildRepr(TestCase):
             'Class2(arg1=None, arg2=None, arg3=None, arg4=None)'
         )
 
-    def test_build_repr__inst_eq_class_wo_args_wi_attrs(self) -> None:
+    def test_build_repr__inst_wo_args_wi_attrs(self) -> None:
         repr = build_repr(Class3())
 
         self.assertEqual(repr, 'Class3()')
 
-    def test_build_repr__inst_eq_class_wo_args_wo_attrs(self) -> None:
+    def test_build_repr__inst_wo_args_wo_attrs(self) -> None:
         repr = build_repr(Class4())
 
         self.assertEqual(repr, 'Class4()')

@@ -49,7 +49,7 @@ class TestSortGraphTopo(TestCase):
 
 
 class TestGetIncomingsQty(TestCase):
-    def test_get_incomings_qty__graph_eq_graph_wi_src_ids(self) -> None:
+    def test_get_incomings_qty__graph_wi_src_ids_wi_dst_ids(self) -> None:
         incomings_qty = _get_incomings_qty(
             {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4'], 'n4': []}
         )
@@ -58,7 +58,16 @@ class TestGetIncomingsQty(TestCase):
             incomings_qty, {'n1': 0, 'n2': 1, 'n3': 1, 'n4': 2}
         )
 
-    def test_get_incomings_qty__graph_eq_graph_wo_src_ids(self) -> None:
+    def test_get_incomings_qty__graph_wi_src_ids_wo_dst_ids(self) -> None:
+        incomings_qty = _get_incomings_qty(
+            {'n1': [], 'n2': [], 'n3': [], 'n4': []}
+        )
+
+        self.assertDictEqual(
+            incomings_qty, {'n1': 0, 'n2': 0, 'n3': 0, 'n4': 0}
+        )
+
+    def test_get_incomings_qty__graph_wo_src_ids_wi_dst_ids(self) -> None:
         with self.assertRaisesRegex(
             SortingError, r'dst_id was not set as a src_id: dst_id == n4'
         ):
@@ -66,24 +75,24 @@ class TestGetIncomingsQty(TestCase):
                 {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4']}
             )
 
-    def test_get_incomings_qty__graph_eq_empty_graph(self) -> None:
+    def test_get_incomings_qty__graph_wo_src_ids_wo_dst_ids(self) -> None:
         incomings_qty = _get_incomings_qty({})
 
         self.assertDictEqual(incomings_qty, {})
 
 
 class TestGetUnboundIds(TestCase):
-    def test_get_unbound_ids__incomings_qty_wi_unbound_ids(self) -> None:
-        unbound_ids = _get_unbound_ids({'n1': 0, 'n2': 0})
-
-        self.assertListEqual(unbound_ids, ['n1', 'n2'])
-
-    def test_get_unbound_ids__incomings_qty_wo_unbound_ids(self) -> None:
+    def test_get_unbound_ids__incomings_qty_wi_ids_wi_qty(self) -> None:
         unbound_ids = _get_unbound_ids({'n1': 1, 'n2': 2})
 
         self.assertListEqual(unbound_ids, [])
 
-    def test_get_unbound_ids__empty_incomings_qty(self) -> None:
+    def test_get_unbound_ids__incomings_qty_wi_ids_wo_qty(self) -> None:
+        unbound_ids = _get_unbound_ids({'n1': 0, 'n2': 0})
+
+        self.assertListEqual(unbound_ids, ['n1', 'n2'])
+
+    def test_get_unbound_ids__incomings_qty_wo_ids_wo_qty(self) -> None:
         unbound_ids = _get_unbound_ids({})
 
         self.assertListEqual(unbound_ids, [])

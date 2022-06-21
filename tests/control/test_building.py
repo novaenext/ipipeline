@@ -11,7 +11,7 @@ from ipipeline.structure.pipeline import Pipeline
 
 
 class TestBuildGraph(TestCase):
-    def test_build_graph__pipe_eq_class_wi_src_id_wi_dst_id(self) -> None:
+    def test_build_graph__pipeline_wi_src_ids_wi_dst_ids(self) -> None:
         pipeline = Pipeline(
             'p1', 
             {
@@ -32,18 +32,7 @@ class TestBuildGraph(TestCase):
             graph, {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': [], 'n4': []}
         )
 
-    def test_build_graph__pipe_eq_class_wo_src_id_wi_dst_id(self) -> None:
-        pipeline = Pipeline(
-            'p1', {'n2': Node('n2', None)}, {'l1': Link('l1', 'n1', 'n2')}
-        )
-
-        with self.assertRaisesRegex(
-            BuildingError, 
-            r'src_id was not found in the pipeline._nodes: src_id == n1'
-        ):
-            _ = build_graph(pipeline)
-
-    def test_build_graph__pipe_eq_class_wi_src_id_wo_dst_id(self) -> None:
+    def test_build_graph__pipeline_wi_src_ids_wo_dst_ids(self) -> None:
         pipeline = Pipeline(
             'p1', {'n1': Node('n1', None)}, {'l1': Link('l1', 'n1', 'n2')}
         )
@@ -54,7 +43,18 @@ class TestBuildGraph(TestCase):
         ):
             _ = build_graph(pipeline)
 
-    def test_build_graph__pipe_eq_class_wi_empty_links(self) -> None:
+    def test_build_graph__pipeline_wo_src_ids_wi_dst_ids(self) -> None:
+        pipeline = Pipeline(
+            'p1', {'n2': Node('n2', None)}, {'l1': Link('l1', 'n1', 'n2')}
+        )
+
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'src_id was not found in the pipeline._nodes: src_id == n1'
+        ):
+            _ = build_graph(pipeline)
+
+    def test_build_graph__pipeline_wo_src_ids_wo_dst_ids(self) -> None:
         pipeline = Pipeline('p1')
         graph = build_graph(pipeline)
 
