@@ -3,8 +3,8 @@ from unittest import TestCase
 from ipipeline.control.sorting import (
     sort_graph_topo, 
     _check_circular_dependency, 
-    _find_ind_node_ids, 
-    _get_incomings_qty
+    _get_incomings_qty, 
+    _get_unbound_ids
 )
 from ipipeline.exceptions import SortingError
 
@@ -72,16 +72,16 @@ class TestGetIncomingsQty(TestCase):
         self.assertDictEqual(incomings_qty, {})
 
 
-class TestFindIndNodeIds(TestCase):
-    def test_node_ids_without_in_conns(self) -> None:
-        ind_node_ids = _find_ind_node_ids({'n1': 0, 'n2': 0})
+class TestGetUnboundIds(TestCase):
+    def test_get_unbound_ids__incomings_qty_wi_unbound_ids(self) -> None:
+        unbound_ids = _get_unbound_ids({'n1': 0, 'n2': 0})
 
-        self.assertListEqual(ind_node_ids, ['n1', 'n2'])
+        self.assertListEqual(unbound_ids, ['n1', 'n2'])
 
-    def test_node_ids_with_in_conns(self) -> None:
-        ind_node_ids = _find_ind_node_ids({'n1': 1, 'n2': 2})
+    def test_get_unbound_ids__incomings_qty_wo_unbound_ids(self) -> None:
+        unbound_ids = _get_unbound_ids({'n1': 1, 'n2': 2})
 
-        self.assertListEqual(ind_node_ids, [])
+        self.assertListEqual(unbound_ids, [])
 
 
 class TestCheckCircularDependency(TestCase):
