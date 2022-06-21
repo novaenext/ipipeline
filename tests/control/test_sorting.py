@@ -1,10 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.control.sorting import (
-    sort_graph_topo, 
-    _check_circular_dependency, 
-    _get_incomings_qty, 
-    _get_unbound_ids
+    sort_graph_topo, _get_incomings_qty, _get_unbound_ids
 )
 from ipipeline.exceptions import SortingError
 
@@ -96,16 +93,3 @@ class TestGetUnboundIds(TestCase):
         unbound_ids = _get_unbound_ids({})
 
         self.assertListEqual(unbound_ids, [])
-
-
-class TestCheckCircularDependency(TestCase):
-    def test_diff_nodes_qty(self) -> None:
-        with self.assertRaisesRegex(
-            SortingError, r'circular dependency found in the graph: 7 != 4'
-        ):
-            _check_circular_dependency(7, 4)
-
-    def test_equal_nodes_qty(self) -> None:
-        _check_circular_dependency(7, 7)
-
-        self.assertTrue(True)
