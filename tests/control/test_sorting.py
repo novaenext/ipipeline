@@ -83,6 +83,11 @@ class TestGetUnboundIds(TestCase):
 
         self.assertListEqual(unbound_ids, [])
 
+    def test_get_unbound_ids__empty_incomings_qty(self) -> None:
+        unbound_ids = _get_unbound_ids({})
+
+        self.assertListEqual(unbound_ids, [])
+
 
 class TestCheckCircularDependency(TestCase):
     def test_diff_nodes_qty(self) -> None:
