@@ -1,48 +1,53 @@
 from unittest import TestCase
 
 from ipipeline.control.sorting import (
-    sort_graph_topo, _get_incomings_qty, _get_unbound_ids
+    sort_topology, _get_incomings_qty, _get_unbound_ids
 )
 from ipipeline.exceptions import SortingError
 
 
-class TestSortGraphTopo(TestCase):
-    def test_dag_with_linear_topo(self) -> None:
-        topo_order = sort_graph_topo({
+class TestSortTopology(TestCase):
+    def test_sort_topology__graph_wi_linear_topology_wi_cycle(self) -> None:
+        with self.assertRaisesRegex(
+            SortingError, 
+            r'circular dependency was found in the graph: '
+            r'incomings_qty == {\'n2\': 1, \'n3\': 1, \'n4\': 1}'
+        ):
+            _ = sort_topology({
+                'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n2']
+            })
+
+    def test_sort_topology__graph_wi_linear_topology_wo_cycle(self) -> None:
+        ordering = sort_topology({
             'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': []
         })
 
-        self.assertListEqual(topo_order, [['n1'], ['n2'], ['n3'], ['n4']])
+        self.assertListEqual(ordering, [['n1'], ['n2'], ['n3'], ['n4']])
 
-    def test_dag_with_nonlinear_topo(self) -> None:
-        topo_order = sort_graph_topo({
+    def test_sort_topology__graph_wo_linear_topology_wi_cycle(self) -> None:
+        with self.assertRaisesRegex(
+            SortingError, 
+            r'circular dependency was found in the graph: '
+            r'incomings_qty == {\'n3\': 1, \'n4\': 1, \'n6\': 2, \'n7\': 1, '
+            r'\'n8\': 1, \'n9\': 1}'
+        ):
+            _ = sort_topology({
+                'n1': ['n3', 'n4', 'n6'], 'n2': ['n5'], 'n3': ['n6'], 
+                'n4': ['n3', 'n6', 'n7', 'n8'], 'n5': ['n8'], 'n6': ['n4'], 
+                'n7': ['n9'], 'n8': [], 'n9': []
+            })
+
+    def test_sort_topology__graph_wo_linear_topology_wo_cycle(self) -> None:
+        ordering = sort_topology({
             'n1': ['n3', 'n4', 'n6'], 'n2': ['n5'], 'n3': ['n6'], 
             'n4': ['n3', 'n6', 'n7', 'n8'], 'n5': ['n8'], 'n6': [], 
             'n7': ['n9'], 'n8': [], 'n9': []
         })
 
         self.assertListEqual(
-            topo_order, 
+            ordering, 
             [['n1', 'n2'], ['n4', 'n5'], ['n3', 'n7', 'n8'], ['n6', 'n9']]
         )
-
-    def test_dcg_with_linear_topo(self) -> None:
-        with self.assertRaisesRegex(
-            SortingError, r'circular dependency found in the graph: 4 != 0'
-        ):
-            _ = sort_graph_topo({
-                'n1': ['n2'], 'n2': ['n3'], 'n3': ['n4'], 'n4': ['n1']
-            })
-
-    def test_dcg_with_nonlinear_topo(self) -> None:
-        with self.assertRaisesRegex(
-            SortingError, r'circular dependency found in the graph: 9 != 3'
-        ):
-            _ = sort_graph_topo({
-                'n1': ['n3', 'n4', 'n6'], 'n2': ['n5'], 'n3': ['n6'], 
-                'n4': ['n3', 'n6', 'n7', 'n8'], 'n5': ['n8'], 'n6': ['n4'], 
-                'n7': ['n9'], 'n8': [], 'n9': []
-            })
 
 
 class TestGetIncomingsQty(TestCase):
