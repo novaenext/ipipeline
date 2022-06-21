@@ -5,63 +5,63 @@ from typing import Dict, List
 from ipipeline.exceptions import SortingError
 
 
-def sort_graph_topo(graph: Dict[str, list]) -> List[list]:
-    """Sorts the graph topology to find its topological order.
+def sort_topology(graph: Dict[str, list]) -> List[list]:
+    """Sorts the graph topology to find a linear ordering of the nodes.
 
-    The graph must be acyclic to be able to obtain its topological order 
-    that is not necessarily unique. 
+    The topological ordering depends on a directed acyclic graph and its 
+    order is not necessarily unique.
 
     Parameters
     ----------
     graph : Dict[str, list]
         Graph of the pipeline. The keys are the source node IDs and the 
-        values are a list of destination node IDs.
+        values are the lists of destination node IDs.
 
     Returns
     -------
-    topo_order : List[list]
-        Topological order of the graph. The inner lists represent groups 
-        of nodes that must be executed in order and the nodes within these 
+    ordering : List[list]
+        Ordering of the graph. The inner lists represent groups of nodes 
+        that must be executed sequentially and the nodes within these 
         groups can be executed simultaneously.
 
     Raises
     ------
     SortingError
-        Informs that the dst_node_id was not specified as a src_node_id.
+        Informs that the dst_id was not set as a src_id.
     SortingError
         Informs that a circular dependency was found in the graph.
 
     Notes
     -----
-        Based on the Kahn algorithm.
+        Based on the Kahn's algorithm.
     """
 
-    topo_order = []
-    ind_nodes_qty = 0
-    in_conns_qty = _get_incomings_qty(graph)
-    ind_node_ids = _get_unbound_ids(in_conns_qty)
+    ordering = []
+    incomings_qty = _get_incomings_qty(graph)
+    unbound_ids = _get_unbound_ids(incomings_qty)
 
-    while ind_node_ids:
-        cand_node_ids = []
-        topo_order.append(ind_node_ids)
+    while unbound_ids:
+        tmp_ids = []
+        ordering.append(unbound_ids)
 
-        for src_node_id in ind_node_ids:
-            for dst_node_id in graph[src_node_id]:
-                in_conns_qty[dst_node_id] -= 1
+        for src_id in unbound_ids:
+            del incomings_qty[src_id]
 
-                if in_conns_qty[dst_node_id] == 0:
-                    cand_node_ids.append(dst_node_id)
+            for dst_id in graph[src_id]:
+                incomings_qty[dst_id] -= 1
 
-            ind_nodes_qty += 1
-        ind_node_ids = cand_node_ids
+                if incomings_qty[dst_id] == 0:
+                    tmp_ids.append(dst_id)
 
-    if len(graph.keys()) != ind_nodes_qty:
+        unbound_ids = tmp_ids
+
+    if incomings_qty:
         raise SortingError(
-            'circular dependency found in the graph', 
-            [f'{len(graph.keys())} != {ind_nodes_qty}']
+            'circular dependency was found in the graph', 
+            [f'incomings_qty == {incomings_qty}']
         )
 
-    return topo_order
+    return ordering
 
 
 def _get_incomings_qty(graph: Dict[str, list]) -> Dict[str, int]:
