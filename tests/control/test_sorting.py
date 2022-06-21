@@ -2,9 +2,9 @@ from unittest import TestCase
 
 from ipipeline.control.sorting import (
     sort_graph_topo, 
-    _obtain_in_conns_qty, 
+    _check_circular_dependency, 
     _find_ind_node_ids, 
-    _check_circular_dependency
+    _get_incomings_qty
 )
 from ipipeline.exceptions import SortingError
 
@@ -48,31 +48,21 @@ class TestSortGraphTopo(TestCase):
             })
 
 
-class TestObtainInConnsQty(TestCase):
-    def test_dag_with_dst_node_ids(self) -> None:
-        in_conns_qty = _obtain_in_conns_qty(
+class TestGetIncomingsQty(TestCase):
+    def test_get_incomings_qty__graph_eq_dag_wi_src_ids(self) -> None:
+        incomings_qty = _get_incomings_qty(
             {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4'], 'n4': []}
         )
 
         self.assertDictEqual(
-            in_conns_qty, {'n1': 0, 'n2': 1, 'n3': 1, 'n4': 2}
+            incomings_qty, {'n1': 0, 'n2': 1, 'n3': 1, 'n4': 2}
         )
 
-    def test_dag_without_dst_node_ids(self) -> None:
-        in_conns_qty = _obtain_in_conns_qty(
-            {'n1': [], 'n2': [], 'n3': [], 'n4': []}
-        )
-
-        self.assertDictEqual(
-            in_conns_qty, {'n1': 0, 'n2': 0, 'n3': 0, 'n4': 0}
-        )
-
-    def test_dag_without_src_node_ids(self) -> None:
+    def test_get_incomings_qty__graph_eq_dag_wo_src_ids(self) -> None:
         with self.assertRaisesRegex(
-            SortingError, 
-            r'dst_node_id not specified as a src_node_id: dst_node_id == n4'
+            SortingError, r'dst_id was not set as a src_id: dst_id == n4'
         ):
-            _ = _obtain_in_conns_qty(
+            _ = _get_incomings_qty(
                 {'n1': ['n2', 'n3'], 'n2': ['n4'], 'n3': ['n4']}
             )
 
