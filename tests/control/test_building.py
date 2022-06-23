@@ -60,6 +60,29 @@ class TestBuildGraph(TestCase):
 
         self.assertDictEqual(graph, {})
 
+    def test_build_graph__pipeline_wi_duplicate_dst_id(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            {'n1': Node('n1', None), 'n2': Node('n2', None)}, 
+            {'l1': Link('l1', 'n1', 'n2'), 'l2': Link('l2', 'n1', 'n2')}
+        )
+
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'dst_id was found in the graph\[link.src_id\]: dst_id == n2'
+        ):
+            _ = build_graph(pipeline)
+
+    def test_build_graph__pipeline_wo_duplicate_dst_id(self) -> None:
+        pipeline = Pipeline(
+            'p1', 
+            {'n1': Node('n1', None), 'n2': Node('n2', None)}, 
+            {'l1': Link('l1', 'n1', 'n2')}
+        )
+        graph = build_graph(pipeline)
+
+        self.assertDictEqual(graph, {'n1': ['n2'], 'n2': []})
+
 
 class TestBuildTaskInputs(TestCase):
     def setUp(self) -> None:
