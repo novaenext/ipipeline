@@ -13,13 +13,13 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
     Parameters
     ----------
     pipeline : Pipeline
-        Pipeline that stores a flow of tasks.
+        Pipeline that stores a flow of executable units.
 
     Returns
     -------
     graph : Dict[str, list]
         Graph of the pipeline. The keys are the source node IDs and the 
-        values are a list of destination node IDs.
+        values are the lists of destination node IDs.
 
     Raises
     ------
@@ -27,6 +27,8 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
         Informs that the src_id was not found in the pipeline._nodes.
     BuildingError
         Informs that the dst_id was not found in the pipeline._nodes.
+    BuildingError
+        Informs that the dst_id was found in the graph[link.src_id].
     """
 
     graph = {}
@@ -44,6 +46,12 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
         if not pipeline.check_node(link.dst_id):
             raise BuildingError(
                 'dst_id was not found in the pipeline._nodes', 
+                [f'dst_id == {link.dst_id}']
+            )
+
+        if link.dst_id in graph[link.src_id]:
+            raise BuildingError(
+                'dst_id was found in the graph[link.src_id]', 
                 [f'dst_id == {link.dst_id}']
             )
 
