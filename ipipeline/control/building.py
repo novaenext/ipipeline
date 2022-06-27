@@ -1,6 +1,6 @@
 """Functions related to the building procedures."""
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from ipipeline.exceptions import BuildingError
 from ipipeline.structure.catalog import Catalog
@@ -60,56 +60,66 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
     return graph
 
 
-def build_inputs(
-    inputs: Union[List[str], Dict[str, str]], catalog: Catalog
-) -> Union[List[Any], Dict[str, Any]]:
-    """Builds the inputs of a task.
+def build_pos_args(pos_inputs: List[str], catalog: Catalog) -> List[Any]:
+    """Builds the positional arguments of a task.
 
     Parameters
     ----------
-    inputs : Union[List[str], Dict[str, str]]
-        Inputs of the task.
-
-        List[str]: the elements are the IDs of the catalog items.
-        Dict[str, str]: the keys are the task parameters and the values 
-        are the IDs of the catalog items.
+    pos_inputs : List[str]
+        Positional inputs of the task. The elements are the IDs of the 
+        catalog items.
     catalog : Catalog
         Catalog that stores the items of an execution.
 
     Returns
     -------
-    built_inputs : Union[List[Any], Dict[str, Any]]
-        Built inputs of the task.
-
-        List[Any]: the elements are the arguments required by the task.
-        Dict[str, Any]: the keys are the task parameters and the values are 
-        the arguments required by the task.
+    pos_args : List[Any]
+        Positional arguments of a task.
 
     Raises
     ------
     CatalogError
         Informs that the id was not found in the _items.
-    BuildingError
-        Informs that the inputs is not an instance of a list or dict.
     """
 
-    if isinstance(inputs, list):
-        built_inputs = []
+    pos_args = []
 
-        for item_id in inputs:
-            built_inputs.append(catalog.get_item(item_id))
-    elif isinstance(inputs, dict):
-        built_inputs = {}
+    for item_id in pos_inputs:
+        pos_args.append(catalog.get_item(item_id))
 
-        for param, item_id in inputs.items():
-            built_inputs[param] = catalog.get_item(item_id)
-    else:
-        raise BuildingError(
-            'inputs is not an instance of a list or dict', 
-            [f'type == {type(inputs)}']
-        )
+    return pos_args
 
-    return built_inputs
+
+def build_key_args(
+    key_inputs: Dict[str, str], catalog: Catalog
+) -> Dict[str, Any]:
+    """Builds the keyword arguments of a task.
+
+    Parameters
+    ----------
+    key_inputs : Dict[str, str]
+        Keyword inputs of the task. The keys are the task parameters and 
+        the values are the IDs of the catalog items.
+    catalog : Catalog
+        Catalog that stores the items of an execution.
+
+    Returns
+    -------
+    key_args : Dict[str, Any]
+        Keyword arguments of a task.
+
+    Raises
+    ------
+    CatalogError
+        Informs that the id was not found in the _items.
+    """
+
+    key_args = {}
+
+    for param, item_id in key_inputs.items():
+        key_args[param] = catalog.get_item(item_id)
+
+    return key_args
 
 
 def build_task_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
