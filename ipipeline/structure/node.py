@@ -1,13 +1,13 @@
 """Class related to the node procedures."""
 
-from typing import Any, Callable, Dict, List
+from typing import Callable, Dict, List
 
 from ipipeline.structure.info import Info
 from ipipeline.utils.checking import check_none
 
 
 class Node(Info):
-    """Stores an executable unit of the graph.
+    """Stores a task.
 
     Attributes
     ----------
@@ -15,18 +15,16 @@ class Node(Info):
         ID of the node.
     _task : Callable
         Task of the node.
-    _inputs : Dict[str, Any], optional
-        Inputs of the task. The keys are the callable parameters and the 
-        values are the data required for the parameters. The values can also 
-        be placeholders for the catalog items.
-
-        Placeholders:
-            'c.<item_id>': gets an item.
-            'c.[<item_id>, ..., <item_id>]': gets a list of items.
-    _outputs : List[str], optional
+    _pos_inputs : List[str]
+        Positional inputs of the task. The elements are the IDs of the 
+        catalog items.
+    _key_inputs : Dict[str, str]
+        Keyword inputs of the task. The keys are the task parameters and 
+        the values are the IDs of the catalog items.
+    _outputs : List[str]
         Outputs of the task. The outputs must match the returns in terms 
         of size.
-    _tags : List[str], optional
+    _tags : List[str]
         Tags of the node to provide more context.
     """
 
@@ -34,7 +32,8 @@ class Node(Info):
         self, 
         id: str, 
         task: Callable, 
-        inputs: Dict[str, Any] = None, 
+        pos_inputs: List[str] = None, 
+        key_inputs: Dict[str, str] = None, 
         outputs: List[str] = None, 
         tags: List[str] = None
     ) -> None:
@@ -46,14 +45,12 @@ class Node(Info):
             ID of the node.
         task : Callable
             Task of the node.
-        inputs : Dict[str, Any], optional
-            Inputs of the task. The keys are the callable parameters and the 
-            values are the data required for the parameters. The values can 
-            also be placeholders for the catalog items.
-
-            Placeholders:
-                'c.<item_id>': gets an item.
-                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        pos_inputs : List[str], optional
+            Positional inputs of the task. The elements are the IDs of the 
+            catalog items.
+        key_inputs : Dict[str, str], optional
+            Keyword inputs of the task. The keys are the task parameters and 
+            the values are the IDs of the catalog items.
         outputs : List[str], optional
             Outputs of the task. The outputs must match the returns in terms 
             of size.
@@ -69,7 +66,8 @@ class Node(Info):
         super().__init__(id, tags=tags)
 
         self._task = task
-        self._inputs = check_none(inputs, {})
+        self._pos_inputs = check_none(pos_inputs, [])
+        self._key_inputs = check_none(key_inputs, {})
         self._outputs = check_none(outputs, [])
 
     @property
@@ -97,40 +95,56 @@ class Node(Info):
         self._task = task
 
     @property
-    def inputs(self) -> Dict[str, Any]:
-        """Gets the _inputs attribute.
+    def pos_inputs(self) -> List[str]:
+        """Gets the _pos_inputs attribute.
 
         Returns
         -------
-        inputs : Dict[str, Any]
-            Inputs of the task. The keys are the callable parameters and the 
-            values are the data required for the parameters. The values can 
-            also be placeholders for the catalog items.
-
-            Placeholders:
-                'c.<item_id>': gets an item.
-                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        pos_inputs : List[str]
+            Positional inputs of the task. The elements are the IDs of the 
+            catalog items.
         """
 
-        return self._inputs
+        return self._pos_inputs
 
-    @inputs.setter
-    def inputs(self, inputs: Dict[str, Any]) -> None:
-        """Sets the _inputs attribute.
+    @pos_inputs.setter
+    def pos_inputs(self, pos_inputs: List[str]) -> None:
+        """Sets the _pos_inputs attribute.
 
         Parameters
         ----------
-        inputs : Dict[str, Any]
-            Inputs of the task. The keys are the callable parameters and the 
-            values are the data required for the parameters. The values can 
-            also be placeholders for the catalog items.
-
-            Placeholders:
-                'c.<item_id>': gets an item.
-                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        pos_inputs : List[str]
+            Positional inputs of the task. The elements are the IDs of the 
+            catalog items.
         """
 
-        self._inputs = inputs
+        self._pos_inputs = pos_inputs
+
+    @property
+    def key_inputs(self) -> Dict[str, str]:
+        """Gets the _key_inputs attribute.
+
+        Returns
+        -------
+        key_inputs : Dict[str, str]
+            Keyword inputs of the task. The keys are the task parameters and 
+            the values are the IDs of the catalog items.
+        """
+
+        return self._key_inputs
+
+    @key_inputs.setter
+    def key_inputs(self, key_inputs: Dict[str, str]) -> None:
+        """Sets the _key_inputs attribute.
+
+        Parameters
+        ----------
+        key_inputs : Dict[str, str]
+            Keyword inputs of the task. The keys are the task parameters and 
+            the values are the IDs of the catalog items.
+        """
+
+        self._key_inputs = key_inputs
 
     @property
     def outputs(self) -> List[str]:
