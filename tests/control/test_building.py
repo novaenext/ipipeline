@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.control.building import (
-    build_graph, build_inputs, build_task_outputs, _check_diff_outputs_qty
+    build_graph, build_inputs, build_task_outputs
 )
 from ipipeline.exceptions import BuildingError, CatalogError
 from ipipeline.structure.catalog import Catalog
@@ -147,17 +147,3 @@ class TestBuildTaskOutputs(TestCase):
             r'outputs_qty is not equal to the returns_qty: 2 != 1'
         ):
             _ = build_task_outputs(['out1', 'out2'], 7)
-
-
-class TestCheckDiffOutputsQty(TestCase):
-    def test_diff_outputs_qty(self) -> None:
-        with self.assertRaisesRegex(
-            BuildingError, 
-            r'outputs_qty is not equal to the returns_qty: 2 != 1'
-        ):
-            _check_diff_outputs_qty(2, 1)
-
-    def test_equal_outputs_qty(self) -> None:
-        _check_diff_outputs_qty(1, 1)
-
-        self.assertTrue(True)
