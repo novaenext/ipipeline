@@ -12,7 +12,7 @@ class TestPipeline(TestCase):
         self._links = {'l1': Link('l1', 'n1', 'n2')}
         self._task = [lambda arg1, arg2: arg1 + arg2]
 
-    def test_init__nodes_eq_dict__links_eq_dict(self) -> None:
+    def test_init__args_eq_types(self) -> None:
         pipeline = Pipeline(
             'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
@@ -22,7 +22,7 @@ class TestPipeline(TestCase):
         self.assertDictEqual(pipeline._links, self._links)
         self.assertListEqual(pipeline._tags, ['t1'])
 
-    def test_get__nodes_eq_dict__links_eq_dict(self) -> None:
+    def test_get__args_eq_types(self) -> None:
         pipeline = Pipeline(
             'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
@@ -32,7 +32,7 @@ class TestPipeline(TestCase):
         self.assertDictEqual(pipeline.links, self._links)
         self.assertListEqual(pipeline.tags, ['t1'])
 
-    def test_set__nodes_eq_dict__links_eq_dict(self) -> None:
+    def test_set__args_eq_types(self) -> None:
         pipeline = Pipeline(
             'p1', nodes=self._nodes, links=self._links, tags=['t1']
         )
@@ -109,7 +109,7 @@ class TestPipeline(TestCase):
             pipeline.add_node(
                 'n1', 
                 self._task, 
-                inputs={'arg1': 2, 'arg2': 4}, 
+                key_inputs={'arg1': 2, 'arg2': 4}, 
                 outputs=['sum']
             )
 
@@ -118,7 +118,7 @@ class TestPipeline(TestCase):
         pipeline.add_node(
             'n1', 
             self._task, 
-            inputs={'arg1': 2, 'arg2': 4}, 
+            key_inputs={'arg1': 2, 'arg2': 4}, 
             outputs=['sum']
         )
 
