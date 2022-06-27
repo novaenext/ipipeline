@@ -147,30 +147,12 @@ def build_task_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
         except TypeError:
             returns_qty = 1
 
-        _check_diff_outputs_qty(outputs_qty, returns_qty)
+        if outputs_qty != returns_qty:
+            raise BuildingError(
+                'outputs_qty is not equal to the returns_qty', 
+                [f'{outputs_qty} != {returns_qty}']
+            )
+
         task_outputs = dict(zip(outputs, returns))
 
     return task_outputs
-
-
-def _check_diff_outputs_qty(outputs_qty: int, returns_qty: int) -> None:
-    """Checks if the quantity of outputs and returns is different.
-
-    Parameters
-    ----------
-    outputs_qty : int
-        Quantity of outputs.
-    returns_qty : int
-        Quantity of returns.
-
-    Raises
-    ------
-    BuildingError
-        Informs that the outputs_qty is not equal to the returns_qty.
-    """
-
-    if outputs_qty != returns_qty:
-        raise BuildingError(
-            'outputs_qty is not equal to the returns_qty', 
-            [f'{outputs_qty} != {returns_qty}']
-        )
