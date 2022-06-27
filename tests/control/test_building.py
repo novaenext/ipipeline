@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.control.building import (
-    build_graph, build_task_inputs, build_task_outputs, _check_diff_outputs_qty
+    build_graph, build_inputs, build_task_outputs, _check_diff_outputs_qty
 )
 from ipipeline.exceptions import BuildingError, CatalogError
 from ipipeline.structure.catalog import Catalog
@@ -84,43 +84,45 @@ class TestBuildGraph(TestCase):
         self.assertDictEqual(graph, {'n1': ['n2'], 'n2': []})
 
 
-class TestBuildTaskInputs(TestCase):
+class TestBuildInputs(TestCase):
     def setUp(self) -> None:
-        self._catalog = Catalog('c1', items={'i1': 7, 'i2': 0})
+        self._catalog = Catalog('c1', items={'i1': 2, 'i2': 4})
 
-    def test_single_placeholders(self) -> None:
-        func_inputs = build_task_inputs(
-            {'in1': 'c.i1', 'in2': 'c.i2'}, self._catalog
-        )
+    def test_build_inputs__inputs_eq_list_wi_ids(self) -> None:
+        built_inputs = build_inputs(['i1', 'i2'], self._catalog)
 
-        self.assertDictEqual(func_inputs, {'in1': 7, 'in2': 0})
+        self.assertListEqual(built_inputs, [2, 4])
 
-    def test_multiple_placeholders(self) -> None:
-        func_inputs = build_task_inputs(
-            {'in1': 'c.[i1, i2]', 'in2': 'c.[i1]'}, self._catalog
-        )
+    def test_build_inputs__inputs_eq_list_wo_ids(self) -> None:
+        built_inputs = build_inputs([], self._catalog)
 
-        self.assertDictEqual(func_inputs, {'in1': [7, 0], 'in2': [7]})
+        self.assertListEqual(built_inputs, [])
 
-    def test_invalid_placeholders(self) -> None:
+    def test_build_inputs__inputs_eq_dict_wi_ids(self) -> None:
+        built_inputs = build_inputs({'p1': 'i1', 'p2': 'i2'}, self._catalog)
+
+        self.assertDictEqual(built_inputs, {'p1': 2, 'p2': 4})
+
+    def test_build_inputs__inputs_eq_dict_wo_ids(self) -> None:
+        built_inputs = build_inputs({}, self._catalog)
+
+        self.assertDictEqual(built_inputs, {})
+
+    def test_build_inputs__inputs_eq_str_wi_id(self) -> None:
         with self.assertRaisesRegex(
-            CatalogError, r'id was not found in the _items: id == i3'
+            BuildingError, 
+            r'inputs is not an instance of a list or dict: '
+            r'type == <class \'str\'>'
         ):
-            _ = build_task_inputs(
-                {'in1': 'c.i3', 'in2': 'c.[]'}, self._catalog
-            )
+            _ = build_inputs('i1', self._catalog)
 
-    def test_default_values(self) -> None:
-        func_inputs = build_task_inputs(
-            {'in1': 10, 'in2': 'python'}, self._catalog
-        )
-
-        self.assertDictEqual(func_inputs, {'in1': 10, 'in2': 'python'})
-
-    def test_empty_values(self) -> None:
-        func_inputs = build_task_inputs({}, self._catalog)
-
-        self.assertDictEqual(func_inputs, {})
+    def test_build_inputs__inputs_eq_str_wo_id(self) -> None:
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'inputs is not an instance of a list or dict: '
+            r'type == <class \'str\'>'
+        ):
+            _ = build_inputs('', self._catalog)
 
 
 class TestBuildTaskOutputs(TestCase):
