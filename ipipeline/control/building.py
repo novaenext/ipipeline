@@ -1,6 +1,6 @@
 """Functions related to the building procedures."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from ipipeline.exceptions import BuildingError
 from ipipeline.structure.catalog import Catalog
@@ -13,7 +13,7 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
     Parameters
     ----------
     pipeline : Pipeline
-        Pipeline that stores a flow of executable units.
+        Pipeline that stores a flow of tasks.
 
     Returns
     -------
@@ -60,55 +60,56 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
     return graph
 
 
-def build_task_inputs(
-    inputs: Dict[str, Any], catalog: Catalog
-) -> Dict[str, Any]:
+def build_inputs(
+    inputs: Union[List[str], Dict[str, str]], catalog: Catalog
+) -> Union[List[Any], Dict[str, Any]]:
     """Builds the inputs of a task.
 
     Parameters
     ----------
-    inputs : Dict[str, Any]
-        Inputs of the task. The keys are the callable parameters and the 
-        values are the data required for the parameters. The values can 
-        also be placeholders for the catalog items.
+    inputs : Union[List[str], Dict[str, str]]
+        Inputs of the task.
 
-        Placeholders:
-            'c.<item_id>': gets an item.
-            'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        List[str]: the elements are the IDs of the catalog items.
+        Dict[str, str]: the keys are the task parameters and the values 
+        are the IDs of the catalog items.
     catalog : Catalog
-        Catalog that stores the items.
+        Catalog that stores the items of an execution.
 
     Returns
     -------
-    task_inputs : Dict[str, Any]
-        Inputs of the task. The keys are the callable parameters and 
-        the values are the data required for the parameters.
+    built_inputs : Union[List[Any], Dict[str, Any]]
+        Built inputs of the task.
+
+        List[Any]: the elements are the arguments required by the task.
+        Dict[str, Any]: the keys are the task parameters and the values are 
+        the arguments required by the task.
 
     Raises
     ------
     CatalogError
         Informs that the id was not found in the _items.
+    BuildingError
+        Informs that the inputs is not an instance of a list or dict.
     """
 
-    task_inputs = {}
+    if isinstance(inputs, list):
+        built_inputs = []
 
-    for in_key, in_value in inputs.items():
-        if isinstance(in_value, str) and in_value.startswith('c.'):
-            in_value = in_value.replace('c.', '')
+        for item_id in inputs:
+            built_inputs.append(catalog.get_item(item_id))
+    elif isinstance(inputs, dict):
+        built_inputs = {}
 
-            if in_value.startswith('[') and in_value.endswith(']'):
-                task_inputs[in_key] = []
+        for param, item_id in inputs.items():
+            built_inputs[param] = catalog.get_item(item_id)
+    else:
+        raise BuildingError(
+            'inputs is not an instance of a list or dict', 
+            [f'type == {type(inputs)}']
+        )
 
-                for item_id in in_value[1:-1].split(','):
-                    task_inputs[in_key].append(
-                        catalog.get_item(item_id.strip())
-                    )
-            else:
-                task_inputs[in_key] = catalog.get_item(in_value)
-        else:
-            task_inputs[in_key] = in_value
-
-    return task_inputs
+    return built_inputs
 
 
 def build_task_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
