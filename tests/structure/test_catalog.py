@@ -8,21 +8,21 @@ class TestCatalog(TestCase):
     def setUp(self) -> None:
         self._items = {'i1': 2, 'i2': 4}
 
-    def test_init__items_eq_dict(self) -> None:
+    def test_init__args_eq_types(self) -> None:
         catalog = Catalog('c1', items=self._items, tags=['t1'])
 
         self.assertEqual(catalog._id, 'c1')
         self.assertDictEqual(catalog._items, self._items)
         self.assertListEqual(catalog._tags, ['t1'])
 
-    def test_get__items_eq_dict(self) -> None:
+    def test_get__args_eq_types(self) -> None:
         catalog = Catalog('c1', items=self._items, tags=['t1'])
 
         self.assertEqual(catalog.id, 'c1')
         self.assertDictEqual(catalog.items, self._items)
         self.assertListEqual(catalog.tags, ['t1'])
 
-    def test_set__items_eq_dict(self) -> None:
+    def test_set__args_eq_types(self) -> None:
         catalog = Catalog('c1', items=self._items, tags=['t1'])
         catalog.id = 'c2'
         catalog.items = {'i3': 8}
