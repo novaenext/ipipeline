@@ -5,9 +5,9 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
 from ipipeline.control.building import (
-    build_graph, build_task_inputs, build_task_outputs
+    build_graph, build_key_args, build_pos_args, build_task_outputs
 )
-from ipipeline.control.sorting import sort_graph_topo
+from ipipeline.control.sorting import sort_topology
 from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
@@ -132,8 +132,9 @@ class BaseExecutor(ABC):
             node = self._pipeline.nodes[id]
             logger.info(f'node.id: {node.id}, node.tags: {node.tags}')
 
-            task_inputs = build_task_inputs(node.inputs, self._catalog)
-            returns = node.task(**task_inputs)
+            pos_args = build_pos_args(node.pos_inputs, self._catalog)
+            key_args = build_key_args(node.key_inputs, self._catalog)
+            returns = node.task(*pos_args, **key_args)
             task_outputs = build_task_outputs(node.outputs, returns)
 
             return task_outputs
@@ -161,7 +162,7 @@ class BaseExecutor(ABC):
         """
 
         graph = build_graph(self._pipeline)
-        topo_order = sort_graph_topo(graph)
+        topo_order = sort_topology(graph)
         logger.info(f'topo_order: {topo_order}')
 
         return topo_order
