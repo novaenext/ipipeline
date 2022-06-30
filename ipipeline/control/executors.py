@@ -176,7 +176,7 @@ class BaseExecutor(ABC):
     @abstractmethod
     def execute_pipeline(
         self, pipeline: Pipeline, catalog: Catalog, ordering: List[list]
-    ) -> None:
+    ) -> Catalog:
         """Provides an interface to execute a pipeline.
 
         Parameters
@@ -189,6 +189,11 @@ class BaseExecutor(ABC):
             Ordering of the graph. The inner lists represent groups of nodes 
             that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
+
+        Returns
+        -------
+        catalog : Catalog
+            Catalog that stores the items of an execution.
 
         Raises
         ------
@@ -216,7 +221,7 @@ class SequentialExecutor(BaseExecutor):
 
     def execute_pipeline(
         self, pipeline: Pipeline, catalog: Catalog, ordering: List[list]
-    ) -> None:
+    ) -> Catalog:
         """Executes a pipeline.
 
         Parameters
@@ -230,6 +235,11 @@ class SequentialExecutor(BaseExecutor):
             that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
 
+        Returns
+        -------
+        catalog : Catalog
+            Catalog that stores the items of an execution.
+
         Raises
         ------
         ExecutorError
@@ -242,3 +252,5 @@ class SequentialExecutor(BaseExecutor):
 
                 for item_id, item in items.items():
                     catalog.set_item(item_id, item)
+
+        return catalog
