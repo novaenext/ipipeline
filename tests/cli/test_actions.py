@@ -4,7 +4,8 @@ from unittest import TestCase
 
 from ipipeline.cli.actions import create_project, execute_pipeline
 from ipipeline.exceptions import InstanceError, SystemError
-from ipipeline.structure import Pipeline
+from ipipeline.structure.catalog import Catalog
+from ipipeline.structure.pipeline import Pipeline
 
 
 class TestCreateProject(TestCase):
@@ -53,32 +54,55 @@ class TestCreateProject(TestCase):
 
 
 class TestExecutePipeline(TestCase):
-    def test_existent_pipeline(self) -> None:
+    def test_execute_pipeline__mod_name_eq_mod(self) -> None:
         execute_pipeline(
-            'tests.cli.test_actions', 'mock_build_pipeline', 'sequential'
+            'SequentialExecutor', 
+            'tests.cli.test_actions', 
+            'tests.cli.test_actions', 
+            'build_pipeline', 
+            'build_catalog'
         )
 
         self.assertTrue(True)
 
-    def test_inexistent_pipeline(self) -> None:
+    def test_execute_pipeline__mod_name_ne_mod(self) -> None:
         with self.assertRaisesRegex(
             InstanceError, 
-            r'inst_name was not found in the module: inst_name == '
-            r'mock_build_pipelines'
+            r'mod_name was not found in the package: '
+            r'mod_name == tests.cli.test_'
         ):
             execute_pipeline(
-                'tests.cli.test_actions', 'mock_build_pipelines', 'sequential'
+                'SequentialExecutor', 
+                'tests.cli.test_', 
+                'tests.cli.test_actions', 
+                'build_pipeline', 
+                'build_catalog'
+            )
+
+    def test_execute_pipeline__func_name_ne_func(self) -> None:
+        with self.assertRaisesRegex(
+            InstanceError, 
+            r'inst_name was not found in the module: '
+            r'inst_name == build_'
+        ):
+            execute_pipeline(
+                'SequentialExecutor', 
+                'tests.cli.test_actions', 
+                'tests.cli.test_actions', 
+                'build_', 
+                'build_catalog'
             )
 
 
-def mock_build_pipeline() -> Pipeline:
+def build_pipeline() -> Pipeline:
     pipeline = Pipeline('p1')
-    pipeline.add_node(
-        'n1', 
-        lambda param1, param2: param1 + param2, 
-        inputs={'param1': 7, 'param2': 3}, 
-        outputs=['sum'], 
-        tags = ['math']
-    )
+    pipeline.add_node('n1', lambda p1: print(f'p1: {p1}'), pos_inputs=['i1'])
 
     return pipeline
+
+
+def build_catalog() -> Catalog:
+    catalog = Catalog('c1')
+    catalog.set_item('i1', 2)
+
+    return catalog
