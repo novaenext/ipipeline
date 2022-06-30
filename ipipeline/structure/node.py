@@ -56,11 +56,6 @@ class Node(Info):
             of size.
         tags : List[str], optional
             Tags of the node to provide more context.
-
-        Raises
-        ------
-        InfoError
-            Informs that the id did not match the pattern.
         """
 
         super().__init__(id, tags=tags)

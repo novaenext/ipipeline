@@ -1,6 +1,6 @@
 """Class related to the pipeline procedures."""
 
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List
 
 from ipipeline.exceptions import PipelineError
 from ipipeline.structure.info import Info
@@ -49,11 +49,6 @@ class Pipeline(Info):
             the links.
         tags : List[str], optional
             Tags of the pipeline to provide more context.
-
-        Raises
-        ------
-        InfoError
-            Informs that the id did not match the pattern.
         """
 
         super().__init__(id, tags=tags)
@@ -232,8 +227,6 @@ class Pipeline(Info):
 
         Raises
         ------
-        InfoError
-            Informs that the id did not match the pattern.
         PipelineError
             Informs that the id was found in the _nodes.
         """
@@ -358,8 +351,6 @@ class Pipeline(Info):
 
         Raises
         ------
-        InfoError
-            Informs that the id did not match the pattern.
         PipelineError
             Informs that the id was found in the _links.
         """

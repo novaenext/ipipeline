@@ -15,8 +15,8 @@ class Catalog(Info):
     _id : str
         ID of the catalog.
     _items : Dict[str, Any]
-        Items of an execution. The keys are the task outputs and the 
-        values are the task returns.
+        Items of an execution. The keys are the item IDs and the values 
+        are the arguments required by the tasks.
     _tags : List[str]
         Tags of the catalog to provide more context.
     """
@@ -31,15 +31,10 @@ class Catalog(Info):
         id : str
             ID of the catalog.
         items : Dict[str, Any], optional
-            Items of an execution. The keys are the task outputs and the 
-            values are the task returns.
+            Items of an execution. The keys are the item IDs and the values 
+            are the arguments required by the tasks.
         tags : List[str], optional
             Tags of the catalog to provide more context.
-
-        Raises
-        ------
-        InfoError
-            Informs that the id did not match the pattern.
         """
 
         super().__init__(id, tags=tags)
@@ -53,8 +48,8 @@ class Catalog(Info):
         Returns
         -------
         items : Dict[str, Any]
-            Items of an execution. The keys are the task outputs and the 
-            values are the task returns.
+            Items of an execution. The keys are the item IDs and the values 
+            are the arguments required by the tasks.
         """
 
         return self._items
@@ -66,8 +61,8 @@ class Catalog(Info):
         Parameters
         ----------
         items : Dict[str, Any]
-            Items of an execution. The keys are the task outputs and the 
-            values are the task returns.
+            Items of an execution. The keys are the item IDs and the values 
+            are the arguments required by the tasks.
         """
 
         self._items = items

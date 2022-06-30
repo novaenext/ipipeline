@@ -6,7 +6,7 @@ from ipipeline.structure.info import Info
 
 
 class Link(Info):
-    """Stores a dependency between the nodes of the graph.
+    """Stores a dependency between the nodes.
 
     Attributes
     ----------
@@ -39,11 +39,6 @@ class Link(Info):
             ID of the destination node.
         tags : List[str], optional
             Tags of the link to provide more context.
-
-        Raises
-        ------
-        InfoError
-            Informs that the id did not match the pattern.
         """
 
         super().__init__(id, tags=tags)

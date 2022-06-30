@@ -75,11 +75,6 @@ def build_pos_args(pos_inputs: List[str], catalog: Catalog) -> List[Any]:
     -------
     pos_args : List[Any]
         Positional arguments of a task.
-
-    Raises
-    ------
-    CatalogError
-        Informs that the id was not found in the _items.
     """
 
     pos_args = []
@@ -107,11 +102,6 @@ def build_key_args(
     -------
     key_args : Dict[str, Any]
         Keyword arguments of a task.
-
-    Raises
-    ------
-    CatalogError
-        Informs that the id was not found in the _items.
     """
 
     key_args = {}
