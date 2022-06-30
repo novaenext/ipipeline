@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
 from ipipeline.control.building import (
-    build_graph, build_key_args, build_pos_args, build_task_outputs
+    build_graph, build_items, build_key_args, build_pos_args
 )
 from ipipeline.control.sorting import sort_topology
 from ipipeline.exceptions import ExecutorError
@@ -118,9 +118,9 @@ class BaseExecutor(ABC):
 
         Returns
         -------
-        task_outputs : Dict[str, Any]
-            Outputs of the task. The keys are the outputs and the values 
-            are the returns obtained from the execution.
+        items : Dict[str, Any]
+            Items of an execution. The keys are the item IDs and the values 
+            are the arguments required by the tasks.
 
         Raises
         ------
@@ -135,9 +135,9 @@ class BaseExecutor(ABC):
             pos_args = build_pos_args(node.pos_inputs, self._catalog)
             key_args = build_key_args(node.key_inputs, self._catalog)
             returns = node.task(*pos_args, **key_args)
-            task_outputs = build_task_outputs(node.outputs, returns)
+            items = build_items(node.outputs, returns)
 
-            return task_outputs
+            return items
         except Exception as error:
             raise ExecutorError(
                 'node not executed by the executor', [f'id == {id}']
