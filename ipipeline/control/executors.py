@@ -143,11 +143,17 @@ class BaseExecutor(ABC):
 
         return ordering
 
-    def execute_node(self, id: str) -> Dict[str, Any]:
+    def execute_node(
+        self, pipeline: Pipeline, catalog: Catalog, id: str
+    ) -> Dict[str, Any]:
         """Executes a node.
 
         Parameters
         ----------
+        pipeline : Pipeline
+            Pipeline that stores a flow of tasks.
+        catalog : Catalog
+            Catalog that stores the items of an execution.
         id : str
             ID of the node.
 
@@ -159,24 +165,19 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        ExecutorError
-            Informs that the node was not executed by the executor.
+        PipelineError
+            Informs that the id was not found in the _nodes.
         """
 
-        try:
-            node = self._pipeline.nodes[id]
-            logger.info(f'node.id: {node.id}, node.tags: {node.tags}')
+        node = pipeline.get_node(id)
+        logger.info(f'node.id: {node.id}, node.tags: {node.tags}')
 
-            pos_args = build_pos_args(node.pos_inputs, self._catalog)
-            key_args = build_key_args(node.key_inputs, self._catalog)
-            returns = node.task(*pos_args, **key_args)
-            items = build_items(node.outputs, returns)
+        pos_args = build_pos_args(node.pos_inputs, catalog)
+        key_args = build_key_args(node.key_inputs, catalog)
+        returns = node.task(*pos_args, **key_args)
+        items = build_items(node.outputs, returns)
 
-            return items
-        except Exception as error:
-            raise ExecutorError(
-                'node not executed by the executor', [f'id == {id}']
-            ) from error
+        return items
 
     @abstractmethod
     def execute_pipeline(self, topo_order: List[list]) -> None:
