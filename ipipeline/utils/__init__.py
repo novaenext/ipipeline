@@ -1,4 +1,4 @@
 """Package initialization procedures.
 
-The utils package provides components to use in different modules.
+The utils package provides helper components.
 """

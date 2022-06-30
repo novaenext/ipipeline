@@ -1,6 +1,6 @@
 """Package initialization procedures.
 
-The execution package provides components to execute the tasks.
+The control package provides components to manipulate the data.
 """
 
 from ipipeline.control.executors import BaseExecutor, SequentialExecutor
