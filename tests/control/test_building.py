@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ipipeline.control.building import (
-    build_graph, build_key_args, build_pos_args, build_task_outputs
+    build_graph, build_items, build_key_args, build_pos_args
 )
 from ipipeline.exceptions import BuildingError
 from ipipeline.structure.catalog import Catalog
@@ -114,25 +114,67 @@ class TestBuildKeyArgs(TestCase):
         self.assertDictEqual(key_args, {})
 
 
-class TestBuildTaskOutputs(TestCase):
-    def test_single_outputs(self) -> None:
-        func_outputs = build_task_outputs(['out1'], [7, 0])
+class TestBuildItems(TestCase):
+    def test_build_items__outputs_wi_one__returns_wi_one(self) -> None:
+        items = build_items(['o1'], ['r1'])
 
-        self.assertDictEqual(func_outputs, {'out1': [7, 0]})
+        self.assertDictEqual(items, {'o1': ['r1']})
 
-    def test_multiple_outputs(self) -> None:
-        func_outputs = build_task_outputs(['out1', 'out2'], [7, 0])
+    def test_build_items__outputs_wi_one__returns_wi_zero(self) -> None:
+        items = build_items(['o1'], None)
 
-        self.assertDictEqual(func_outputs, {'out1': 7, 'out2': 0})
+        self.assertDictEqual(items, {'o1': None})
 
-    def test_empty_outputs(self) -> None:
-        func_outputs = build_task_outputs([], None)
+    def test_build_items__outputs_wi_zero__returns_wi_one(self) -> None:
+        items = build_items([], ['r1'])
 
-        self.assertDictEqual(func_outputs, {})
+        self.assertDictEqual(items, {})
 
-    def test_invalid_outputs(self) -> None:
+    def test_build_items__outputs_wi_zero__returns_wi_zero(self) -> None:
+        items = build_items([], None)
+
+        self.assertDictEqual(items, {})
+
+    def test_build_items__outputs_wi_two__returns_wi_two(self) -> None:
+        items = build_items(['o1', 'o2'], ['r1', 'r2'])
+
+        self.assertDictEqual(items, {'o1': 'r1', 'o2': 'r2'})
+
+    def test_build_items__outputs_wi_two__returns_wi_zero(self) -> None:
         with self.assertRaisesRegex(
             BuildingError, 
-            r'outputs_qty is not equal to the returns_qty: 2 != 1'
+            r'invalid type was found for the returns: '
+            r'type == <class \'NoneType\'>'
         ):
-            _ = build_task_outputs(['out1', 'out2'], 7)
+            _ = build_items(['o1', 'o2'], None)
+
+    def test_build_items__outputs_wi_two__returns_wi_one(self) -> None:
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'outputs did not match the returns in terms of size: 2 != 1'
+        ):
+            _ = build_items(['o1', 'o2'], ['r1'])
+
+    def test_build_items__outputs_wi_one__returns_wi_two(self) -> None:
+        items = build_items(['o1'], ['r1', 'r2'])
+
+        self.assertDictEqual(items, {'o1': ['r1', 'r2']})
+
+    def test_build_items__outputs_wi_three__returns_wi_three(self) -> None:
+        items = build_items(['o1', 'o2', 'o3'], ['r1', 'r2', 'r3'])
+
+        self.assertDictEqual(items, {'o1': 'r1', 'o2': 'r2', 'o3': 'r3'})
+
+    def test_build_items__outputs_wi_three__returns_wi_two(self) -> None:
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'outputs did not match the returns in terms of size: 3 != 2'
+        ):
+            _ = build_items(['o1', 'o2', 'o3'], ['r1', 'r2'])
+
+    def test_build_items__outputs_wi_two__returns_wi_three(self) -> None:
+        with self.assertRaisesRegex(
+            BuildingError, 
+            r'outputs did not match the returns in terms of size: 2 != 3'
+        ):
+            _ = build_items(['o1', 'o2'], ['r1', 'r2', 'r3'])
