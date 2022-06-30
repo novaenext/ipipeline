@@ -108,6 +108,30 @@ class BaseExecutor(ABC):
             catalog, Catalog('c0', tags=['default'])
         )
 
+    def obtain_topo_order(self) -> List[list]:
+        """Obtains the topological order of the graph.
+
+        Returns
+        -------
+        topo_order : List[list]
+            Topological order of the graph. The inner lists represent groups 
+            of nodes that must be executed in order and the nodes within these 
+            groups can be executed simultaneously.
+
+        Raises
+        ------
+        SortingError
+            Informs that the dst_node_id was not specified as a src_node_id.
+        SortingError
+            Informs that a circular dependency was found in the graph.
+        """
+
+        graph = build_graph(self._pipeline)
+        topo_order = sort_topology(graph)
+        logger.info(f'topo_order: {topo_order}')
+
+        return topo_order
+
     def execute_node(self, id: str) -> Dict[str, Any]:
         """Executes a node.
 
@@ -142,30 +166,6 @@ class BaseExecutor(ABC):
             raise ExecutorError(
                 'node not executed by the executor', [f'id == {id}']
             ) from error
-
-    def obtain_topo_order(self) -> List[list]:
-        """Obtains the topological order of the graph.
-
-        Returns
-        -------
-        topo_order : List[list]
-            Topological order of the graph. The inner lists represent groups 
-            of nodes that must be executed in order and the nodes within these 
-            groups can be executed simultaneously.
-
-        Raises
-        ------
-        SortingError
-            Informs that the dst_node_id was not specified as a src_node_id.
-        SortingError
-            Informs that a circular dependency was found in the graph.
-        """
-
-        graph = build_graph(self._pipeline)
-        topo_order = sort_topology(graph)
-        logger.info(f'topo_order: {topo_order}')
-
-        return topo_order
 
     @abstractmethod
     def execute_pipeline(self, topo_order: List[list]) -> None:
