@@ -2,38 +2,48 @@ from pathlib import Path
 from shutil import rmtree
 from unittest import TestCase
 
-from ipipeline.cli.actions import create_project, execute_pipeline
+from ipipeline.cli.actions import build_project, execute_pipeline
 from ipipeline.exceptions import InstanceError, SystemError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 
 
-class TestCreateProject(TestCase):
+class TestBuildProject(TestCase):
     def setUp(self) -> None:
-        self._path = Path(__file__).resolve().parents[0] / 'mock_proj'
+        self._path = Path(__file__).resolve().parents[0] / 'proj'
 
     def tearDown(self) -> None:
         rmtree(self._path)
 
-    def test_inexistent_project(self) -> None:
-        create_project(str(self._path.parents[0]), 'mock_proj')
+    def test_build_project__path_eq_dir(self) -> None:
+        build_project(str(self._path.parents[0]), 'proj')
+
+        with self.assertRaisesRegex(
+            SystemError, r'path was found in the file system: path == *'
+        ):
+            build_project(str(self._path.parents[0]), 'proj')
+
+    def test_build_project__path_ne_dir(self) -> None:
+        build_project(str(self._path.parents[0]), 'proj')
         proj_items = [
             '.gitignore', 
             'CONTRIBUTING.md', 
             'io', 
             'LICENSE.md', 
             'MANIFEST.in', 
-            'mock_proj', 
+            'proj', 
+            'pyproject.toml', 
             'README.md', 
             'requirements', 
             'setup.py', 
             'tests'
         ]
         pkg_items = [
-            'configs', 
+            'cli', 
+            'control', 
             'exceptions.py', 
-            'pipelines', 
-            'tasks', 
+            'structure', 
+            'utils', 
             '__init__.py', 
             '__main__.py'
         ]
@@ -42,15 +52,7 @@ class TestCreateProject(TestCase):
             self.assertTrue((self._path / proj_item).exists())
 
         for pkg_item in pkg_items:
-            self.assertTrue((self._path / 'mock_proj' / pkg_item).exists())
-
-    def test_existent_project(self) -> None:
-        create_project(str(self._path.parents[0]), 'mock_proj')
-
-        with self.assertRaisesRegex(
-            SystemError, r'path was found in the file system: path == *'
-        ):
-            create_project(str(self._path.parents[0]), 'mock_proj')
+            self.assertTrue((self._path / 'proj' / pkg_item).exists())
 
 
 class TestExecutePipeline(TestCase):
