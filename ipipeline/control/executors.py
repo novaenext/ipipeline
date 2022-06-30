@@ -180,14 +180,20 @@ class BaseExecutor(ABC):
         return items
 
     @abstractmethod
-    def execute_pipeline(self, topo_order: List[list]) -> None:
+    def execute_pipeline(
+        self, pipeline: Pipeline, catalog: Catalog, ordering: List[list]
+    ) -> None:
         """Provides an interface to execute a pipeline.
 
         Parameters
         ----------
-        topo_order : List[list]
-            Topological order of the graph. The inner lists represent groups 
-            of nodes that must be executed in order and the nodes within these 
+        pipeline : Pipeline
+            Pipeline that stores a flow of tasks.
+        catalog : Catalog
+            Catalog that stores the items of an execution.
+        ordering : List[list]
+            Ordering of the graph. The inner lists represent groups of nodes 
+            that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
         """
 
@@ -209,25 +215,26 @@ class SequentialExecutor(BaseExecutor):
         Catalog that stores the items from an execution.
     """
 
-    def execute_pipeline(self, topo_order: List[list]) -> None:
+    def execute_pipeline(
+        self, pipeline: Pipeline, catalog: Catalog, ordering: List[list]
+    ) -> None:
         """Executes a pipeline.
 
         Parameters
         ----------
-        topo_order : List[list]
-            Topological order of the graph. The inner lists represent groups 
-            of nodes that must be executed in order and the nodes within these 
+        pipeline : Pipeline
+            Pipeline that stores a flow of tasks.
+        catalog : Catalog
+            Catalog that stores the items of an execution.
+        ordering : List[list]
+            Ordering of the graph. The inner lists represent groups of nodes 
+            that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
-
-        Raises
-        ------
-        ExecutorError
-            Informs that the node was not executed by the executor.
         """
 
-        for group in topo_order:
+        for group in ordering:
             for node_id in group:
-                task_outputs = self.execute_node(node_id)
+                items = self.execute_node(pipeline, catalog, node_id)
 
-                for out_key, out_value in task_outputs.items():
-                    self._catalog.set_item(out_key, out_value)
+                for item_id, item in items.items():
+                    catalog.set_item(item_id, item)
