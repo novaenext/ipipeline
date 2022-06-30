@@ -122,19 +122,6 @@ class BaseExecutor(ABC):
             Ordering of the graph. The inner lists represent groups of nodes 
             that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
-
-        Raises
-        ------
-        BuildingError
-            Informs that the src_id was not found in the pipeline._nodes.
-        BuildingError
-            Informs that the dst_id was not found in the pipeline._nodes.
-        BuildingError
-            Informs that the dst_id was found in the graph[link.src_id].
-        SortingError
-            Informs that the dst_id was not set as a src_id.
-        SortingError
-            Informs that a circular dependency was found in the graph.
         """
 
         graph = build_graph(pipeline)
@@ -165,8 +152,8 @@ class BaseExecutor(ABC):
 
         Raises
         ------
-        PipelineError
-            Informs that the id was not found in the _nodes.
+        ExecutorError
+            Informs that the node was not executed by the executor.
         """
 
         node = pipeline.get_node(id)
@@ -174,7 +161,14 @@ class BaseExecutor(ABC):
 
         pos_args = build_pos_args(node.pos_inputs, catalog)
         key_args = build_key_args(node.key_inputs, catalog)
-        returns = node.task(*pos_args, **key_args)
+
+        try:
+            returns = node.task(*pos_args, **key_args)
+        except Exception as error:
+            raise ExecutorError(
+                'node was not executed by the executor', [f'id == {node.id}']
+            ) from error
+
         items = build_items(node.outputs, returns)
 
         return items
@@ -195,6 +189,11 @@ class BaseExecutor(ABC):
             Ordering of the graph. The inner lists represent groups of nodes 
             that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
+
+        Raises
+        ------
+        ExecutorError
+            Informs that the node was not executed by the executor.
         """
 
         pass
@@ -230,6 +229,11 @@ class SequentialExecutor(BaseExecutor):
             Ordering of the graph. The inner lists represent groups of nodes 
             that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
+
+        Raises
+        ------
+        ExecutorError
+            Informs that the node was not executed by the executor.
         """
 
         for group in ordering:
