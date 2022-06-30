@@ -122,47 +122,49 @@ def build_key_args(
     return key_args
 
 
-def build_task_outputs(outputs: List[str], returns: Any) -> Dict[str, Any]:
-    """Builds the outputs of a task.
+def build_items(outputs: List[str], returns: Any) -> Dict[str, Any]:
+    """Builds the items of an execution.
 
     Parameters
     ----------
     outputs : List[str]
         Outputs of the task. The outputs must match the returns in terms 
-        of size.
+        of size when more than one output is expected.
     returns : Any
-        Returns of the task obtained from its execution.
+        Returns of the executed task.
 
     Returns
     -------
-    task_outputs : Dict[str, Any]
-        Outputs of the task. The keys are the task outputs and the 
-        values are the task returns obtained from the execution.
+    items : Dict[str, Any]
+        Items of an execution. The keys are the item IDs and the values 
+        are the arguments required by the tasks.
 
     Raises
     ------
     BuildingError
-        Informs that the outputs_qty is not equal to the returns_qty.
+        Informs that an invalid type was found for the returns.
+    BuildingError
+        Informs that the outputs did not match the returns in terms of size.
     """
 
-    task_outputs = {}
-    outputs_qty = len(outputs)
+    items = {}
 
-    if outputs_qty > 0:
-        if outputs_qty == 1:
+    if len(outputs) > 0:
+        if len(outputs) == 1:
             returns = [returns]
 
-        try:
-            returns_qty = len(returns)
-        except TypeError:
-            returns_qty = 1
-
-        if outputs_qty != returns_qty:
+        if not isinstance(returns, (list, tuple)):
             raise BuildingError(
-                'outputs_qty is not equal to the returns_qty', 
-                [f'{outputs_qty} != {returns_qty}']
+                'invalid type was found for the returns', 
+                [f'type == {type(returns)}']
             )
 
-        task_outputs = dict(zip(outputs, returns))
+        if len(outputs) != len(returns):
+            raise BuildingError(
+                'outputs did not match the returns in terms of size', 
+                [f'{len(outputs)} != {len(returns)}']
+            )
 
-    return task_outputs
+        items = dict(zip(outputs, returns))
+
+    return items
