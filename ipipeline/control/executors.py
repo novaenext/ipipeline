@@ -148,6 +148,9 @@ class SequentialExecutor(BaseExecutor):
         logger.info(
             f'pipeline.id: {pipeline.id}, pipeline.tags: {pipeline.tags}'
         )
+        logger.info(
+            f'catalog.id: {catalog.id}, catalog.tags: {catalog.tags}'
+        )
 
         for group in ordering:
             for node_id in group:
