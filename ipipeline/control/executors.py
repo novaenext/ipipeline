@@ -108,29 +108,40 @@ class BaseExecutor(ABC):
             catalog, Catalog('c0', tags=['default'])
         )
 
-    def obtain_topo_order(self) -> List[list]:
-        """Obtains the topological order of the graph.
+    def get_ordering(self, pipeline: Pipeline) -> List[list]:
+        """Gets the ordering of a graph.
+
+        Parameters
+        ----------
+        pipeline : Pipeline
+            Pipeline that stores a flow of tasks.
 
         Returns
         -------
-        topo_order : List[list]
-            Topological order of the graph. The inner lists represent groups 
-            of nodes that must be executed in order and the nodes within these 
+        ordering : List[list]
+            Ordering of the graph. The inner lists represent groups of nodes 
+            that must be executed sequentially and the nodes within these 
             groups can be executed simultaneously.
 
         Raises
         ------
+        BuildingError
+            Informs that the src_id was not found in the pipeline._nodes.
+        BuildingError
+            Informs that the dst_id was not found in the pipeline._nodes.
+        BuildingError
+            Informs that the dst_id was found in the graph[link.src_id].
         SortingError
-            Informs that the dst_node_id was not specified as a src_node_id.
+            Informs that the dst_id was not set as a src_id.
         SortingError
             Informs that a circular dependency was found in the graph.
         """
 
-        graph = build_graph(self._pipeline)
-        topo_order = sort_topology(graph)
-        logger.info(f'topo_order: {topo_order}')
+        graph = build_graph(pipeline)
+        ordering = sort_topology(graph)
+        logger.info(f'ordering: {ordering}')
 
-        return topo_order
+        return ordering
 
     def execute_node(self, id: str) -> Dict[str, Any]:
         """Executes a node.
