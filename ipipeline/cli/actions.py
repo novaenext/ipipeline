@@ -1,14 +1,11 @@
-"""Functions related to the action procedure."""
+"""Functions related to the action procedures."""
 
 from ipipeline.utils.instance import get_inst
 from ipipeline.utils.system import build_directory, build_file
 
 
-def create_project(path: str, name: str) -> None:
-    """Creates a project in the file system.
-
-    The project provides a standard structure for organizing the tasks that 
-    interact with the package.
+def build_project(path: str, name: str) -> None:
+    """Builds a project in the file system.
 
     Parameters
     ----------
@@ -16,13 +13,6 @@ def create_project(path: str, name: str) -> None:
         Path of the project.
     name : str
         Name of the project.
-
-    Raises
-    ------
-    SystemError
-        Informs that the directory was not created in the file system.
-    SystemError
-        Informs that the file was not created in the file system.
     """
 
     proj_path = f'{path}/{name}'
@@ -37,12 +27,13 @@ def create_project(path: str, name: str) -> None:
         'CONTRIBUTING.md', 
         'LICENSE.md', 
         'MANIFEST.in', 
+        'pyproject.toml', 
         'README.md', 
         'setup.py'
     ]:
         build_file(f'{proj_path}/{proj_file}')
 
-    for pkg_dir in ['configs', 'pipelines', 'tasks']:
+    for pkg_dir in ['cli', 'control', 'structure', 'utils']:
         build_directory(f'{pkg_path}/{pkg_dir}')
 
     for pkg_file in ['exceptions.py', '__init__.py', '__main__.py']:
