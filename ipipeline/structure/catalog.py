@@ -96,7 +96,7 @@ class Catalog(Info):
         Returns
         -------
         item : Any
-            Item of an execution.
+            Item that represents an argument required by a task.
 
         Raises
         ------
@@ -121,7 +121,7 @@ class Catalog(Info):
         id : str
             ID of the item.
         item : Any
-            Item of an execution.
+            Item that represents an argument required by a task.
         """
 
         self._items[id] = item
