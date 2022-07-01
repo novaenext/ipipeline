@@ -1,14 +1,14 @@
 # **ipipeline**
 
-A micro framework for building and executing pipelines from different domains.
+ipipeline is a micro framework to build and execute pipelines from different domains.
 
 ## **Features**
 
 - **Simplicity:** high-level interfaces that can be used to perform complex tasks.
 
-- **Flexibility:** freedom to build the pipeline according to the requirements of the problem.
+- **Flexibility:** freedom to build according to the requirements of the problem.
 
-- **Scalability:** pipeline execution through concurrency or parallelism (coming soon).
+- **Scalability:** execution through concurrency or parallelism (coming soon).
 
 ## **Installation**
 
@@ -32,17 +32,13 @@ To learn about the legal rights linked to this repository, follow the [license](
 
 ## **Example**
 
-This example was divided into sections to explain the main features of the package. In case of questions about a specific detail the package contains docstrings for all modules, classes, methods and functions.
-
-### **Imports**
-
-The ipipeline package tries to keep things simple, therefore all the work is done through the pipeline interface imported as Pipeline and the execution interface imported as SequentialExecutor.
+The ipipeline package tries to keep things simple, therefore all the work is done through a few interfaces.
 
 ```python
 import logging
 
-from ipipeline.execution import SequentialExecutor
-from ipipeline.structure import Pipeline
+from ipipeline.control import SequentialExecutor
+from ipipeline.structure import Catalog, Pipeline
 
 
 logging.basicConfig(
@@ -54,42 +50,64 @@ logging.basicConfig(
 
 ### **Tasks**
 
-The functions below represent the user tasks (executable units) that need to be executed in a certain order which forms a flow of tasks with the following idea: data is extracted from somewhere, then transformed in two different ways and finally loaded to somewhere. Although this example only contains functions, the methods of an instance can also be used.
+The functions below represent tasks that need to be executed in a certain order which forms a flow of tasks with the following idea: the data is extracted from a source, then transformed in different ways, and finally loaded to a destination. The focus in this example is not on the code block of the functions, but on the dependencies between them.
 
 ```python
-def extract() -> list:
-    return [1, 2]
+def extract_data(path: str, encoding: str = None) -> list:
+    data = [2, 4]
+
+    return data
 
 
-def transform1(x: int) -> int:
-    return x + 1
+def transform_data1(data: list) -> list:
+    sum_data = [num + 2 for num in data]
+
+    return sum_data
 
 
-def transform2(y: int) -> int:
-    return y * 2
+def transform_data2(data: list) -> list:
+    sub_data = [num - 2 for num in data]
+
+    return sub_data
 
 
-def load(x: int, y: int, z: int) -> None:
-    print(f'loading - x: {x}, y: {y}, z: {z}')
+def load_data(sum_data: list, sub_data: list, path: str) -> None:
+    pass
 ```
 
 ### **Pipeline**
 
-A pipeline stores the nodes (tasks) and links (relationships) which are represented as a graph during the execution. The graph built process is not visible to the user.
+A pipeline stores a flow of tasks represented by nodes (tasks) and links (dependencies). The links between the nodes must compose a directed acyclic graph which is used to find a linear ordering for the execution.
 
 ```python
 pipeline = Pipeline('p1', tags=['example'])
 pipeline.add_node(
-    'n1', extract, outputs=['x', 'y'], tags=['extract']
+    'n1', 
+    extract_data, 
+    pos_inputs=['src_path'], 
+    key_inputs={'encoding': 'encoding'}, 
+    outputs=['data'], 
+    tags=['extract']
 )
 pipeline.add_node(
-    'n2', transform1, inputs={'x': 'c.x'}, outputs=['x'], tags=['transform1']
+    'n2', 
+    transform_data1, 
+    pos_inputs=['data'], 
+    outputs=['sum_data'], 
+    tags=['transform1']
 )
 pipeline.add_node(
-    'n3', transform2, inputs={'y': 'c.y'}, outputs=['y'], tags=['transform2']
+    'n3', 
+    transform_data2, 
+    pos_inputs=['data'], 
+    outputs=['sub_data'], 
+    tags=['transform2']
 )
 pipeline.add_node(
-    'n4', load, inputs={'x': 'c.x', 'y': 'c.y', 'z': 8}, tags=['load']
+    'n4', 
+    load_data, 
+    pos_inputs=['sum_data', 'sub_data', 'dst_path'], 
+    tags=['load']
 )
 pipeline.add_link('l1', 'n1', 'n2')
 pipeline.add_link('l2', 'n1', 'n3')
@@ -97,102 +115,55 @@ pipeline.add_link('l3', 'n2', 'n4')
 pipeline.add_link('l4', 'n3', 'n4')
 ```
 
-Based on the flow of tasks defined, the pipeline was built with four nodes and four links. Two aspects deserve attention here, the inputs and outputs parameters of the add_node method.
+The pipeline built produces a graph as shown in the image below.
 
-The outputs parameter, when declared, indicates that during the pipeline execution, the function returns must be stored in the catalog with specific names. For example, the outputs parameter of the 'n1' node expects to store two items in the catalog with the names 'x' and 'y' which are obtained from the returns of the function.
+![graph](https://github.com/novaenext/ipipeline/blob/master/images/graph.png)
 
-The inputs parameter, when declared, indicates that during the pipeline execution, the function receives a dictionary with its arguments. For example, the inputs parameter of the 'n4' node expects to receive a dictionary where the 'x' and 'y' values are obtained from the catalog and the 'z' value is obtained directly. The 'c.' prefix assumes the existence of an item ('c.<item_id>') or a list of items ('c.[<item_id>, ..., <item_id>]') in the catalog stored by the predecessor nodes.
+### **Catalog**
 
-The links determine the order in which the nodes are executed. For example, 'l1' link indicates a relationship between 'n1' node (source) and 'n2' node (destination) where the 'n2' node depends on the execution of the 'n1' node. A node can dependent on another node even though it does not use the outputs of its predecessor.
+A catalog stores the items (arguments) of an execution. When a node is executed, its return is stored in the catalog linked to the name defined in the outputs parameter, creating a key:value pair. This pair is made available to all other nodes that depend on it as an argument. Therefore, the pos_inputs and key_inputs parameters are references to the keys of the arguments stored in the catalog. It is possible to pass default arguments to the nodes before the execution takes place as shown below.
+
+```python
+catalog = Catalog('c1', tags=['example'])
+catalog.set_item('src_path', 'src/file')
+catalog.set_item('dst_path', 'dst/file')
+catalog.set_item('encoding', 'utf-8') 
+```
 
 ### **Executor**
 
-An executor is responsible for executing a pipeline from the topological order (execution order) of the graph. Therefore, it is expected that the links between the nodes form a DAG (Directed Acyclic Graph), if this does not happen, an error is raised. Behind the scenes, a catalog is created to store the node returns that are requested by other nodes during the execution.
+An executor is responsible to execute a pipeline from the topological ordering of the graph built from the relationships between the nodes. The result of the execution is the catalog populated with the returns of the functions.
 
 ```python
 executor = SequentialExecutor()
-executor.add_pipeline(pipeline)
-topo_order = executor.obtain_topo_order()
-executor.execute_pipeline(topo_order)
+ordering = executor.get_ordering(pipeline)
+catalog = executor.execute_pipeline(pipeline, catalog, ordering)
 ```
 
-Below are the log results generated by the execution. It is recommended to turn off the logs in cases where there are many nodes or the pipeline is called many times inside a loop.
+The log generated while executing is shown below.
 
 ```shell
-[2022-06-20 10:46:21] INFO ipipeline.execution.executors - topo_order: [['n1'], ['n2', 'n3'], ['n4']]
-[2022-06-20 10:46:21] INFO ipipeline.execution.executors - node.id: n1, node.tags: ['extract']
-[2022-06-20 10:46:21] INFO ipipeline.execution.executors - node.id: n2, node.tags: ['transform1']
-[2022-06-20 10:46:21] INFO ipipeline.execution.executors - node.id: n3, node.tags: ['transform2']
-[2022-06-20 10:46:21] INFO ipipeline.execution.executors - node.id: n4, node.tags: ['load']
-loading - x: 2, y: 4, z: 8
+[2022-07-01 09:30:00] INFO ipipeline.control.executors - ordering: [['n1'], ['n2', 'n3'], ['n4']]
+[2022-07-01 09:30:00] INFO ipipeline.control.executors - pipeline.id: p1, pipeline.tags: ['example']
+[2022-07-01 09:30:00] INFO ipipeline.control.executors - catalog.id: c1, catalog.tags: ['example']
+[2022-07-01 09:30:00] INFO ipipeline.control.executors - node.id: n1, node.tags: ['extract']
+[2022-07-01 09:30:00] INFO ipipeline.control.executors - node.id: n2, node.tags: ['transform1']
+[2022-07-01 09:30:00] INFO ipipeline.control.executors - node.id: n3, node.tags: ['transform2']
+[2022-07-01 09:30:00] INFO ipipeline.control.executors - node.id: n4, node.tags: ['load']
 ```
 
-According to the defined flow of tasks, the nodes were executed in the expected order. The inner lists of the topological order must always be executed in order, however, the elements within them can be executed simultaneously. As in this example the SequentialExecutor class was used, the nodes were executed as if the topological order were a flat list.
+The ordering list has inner lists that represent groups of nodes that must be executed sequentially and the nodes within these groups can be executed simultaneously. As in this case the sequential executor was used, the benefit of simultaneous execution was skipped, but soon new executors will be created to take advantage of this.
 
 ### **CLI**
 
-The package provides a CLI with two commands called project and execution. The project command creates a project in the file system that provides a standard structure for organizing the tasks that interact with the package. Let's assume the project path is the home directory and the project name is iexample, therefore the command would be entered like this:
+The package provides a CLI with two commands called project and execution. The project command builds a project in the file system that provides a standard structure for organizing the code. Let's assume the project path is the home directory and the project name is example, therefore the command would be entered like this:
 
 ```shell
-python -m ipipeline project ~ iexample
+python -m ipipeline project ~ example
 ```
 
-The result of this command would be the following structure:
-
-```text
-iexample
-|
-|----iexample
-|    |
-|    |----configs
-|    |
-|    |----pipelines
-|    |
-|    |----tasks
-|    |
-|    |----__init__.py
-|    |
-|    |----__main__.py
-|    |
-|    |----exceptions.py
-|
-|----io
-|
-|----requirements
-|
-|----tests
-|
-|----.gitignore
-|
-|----CONTRIBUTING.md
-|
-|----LICENSE.md
-|
-|----MANIFEST.in
-|
-|----README.md
-|
-|----setup.py
-```
-
-The example code provided would fit into this structure as follows:
-
-- The configurations is moved to the configs package.
-
-- The tasks are moved to the tasks package.
-
-- The pipeline is moved to the pipelines package.
-
-- The executor is moved to the main module.
-
-With these modifications this project can be executed with the following command:
+The execution command executes a pipeline according to the location of the modules and functions that build the pipeline and the catalog. The pipeline and catalog building process can be wrapped into separate functions called, for example, build_pipeline and build_catalog. Let's assume both functions are in the __main__ module of the example project, therefore the command would be as follows:
 
 ```shell
-python -m iexample
-```
-
-Another option to execute this project without having to deal with the execution interface would be through the execution command. For this, the pipeline building process must be wrap in a function that returns the pipeline instance. Let's suppose that the wrapper function is called build_pipeline and the module where it was declared is called etl (inside the iexample.pipelines package), therefore the command would be as follows:
-
-```shell
-python -m ipipeline execution iexample.pipelines.etl build_pipeline sequential
+python -m ipipeline execution SequentialExecutor example.__main__ example.__main__ build_pipeline build_catalog
 ```
