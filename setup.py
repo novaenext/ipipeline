@@ -12,9 +12,9 @@ with open(str(proj_path / 'requirements' / 'prod.txt')) as requirements_file:
 
 setup(
     name='ipipeline', 
-    version='0.15.0', 
+    version='0.16.0', 
     description=(
-        'A micro framework for building and executing pipelines from '
+        'A micro framework to build and execute pipelines from '
         'different domains.'
     ), 
     url='https://github.com/novaenext/ipipeline', 

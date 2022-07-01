@@ -1,7 +1,7 @@
 """Package initialization procedures.
 
-The ipipeline is a micro framework to build and execute pipelines from 
+ipipeline is a micro framework to build and execute pipelines from 
 different domains.
 """
 
-__version__ = '0.14.0'
+__version__ = '0.16.0'
