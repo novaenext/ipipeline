@@ -2,7 +2,7 @@
 
 from typing import Callable, List
 
-from ipipeline.cli.actions import create_project, execute_pipeline
+from ipipeline.cli.actions import build_project, execute_pipeline
 from ipipeline.cli.arguments import Argument, args
 
 
@@ -145,18 +145,22 @@ cmds = {
     ), 
     'project': Command(
         'project', 
-        'creates a project in the file system. the project provides a '
-        'standard structure for organizing the tasks that interact with the '
-        'package.', 
-        create_project, 
+        'builds a project in the file system.', 
+        build_project, 
         [args['path'], args['name']], 
         [args['help']]
     ), 
     'execution': Command(
         'execution', 
-        'executes a pipeline according to an executor.', 
+        'executes a pipeline.', 
         execute_pipeline, 
-        [args['mod_name'], args['func_name'], args['exe_type']], 
+        [
+            args['executor_class_name'], 
+            args['pipeline_mod_name'], 
+            args['catalog_mod_name'], 
+            args['pipeline_func_name'], 
+            args['catalog_func_name']
+        ], 
         [args['help']]
     )
 }

@@ -130,22 +130,33 @@ args = {
         'store', 
         str
     ), 
-    'mod_name': Argument(
-        'mod_name', 
-        'name of the module in absolute terms (package.module).', 
+    'executor_class_name': Argument(
+        'executor_class_name', 
+        'name of the executor class.', 
         'store', 
         str
     ), 
-    'func_name': Argument(
-        'func_name', 
+    'pipeline_mod_name': Argument(
+        'pipeline_mod_name', 
+        'name of the module where a pipeline function is declared.', 
+        'store', 
+        str
+    ), 
+    'catalog_mod_name': Argument(
+        'catalog_mod_name', 
+        'name of the module where a catalog function is declared.', 
+        'store', 
+        str
+    ), 
+    'pipeline_func_name': Argument(
+        'pipeline_func_name', 
         'name of the function that returns a pipeline.', 
         'store', 
         str
     ), 
-    'exe_type': Argument(
-        'exe_type', 
-        'type of the executor.\n\n'
-        'sequential: executes a pipeline sequentially.', 
+    'catalog_func_name': Argument(
+        'catalog_func_name', 
+        'name of the function that returns a catalog.', 
         'store', 
         str
     ), 

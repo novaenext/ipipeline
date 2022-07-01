@@ -5,19 +5,19 @@ from ipipeline.structure.info import Info
 
 
 class TestInfo(TestCase):
-    def test_init__id_eq_str__tags_eq_list(self) -> None:
+    def test_init__args_eq_types(self) -> None:
         info = Info('i1', tags=['t1', 't2'])
 
         self.assertEqual(info._id, 'i1')
         self.assertListEqual(info._tags, ['t1', 't2'])
 
-    def test_get__id_eq_str__tags_eq_list(self) -> None:
+    def test_get__args_eq_types(self) -> None:
         info = Info('i1', tags=['t1', 't2'])
 
         self.assertEqual(info.id, 'i1')
         self.assertListEqual(info.tags, ['t1', 't2'])
 
-    def test_set__id_eq_str__tags_eq_list(self) -> None:
+    def test_set__args_eq_types(self) -> None:
         info = Info('i1', tags=['t1', 't2'])
         info.id = 'i2'
         info.tags = ['t3', 't4']

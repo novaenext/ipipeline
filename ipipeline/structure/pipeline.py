@@ -1,6 +1,6 @@
 """Class related to the pipeline procedures."""
 
-from typing import Any, Callable, Dict, List
+from typing import Callable, Dict, List
 
 from ipipeline.exceptions import PipelineError
 from ipipeline.structure.info import Info
@@ -10,9 +10,9 @@ from ipipeline.utils.checking import check_none
 
 
 class Pipeline(Info):
-    """Stores a flow of executable units.
+    """Stores a flow of tasks.
 
-    The link between the nodes must compose a directed acyclic graph.
+    The links between the nodes must compose a directed acyclic graph.
 
     Attributes
     ----------
@@ -49,11 +49,6 @@ class Pipeline(Info):
             the links.
         tags : List[str], optional
             Tags of the pipeline to provide more context.
-
-        Raises
-        ------
-        InfoError
-            Informs that the id did not match the pattern.
         """
 
         super().__init__(id, tags=tags)
@@ -142,7 +137,7 @@ class Pipeline(Info):
         Returns
         -------
         node : Node
-            Node that stores an executable unit of the graph.
+            Node that stores a task.
 
         Raises
         ------
@@ -165,7 +160,7 @@ class Pipeline(Info):
         Parameters
         ----------
         node : Node
-            Node that stores an executable unit of the graph.
+            Node that stores a task.
 
         Raises
         ------
@@ -205,11 +200,12 @@ class Pipeline(Info):
         self, 
         id: str, 
         task: Callable, 
-        inputs: Dict[str, Any] = None, 
+        pos_inputs: List[str] = None, 
+        key_inputs: Dict[str, str] = None, 
         outputs: List[str] = None, 
         tags: List[str] = None
     ) -> None:
-        """Adds a node through its settings.
+        """Adds a node.
 
         Parameters
         ----------
@@ -217,14 +213,12 @@ class Pipeline(Info):
             ID of the node.
         task : Callable
             Task of the node.
-        inputs : Dict[str, Any], optional
-            Inputs of the task. The keys are the callable parameters and the 
-            values are the data required for the parameters. The values can 
-            also be placeholders for the catalog items.
-
-            Placeholders:
-                'c.<item_id>': gets an item.
-                'c.[<item_id>, ..., <item_id>]': gets a list of items.
+        pos_inputs : List[str], optional
+            Positional inputs of the task. The elements are the IDs of the 
+            catalog items.
+        key_inputs : Dict[str, str], optional
+            Keyword inputs of the task. The keys are the task parameters and 
+            the values are the IDs of the catalog items.
         outputs : List[str], optional
             Outputs of the task. The outputs must match the returns in terms 
             of size.
@@ -233,13 +227,18 @@ class Pipeline(Info):
 
         Raises
         ------
-        InfoError
-            Informs that the id did not match the pattern.
         PipelineError
             Informs that the id was found in the _nodes.
         """
 
-        node = Node(id, task, inputs=inputs, outputs=outputs, tags=tags)
+        node = Node(
+            id, 
+            task, 
+            pos_inputs=pos_inputs, 
+            key_inputs=key_inputs, 
+            outputs=outputs, 
+            tags=tags
+        )
         self.set_node(node)
 
     def check_link(self, id: str) -> bool:
@@ -271,7 +270,7 @@ class Pipeline(Info):
         Returns
         -------
         link : Link
-            Link that stores a dependency between the nodes of the graph.
+            Link that stores a dependency between the nodes.
 
         Raises
         ------
@@ -294,7 +293,7 @@ class Pipeline(Info):
         Parameters
         ----------
         link : Link
-            Link that stores a dependency between the nodes of the graph.
+            Link that stores a dependency between the nodes.
 
         Raises
         ------
@@ -337,7 +336,7 @@ class Pipeline(Info):
         dst_id: str, 
         tags: List[str] = None
     ) -> None:
-        """Adds a link through its settings.
+        """Adds a link.
 
         Parameters
         ----------
@@ -352,8 +351,6 @@ class Pipeline(Info):
 
         Raises
         ------
-        InfoError
-            Informs that the id did not match the pattern.
         PipelineError
             Informs that the id was found in the _links.
         """

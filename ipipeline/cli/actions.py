@@ -1,14 +1,11 @@
-"""Functions related to the action procedure."""
+"""Functions related to the action procedures."""
 
 from ipipeline.utils.instance import get_inst
 from ipipeline.utils.system import build_directory, build_file
 
 
-def create_project(path: str, name: str) -> None:
-    """Creates a project in the file system.
-
-    The project provides a standard structure for organizing the tasks that 
-    interact with the package.
+def build_project(path: str, name: str) -> None:
+    """Builds a project in the file system.
 
     Parameters
     ----------
@@ -16,13 +13,6 @@ def create_project(path: str, name: str) -> None:
         Path of the project.
     name : str
         Name of the project.
-
-    Raises
-    ------
-    SystemError
-        Informs that the directory was not created in the file system.
-    SystemError
-        Informs that the file was not created in the file system.
     """
 
     proj_path = f'{path}/{name}'
@@ -37,48 +27,46 @@ def create_project(path: str, name: str) -> None:
         'CONTRIBUTING.md', 
         'LICENSE.md', 
         'MANIFEST.in', 
+        'pyproject.toml', 
         'README.md', 
         'setup.py'
     ]:
         build_file(f'{proj_path}/{proj_file}')
 
-    for pkg_dir in ['configs', 'pipelines', 'tasks']:
+    for pkg_dir in ['cli', 'control', 'structure', 'utils']:
         build_directory(f'{pkg_path}/{pkg_dir}')
 
     for pkg_file in ['exceptions.py', '__init__.py', '__main__.py']:
         build_file(f'{pkg_path}/{pkg_file}')
 
 
-def execute_pipeline(mod_name: str, func_name: str, exe_type: str) -> None:
-    """Executes a pipeline according to an executor.
+def execute_pipeline(
+    executor_class_name: str, 
+    pipeline_mod_name: str, 
+    catalog_mod_name: str, 
+    pipeline_func_name: str, 
+    catalog_func_name: str
+) -> None:
+    """Executes a pipeline.
 
     Parameters
     ----------
-    mod_name : str
-        Name of the module in absolute terms (package.module).
-    func_name : str
+    executor_class_name : str
+        Name of the executor class.
+    pipeline_mod_name : str
+        Name of the module where a pipeline function is declared.
+    catalog_mod_name : str
+        Name of the module where a catalog function is declared.
+    pipeline_func_name : str
         Name of the function that returns a pipeline.
-    exe_type : {'sequential'}
-        Type of the executor.
-
-        sequential: executes a pipeline sequentially.
-
-    Raises
-    ------
-    InstanceError
-        Informs that the inst_name was not found in the module.
-    SortingError
-        Informs that the dst_node_id was not specified as a src_node_id.
-    SortingError
-        Informs that a circular dependency was found in the graph.
-    ExecutorError
-        Informs that the node was not executed by the executor.
+    catalog_func_name : str
+        Name of the function that returns a catalog.
     """
 
-    pipeline = get_inst(mod_name, func_name)()
-    executor = get_inst(
-        'ipipeline.execution.executors', f'{exe_type.capitalize()}Executor'
-    )()
-    executor.add_pipeline(pipeline)
-    topo_order = executor.obtain_topo_order()
-    executor.execute_pipeline(topo_order)
+    executor_mod_name = 'ipipeline.control.executors'
+    executor = get_inst(executor_mod_name, executor_class_name)()
+    pipeline = get_inst(pipeline_mod_name, pipeline_func_name)()
+    catalog = get_inst(catalog_mod_name, catalog_func_name)()
+
+    ordering = executor.get_ordering(pipeline)
+    _ = executor.execute_pipeline(pipeline, catalog, ordering)

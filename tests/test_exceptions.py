@@ -4,7 +4,7 @@ from ipipeline.exceptions import BaseError
 
 
 class TestBaseError(TestCase):
-    def test_init__text_eq_str__causes_eq_list(self) -> None:
+    def test_init__args_eq_types(self) -> None:
         error = BaseError('error text', ['cause == item'])
 
         self.assertEqual(error._text, 'error text')
