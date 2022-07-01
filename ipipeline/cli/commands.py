@@ -154,7 +154,13 @@ cmds = {
         'execution', 
         'executes a pipeline.', 
         execute_pipeline, 
-        [args['mod_name'], args['func_name'], args['exe_type']], 
+        [
+            args['executor_class_name'], 
+            args['pipeline_mod_name'], 
+            args['catalog_mod_name'], 
+            args['pipeline_func_name'], 
+            args['catalog_func_name']
+        ], 
         [args['help']]
     )
 }
