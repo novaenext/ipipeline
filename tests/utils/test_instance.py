@@ -1,4 +1,3 @@
-import sys
 from unittest import TestCase
 from typing import List
 
@@ -77,7 +76,6 @@ class TestGetInst(TestCase):
         inst = get_inst('tests.utils.test_instance', 'Class1')
 
         self.assertEqual(inst.__name__, 'Class1')
-        self.assertIn('ipipeline/tests', sys.path[-1])
 
     def test_get_inst__mod_name_ne_mod__inst_name_eq_inst(self) -> None:
         with self.assertRaisesRegex(
