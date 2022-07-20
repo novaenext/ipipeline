@@ -14,7 +14,7 @@ class TestExecuteCli(TestCase):
 
     def test_failed_arg(self) -> None:
         with self.assertRaisesRegex(SystemExit, r'1'):
-            execute_cli(['execution', 'module', 'func', 'executor'])
+            execute_cli(['execution', 'class', 'mod', 'mod', 'func', 'func'])
 
     def test_invalid_arg(self) -> None:
         with self.assertRaisesRegex(SystemExit, r'2'):
