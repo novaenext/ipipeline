@@ -1,10 +1,8 @@
 # directories
 venv/
+dist/
 __pycache__/
 .pytest_cache/
-build/
-dist/
-ipipeline.egg-info/
 
 # files
 .env
