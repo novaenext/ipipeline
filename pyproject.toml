@@ -8,7 +8,7 @@ dynamic = [ "version" ]
 authors = [ { name = "novaenext" } ]
 description = "A micro framework to build and execute pipelines from different domains."
 readme = "README.md"
-license = { file = "LICENSE.md" }
+license = "BSD-3-Clause"
 classifiers = [
     "License :: OSI Approved :: BSD License", 
     "Operating System :: OS Independent", 
