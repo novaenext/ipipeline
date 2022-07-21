@@ -116,8 +116,7 @@ pipeline.add_link('l4', 'n3', 'n4')
 ```
 
 The pipeline built produces a graph as shown in the image below.
-
-![graph](https://github.com/novaenext/ipipeline/blob/master/images/graph.png)
+![graph](https://raw.githubusercontent.com/novaenext/ipipeline/master/images/graph.png)
 
 ### **Catalog**
 
