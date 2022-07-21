@@ -1,6 +1,0 @@
-include LICENSE.md
-include MANIFEST.in
-include README.md
-include setup.py
-graft requirements
-prune tests

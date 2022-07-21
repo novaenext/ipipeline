@@ -1,0 +1,32 @@
+name: dist
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: the repository (package index) to upload the package to.
+        required: true
+        type: choice
+        options:
+        - testpypi
+        - pypi
+jobs:
+  dist:
+    name: distribute package
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v3
+      - name: set up python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: install dependencies
+        run: python -m pip install build twine
+      - name: build package
+        run: python -m build
+      - name: upload package via testpypi
+        if: ${{ inputs.repository == 'testpypi' }}
+        run: python -m twine dist/* -r ${{ inputs.repository }} -u __token__ -p ${{ secrets.TESTPYPI_TOKEN }}
+      - name: upload package via pypi
+        if: ${{ inputs.repository == 'pypi' }}
+        run: python -m twine dist/* -r ${{ inputs.repository }} -u __token__ -p ${{ secrets.PYPI_TOKEN }}

@@ -1,3 +1,37 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = [ "hatchling" ]
+build-backend = "hatchling.build"
+
+[project]
+name = "ipipeline"
+dynamic = [ "version" ]
+authors = [ { name = "novaenext" } ]
+description = "A micro framework to build and execute pipelines from different domains."
+readme = "README.md"
+license = { file = "LICENSE.md" }
+classifiers = [
+    "License :: OSI Approved :: BSD License", 
+    "Operating System :: OS Independent", 
+    "Programming Language :: Python :: 3"
+]
+keywords = [
+    "data", 
+    "etl", 
+    "pipeline"
+]
+requires-python = ">=3.6"
+
+[project.urls]
+GitHub = "https://github.com/novaenext/ipipeline"
+
+[tool.hatch.version]
+path = "ipipeline/__init__.py"
+
+[tool.hatch.build]
+exclude = [
+    "CONTRIBUTING.md", 
+    ".github/", 
+    "images/", 
+    "requirements/", 
+    "tests/"
+]
