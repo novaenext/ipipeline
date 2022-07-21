@@ -26,7 +26,7 @@ jobs:
         run: python -m build
       - name: upload package via testpypi
         if: ${{ inputs.repository == 'testpypi' }}
-        run: python -m twine dist/* -r ${{ inputs.repository }} -u __token__ -p ${{ secrets.TESTPYPI_TOKEN }}
+        run: python -m twine upload dist/* -r ${{ inputs.repository }} -u __token__ -p ${{ secrets.TESTPYPI_TOKEN }}
       - name: upload package via pypi
         if: ${{ inputs.repository == 'pypi' }}
-        run: python -m twine dist/* -r ${{ inputs.repository }} -u __token__ -p ${{ secrets.PYPI_TOKEN }}
+        run: python -m twine upload dist/* -r ${{ inputs.repository }} -u __token__ -p ${{ secrets.PYPI_TOKEN }}
