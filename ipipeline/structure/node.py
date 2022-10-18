@@ -1,7 +1,8 @@
 """Class related to the node procedures."""
 
-from typing import Callable, Dict, List
+from typing import Any, Callable, Dict, List
 
+from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.info import Info
 from ipipeline.utils.checking import check_none
 
@@ -166,3 +167,45 @@ class Node(Info):
         """
 
         self._outputs = outputs
+
+    def build_pos_args(self, catalog: Catalog) -> List[Any]:
+        """Builds the positional arguments of a task.
+
+        Parameters
+        ----------
+        catalog : Catalog
+            Catalog that stores the items of an execution.
+
+        Returns
+        -------
+        pos_args : List[Any]
+            Positional arguments of a task.
+        """
+
+        pos_args = []
+
+        for item_id in self._pos_inputs:
+            pos_args.append(catalog.get_item(item_id))
+
+        return pos_args
+
+    def build_key_args(self, catalog: Catalog) -> Dict[str, Any]:
+        """Builds the keyword arguments of a task.
+
+        Parameters
+        ----------
+        catalog : Catalog
+            Catalog that stores the items of an execution.
+
+        Returns
+        -------
+        key_args : Dict[str, Any]
+            Keyword arguments of a task.
+        """
+
+        key_args = {}
+
+        for param, item_id in self._key_inputs.items():
+            key_args[param] = catalog.get_item(item_id)
+
+        return key_args
