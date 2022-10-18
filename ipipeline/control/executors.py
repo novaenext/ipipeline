@@ -4,9 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from ipipeline.control.building import (
-    build_graph, build_items, build_key_args, build_pos_args
-)
+from ipipeline.control.building import build_graph, build_items
 from ipipeline.control.sorting import sort_topology
 from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
@@ -70,8 +68,8 @@ class BaseExecutor(ABC):
         node = pipeline.get_node(id)
         logger.info(f'node.id: {node.id}, node.tags: {node.tags}')
 
-        pos_args = build_pos_args(node.pos_inputs, catalog)
-        key_args = build_key_args(node.key_inputs, catalog)
+        pos_args = node.build_pos_args(catalog)
+        key_args = node.build_key_args(catalog)
 
         try:
             returns = node.task(*pos_args, **key_args)
