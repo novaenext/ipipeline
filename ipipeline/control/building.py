@@ -3,7 +3,6 @@
 from typing import Any, Dict, List
 
 from ipipeline.exceptions import BuildingError
-from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 
 
@@ -58,58 +57,6 @@ def build_graph(pipeline: Pipeline) -> Dict[str, list]:
         graph[link.src_id].append(link.dst_id)
 
     return graph
-
-
-def build_pos_args(pos_inputs: List[str], catalog: Catalog) -> List[Any]:
-    """Builds the positional arguments of a task.
-
-    Parameters
-    ----------
-    pos_inputs : List[str]
-        Positional inputs of the task. The elements are the IDs of the 
-        catalog items.
-    catalog : Catalog
-        Catalog that stores the items of an execution.
-
-    Returns
-    -------
-    pos_args : List[Any]
-        Positional arguments of a task.
-    """
-
-    pos_args = []
-
-    for item_id in pos_inputs:
-        pos_args.append(catalog.get_item(item_id))
-
-    return pos_args
-
-
-def build_key_args(
-    key_inputs: Dict[str, str], catalog: Catalog
-) -> Dict[str, Any]:
-    """Builds the keyword arguments of a task.
-
-    Parameters
-    ----------
-    key_inputs : Dict[str, str]
-        Keyword inputs of the task. The keys are the task parameters and 
-        the values are the IDs of the catalog items.
-    catalog : Catalog
-        Catalog that stores the items of an execution.
-
-    Returns
-    -------
-    key_args : Dict[str, Any]
-        Keyword arguments of a task.
-    """
-
-    key_args = {}
-
-    for param, item_id in key_inputs.items():
-        key_args[param] = catalog.get_item(item_id)
-
-    return key_args
 
 
 def build_items(outputs: List[str], returns: Any) -> Dict[str, Any]:
