@@ -1,10 +1,7 @@
 from unittest import TestCase
 
-from ipipeline.control.building import (
-    build_graph, build_items, build_key_args, build_pos_args
-)
+from ipipeline.control.building import build_graph, build_items
 from ipipeline.exceptions import BuildingError
-from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.link import Link
 from ipipeline.structure.node import Node
 from ipipeline.structure.pipeline import Pipeline
@@ -82,36 +79,6 @@ class TestBuildGraph(TestCase):
         graph = build_graph(pipeline)
 
         self.assertDictEqual(graph, {'n1': ['n2'], 'n2': []})
-
-
-class TestBuildPosArgs(TestCase):
-    def setUp(self) -> None:
-        self._catalog = Catalog('c1', items={'i1': 2, 'i2': 4})
-
-    def test_build_pos_args__pos_inputs_wi_ids(self) -> None:
-        pos_args = build_pos_args(['i1', 'i2'], self._catalog)
-
-        self.assertListEqual(pos_args, [2, 4])
-
-    def test_build_pos_args__pos_inputs_wo_ids(self) -> None:
-        pos_args = build_pos_args([], self._catalog)
-
-        self.assertListEqual(pos_args, [])
-
-
-class TestBuildKeyArgs(TestCase):
-    def setUp(self) -> None:
-        self._catalog = Catalog('c1', items={'i1': 2, 'i2': 4})
-
-    def test_build_key_args__key_inputs_wi_ids(self) -> None:
-        key_args = build_key_args({'p1': 'i1', 'p2': 'i2'}, self._catalog)
-
-        self.assertDictEqual(key_args, {'p1': 2, 'p2': 4})
-
-    def test_build_key_args__key_inputs_wo_ids(self) -> None:
-        key_args = build_key_args({}, self._catalog)
-
-        self.assertDictEqual(key_args, {})
 
 
 class TestBuildItems(TestCase):
