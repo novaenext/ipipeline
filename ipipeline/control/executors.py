@@ -6,7 +6,6 @@ from typing import Any, Dict, List
 
 from ipipeline.control.building import build_graph, build_items
 from ipipeline.control.sorting import sort_topology
-from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 
@@ -58,11 +57,6 @@ class BaseExecutor(ABC):
         items : Dict[str, Any]
             Items of an execution. The keys are the item IDs and the values 
             are the arguments required by the tasks.
-
-        Raises
-        ------
-        ExecutorError
-            Informs that the node was not executed by the executor.
         """
 
         node = pipeline.get_node(id)
@@ -70,15 +64,9 @@ class BaseExecutor(ABC):
 
         pos_args = node.build_pos_args(catalog)
         key_args = node.build_key_args(catalog)
+        results = node.execute_task(pos_args, key_args)
 
-        try:
-            returns = node.task(*pos_args, **key_args)
-        except Exception as error:
-            raise ExecutorError(
-                'node was not executed by the executor', [f'id == {node.id}']
-            ) from error
-
-        items = build_items(node.outputs, returns)
+        items = build_items(node.outputs, results)
 
         return items
 
@@ -103,11 +91,6 @@ class BaseExecutor(ABC):
         -------
         catalog : Catalog
             Catalog that stores the items of an execution.
-
-        Raises
-        ------
-        ExecutorError
-            Informs that the node was not executed by the executor.
         """
 
         pass
@@ -136,11 +119,6 @@ class SequentialExecutor(BaseExecutor):
         -------
         catalog : Catalog
             Catalog that stores the items of an execution.
-
-        Raises
-        ------
-        ExecutorError
-            Informs that the node was not executed by the executor.
         """
 
         logger.info(
