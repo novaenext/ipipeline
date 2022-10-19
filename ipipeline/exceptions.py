@@ -114,6 +114,20 @@ class InstanceError(BaseError):
     pass
 
 
+class NodeError(BaseError):
+    """Informs the occurrence of an error related to the node module.
+
+    Attributes
+    ----------
+    _text : str
+        Text of the error.
+    _causes : List[str]
+        Causes of the error.
+    """
+
+    pass
+
+
 class PipelineError(BaseError):
     """Informs the occurrence of an error related to the pipeline module.
 
