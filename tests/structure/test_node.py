@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from ipipeline.exceptions import NodeError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.node import Node
 
@@ -7,7 +8,7 @@ from ipipeline.structure.node import Node
 class TestNode(TestCase):
     def setUp(self) -> None:
         self._catalog = Catalog('c1', items={'i1': 2, 'i2': 4})
-        self._tasks = [lambda arg1: arg1, lambda arg2: arg2]
+        self._tasks = [lambda p1, p2: [p1, p2], lambda p1, p2: (p1, p2)]
 
     def test_init__args_eq_types(self) -> None:
         node = Node(
@@ -113,3 +114,31 @@ class TestNode(TestCase):
         key_args = node.build_key_args(self._catalog)
 
         self.assertDictEqual(key_args, {})
+
+    def test_execute_task__args_wi_values(self) -> None:
+        node = Node(
+            'n1', 
+            self._tasks[0], 
+            pos_inputs=['i1'], 
+            key_inputs={'p2': 'i2'}, 
+            outputs=['o1'], 
+            tags=['t1']
+        )
+        results = node.execute_task([2], {'p2': 4})
+
+        self.assertListEqual(results, [2, 4])
+
+    def test_execute_task__args_wo_values(self) -> None:
+        node = Node(
+            'n1', 
+            self._tasks[0], 
+            pos_inputs=['i1'], 
+            key_inputs={'p2': 'i2'}, 
+            outputs=['o1'], 
+            tags=['t1']
+        )
+
+        with self.assertRaisesRegex(
+            NodeError, r'task was not executed: id == n1'
+        ):
+            _ = node.execute_task([], {})
