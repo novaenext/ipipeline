@@ -72,20 +72,6 @@ class CatalogError(BaseError):
     pass
 
 
-class ExecutorError(BaseError):
-    """Informs the occurrence of an error related to the executors module.
-
-    Attributes
-    ----------
-    _text : str
-        Text of the error.
-    _causes : List[str]
-        Causes of the error.
-    """
-
-    pass
-
-
 class InfoError(BaseError):
     """Informs the occurrence of an error related to the info module.
 
