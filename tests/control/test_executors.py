@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from ipipeline.control.executors import BaseExecutor, SequentialExecutor
-from ipipeline.exceptions import ExecutorError
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
 
@@ -26,7 +25,7 @@ class TestBaseExecutor(TestCase):
         )
         self._pipeline.add_node(
             'n3', 
-            lambda: [][0], 
+            lambda: None, 
             tags=['t3']
         )
         self._pipeline.add_link('l1', 'n1', 'n2')
@@ -48,19 +47,17 @@ class TestBaseExecutor(TestCase):
 
         self.assertListEqual(ordering, [])
 
-    def test_execute_node__node_wi_exception(self) -> None:
-        executor = BaseExecutor()
-
-        with self.assertRaisesRegex(
-            ExecutorError, r'node was not executed by the executor: id == n3'
-        ):
-            _ = executor.execute_node(self._pipeline, self._catalog, 'n3')
-
-    def test_execute_node__node_wo_exception(self) -> None:
+    def test_execute_node__task_wi_results(self) -> None:
         executor = BaseExecutor()
         items = executor.execute_node(self._pipeline, self._catalog, 'n1')
 
         self.assertDictEqual(items, {'i3': 6})
+
+    def test_execute_node__task_wo_results(self) -> None:
+        executor = BaseExecutor()
+        items = executor.execute_node(self._pipeline, self._catalog, 'n3')
+
+        self.assertDictEqual(items, {})
 
 
 class TestSequentialExecutor(TestCase):
