@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from ipipeline.control.building import build_graph, build_items
+from ipipeline.control.building import build_graph
 from ipipeline.control.sorting import sort_topology
 from ipipeline.structure.catalog import Catalog
 from ipipeline.structure.pipeline import Pipeline
@@ -65,8 +65,7 @@ class BaseExecutor(ABC):
         pos_args = node.build_pos_args(catalog)
         key_args = node.build_key_args(catalog)
         results = node.execute_task(pos_args, key_args)
-
-        items = build_items(node.outputs, results)
+        items = node.build_items(results)
 
         return items
 
